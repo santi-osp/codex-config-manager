@@ -1,0 +1,3657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex Workspace Manager // Retro Pixel Tech</title>
+  <link rel="icon" type="image/png" href="assets/codex-config-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* -------------------------------------------------------------
+       DESIGN SYSTEM: MONOCHROME PIXEL EDITORIAL
+       Inspired by high-contrast retro computing, technical editorial,
+       pixel typography and horizontal scanline shading.
+       ------------------------------------------------------------- */
+    :root {
+      color-scheme: light;
+      --bg-canvas: #F4F3EF;
+      --bg-surface: #FAF9F6;
+      --bg-surface-alt: #EAE9E3;
+      --bg-dark: #101010;
+      --bg-dark-surface: #0c0d10;
+      
+      --text-main: #101010;
+      --text-muted: #4e4e4e;
+      --text-dim: #767570;
+      --text-inv: #FAF9F6;
+      
+      --border-line: #B8B7B1;
+      --border-dark: #101010;
+      --border-subtle: rgba(16, 16, 16, 0.12);
+      
+      --font-pixel: 'Silkscreen', 'Pixelify Sans', monospace;
+      --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+      
+      --radius-none: 0px;
+      --radius-sm: 2px;
+      --radius-md: 4px;
+
+      --scrollbar-thumb: #101010;
+      --scrollbar-track: #EAE9E3;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-canvas);
+    }
+
+    body {
+      font-family: var(--font-mono);
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+      background-image: 
+        radial-gradient(#101010 0.65px, transparent 0.65px),
+        linear-gradient(to right, rgba(16, 16, 16, 0.02) 1px, transparent 1px);
+      background-size: 16px 16px, 120px 120px;
+      background-position: 0 0, 0 0;
+    }
+
+    /* Scanline Bar Pattern */
+    .scanline-bar {
+      height: 8px;
+      background: repeating-linear-gradient(
+        to bottom,
+        #101010 0px,
+        #101010 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      width: 100%;
+      opacity: 0.75;
+    }
+
+    .scanline-bar-subtle {
+      height: 4px;
+      background: repeating-linear-gradient(
+        to bottom,
+        #101010 0px,
+        #101010 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      width: 100%;
+      opacity: 0.35;
+    }
+
+    /* Custom WebKit Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-surface-alt);
+      border-left: 1px solid var(--border-line);
+      border-top: 1px solid var(--border-line);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #101010;
+      border: 1px solid var(--bg-surface-alt);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #333333;
+    }
+    ::-webkit-scrollbar-corner {
+      background: var(--bg-surface-alt);
+    }
+
+    /* Layout Wrapper */
+    .layout-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* SVGs */
+    .icon {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: square;
+      stroke-linejoin: miter;
+      fill: none;
+      flex-shrink: 0;
+    }
+
+    /* TOP BANNER METRICS & BRAND */
+    .top-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-dark);
+      padding-bottom: 12px;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 600;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .top-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-pixel);
+      font-size: 0.78rem;
+      color: var(--text-main);
+    }
+
+    .pixel-sparkle {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #101010;
+      clip-path: polygon(50% 0%, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0% 50%, 35% 35%);
+    }
+
+    .top-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .telemetry-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-line);
+      padding: 3px 8px;
+    }
+
+    .pixel-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--text-dim);
+    }
+    .pixel-dot.active {
+      background: #101010;
+      box-shadow: 0 0 0 1px #101010;
+    }
+    .telemetry-item.active {
+      border-color: #101010;
+      background: #FFFFFF;
+    }
+    .telemetry-item.active .pixel-dot {
+      background: #101010;
+    }
+
+    /* HEADER EDITORIAL HERO */
+    header {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-dark);
+      padding: 24px 28px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+      position: relative;
+      box-shadow: 4px 4px 0px #101010;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .hero-text-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hero-title {
+      font-family: var(--font-pixel);
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--text-main);
+      text-transform: uppercase;
+    }
+
+    .hero-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      line-height: 1.45;
+    }
+
+    /* Speech bubble in hero (inspired by reference image) */
+    .pixel-callout {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-canvas);
+      border: 2px solid var(--border-dark);
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      align-self: flex-start;
+      margin-top: 4px;
+      box-shadow: 2px 2px 0 #101010;
+    }
+
+    .cursor-block {
+      display: inline-block;
+      width: 7px;
+      height: 12px;
+      background: #101010;
+      animation: blink 1s step-start infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Header Action Controls */
+    .hero-actions-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    @media (max-width: 900px) {
+      .hero-actions-col {
+        align-items: stretch;
+      }
+    }
+
+    .actions-cluster {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Stark Retro Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 2px solid var(--border-dark);
+      transition: all 0.1s ease;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0 0 0 #101010 !important;
+    }
+
+    .btn-solid-dark {
+      background: var(--bg-dark);
+      color: var(--text-inv);
+      box-shadow: 2px 2px 0 #767570;
+    }
+    .btn-solid-dark:hover {
+      background: #2a2a2a;
+      box-shadow: 3px 3px 0 #101010;
+    }
+
+    .btn-outline {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      box-shadow: 2px 2px 0 var(--border-dark);
+    }
+    .btn-outline:hover {
+      background: var(--bg-surface-alt);
+      box-shadow: 3px 3px 0 var(--border-dark);
+    }
+
+    .btn-danger-outline {
+      background: #FFF1F0;
+      border-color: #B91C1C;
+      color: #991B1B;
+      box-shadow: 2px 2px 0 #B91C1C;
+    }
+    .btn-danger-outline:hover {
+      background: #FEE2E2;
+    }
+
+    /* RECTANGULAR TECHNICAL NAV TABS */
+    .nav-container {
+      display: flex;
+      flex-direction: column;
+      border: 2px solid var(--border-dark);
+      background: var(--bg-surface-alt);
+      box-shadow: 3px 3px 0 #101010;
+    }
+
+    .nav-tabs-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      border-bottom: 2px solid var(--border-dark);
+      overflow-x: auto;
+    }
+
+    @media (max-width: 1200px) {
+      .nav-tabs-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .nav-tabs-grid {
+        grid-template-columns: repeat(1, 1fr);
+      }
+    }
+
+    .tab-trigger {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 12px;
+      background: var(--bg-surface-alt);
+      border: none;
+      border-right: 1px solid var(--border-line);
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font-mono);
+      transition: all 0.15s ease;
+      color: var(--text-muted);
+    }
+    .tab-trigger:last-child {
+      border-right: none;
+    }
+
+    .tab-num {
+      font-family: var(--font-pixel);
+      font-size: 0.64rem;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      margin-bottom: 3px;
+    }
+
+    .tab-text {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .tab-trigger:hover {
+      background: var(--bg-surface);
+      color: var(--text-main);
+    }
+
+    .tab-trigger.active {
+      background: #101010;
+      color: #FAF9F6;
+    }
+    .tab-trigger.active .tab-num {
+      color: #B8B7B1;
+    }
+
+    /* TAB CONTENT PANELS */
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      animation: pageReveal 0.15s ease-out;
+    }
+    .tab-pane.active {
+      display: flex;
+    }
+
+    @keyframes pageReveal {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* TECHNICAL MODULE CARDS */
+    .spec-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-dark);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 3px 3px 0 #101010;
+      position: relative;
+    }
+
+    .spec-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--border-line);
+      padding-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .spec-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .spec-tag {
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .spec-title {
+      font-family: var(--font-pixel);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .spec-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Form Fields Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .form-unit {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-line);
+      padding: 14px 16px;
+    }
+
+    .form-unit-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .form-unit-help {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-dark);
+      padding: 8px 10px;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      outline: none;
+      transition: all 0.1s;
+      border-radius: var(--radius-none);
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      background: #FFFFFF;
+      border-color: #101010;
+      box-shadow: 2px 2px 0 #101010;
+    }
+
+    /* COMBO SELECTION CARDS (HIGH CONTRAST PIXEL TECH) */
+    .combo-item {
+      background: var(--bg-surface);
+      border: 1.5px solid var(--border-line);
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 0.1s ease;
+      position: relative;
+    }
+
+    .combo-item:hover {
+      border-color: var(--border-dark);
+      box-shadow: 2px 2px 0 #101010;
+    }
+
+    .combo-item.is-selected {
+      background: var(--bg-dark);
+      color: var(--text-inv);
+      border-color: var(--border-dark);
+      box-shadow: 3px 3px 0 #767570;
+    }
+
+    .combo-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .combo-id {
+      font-size: 0.84rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      word-break: break-all;
+    }
+
+    .combo-tag {
+      font-family: var(--font-pixel);
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-line);
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .combo-item.is-selected .combo-id {
+      color: #FFFFFF;
+    }
+
+    .combo-item.is-selected .combo-tag {
+      background: #FFFFFF;
+      color: #101010;
+      border-color: #FFFFFF;
+      font-weight: 700;
+    }
+
+    .combo-instruction {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .combo-item.is-selected .combo-instruction {
+      color: #B8B7B1;
+    }
+
+    .active-indicator-symbol {
+      display: none;
+    }
+
+    .combo-item.is-selected .active-indicator-symbol {
+      display: inline-block;
+      font-family: var(--font-pixel);
+      color: #FFFFFF;
+    }
+
+    /* RETRO CONSOLE TOGGLE SWITCH */
+    .retro-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-line);
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.1s;
+      gap: 14px;
+    }
+
+    .retro-toggle-row:hover {
+      border-color: var(--border-dark);
+      background: #FFFFFF;
+    }
+
+    .toggle-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .toggle-code {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+    }
+
+    .toggle-desc {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      line-height: 1.35;
+    }
+
+    /* Physical 8-bit rocker switch */
+    .rocker-switch {
+      display: flex;
+      align-items: center;
+      border: 2px solid var(--border-dark);
+      background: var(--bg-surface);
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      padding: 2px;
+      box-shadow: 1px 1px 0 #101010;
+    }
+
+    .rocker-pill {
+      padding: 3px 8px;
+      color: var(--text-dim);
+      transition: all 0.1s ease;
+    }
+
+    /* Rocker switch toggle checkbox: keep accessible to screen readers & keyboard */
+    .retro-toggle-row input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+    }
+
+    .retro-toggle-row input[type="checkbox"]:focus-visible + .rocker-switch {
+      outline: 2px solid var(--border-dark);
+      outline-offset: 2px;
+    }
+
+    /* Standard/retro checkboxes (e.g. auto-refresh) */
+    input[type="checkbox"]:not(.sr-only) {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border: 2px solid var(--border-dark);
+      background: var(--bg-surface);
+      cursor: pointer;
+      display: inline-grid;
+      place-content: center;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    input[type="checkbox"]:not(.sr-only):checked::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: var(--border-dark);
+    }
+
+    input[type="checkbox"]:not(.sr-only):focus-visible {
+      outline: 2px solid var(--border-dark);
+      outline-offset: 2px;
+    }
+
+    /* OFF state */
+    input[type="checkbox"] + .rocker-switch .rocker-off {
+      background: #101010;
+      color: #FFFFFF;
+    }
+
+    /* ON state */
+    input[type="checkbox"]:checked + .rocker-switch .rocker-off {
+      background: transparent;
+      color: var(--text-dim);
+    }
+    input[type="checkbox"]:checked + .rocker-switch .rocker-on {
+      background: #101010;
+      color: #FFFFFF;
+    }
+
+    /* SEARCH FILTER PROMPT */
+    .search-prompt-wrap {
+      display: flex;
+      align-items: center;
+      background: #FFFFFF;
+      border: 2px solid var(--border-dark);
+      padding: 6px 12px;
+      gap: 10px;
+      box-shadow: 2px 2px 0 #101010;
+    }
+
+    .prompt-symbol {
+      font-family: var(--font-pixel);
+      font-size: 0.75rem;
+      color: #101010;
+      font-weight: 700;
+    }
+
+    .search-prompt-wrap input {
+      border: none;
+      padding: 4px;
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      width: 100%;
+      outline: none;
+    }
+
+    /* CONTRAST DARK CODE EDITOR */
+    .dark-editor-wrapper {
+      display: flex;
+      flex-direction: column;
+      border: 2px solid var(--border-dark);
+      background: var(--bg-dark);
+      box-shadow: 4px 4px 0 #101010;
+    }
+
+    .editor-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1c1d22;
+      border-bottom: 2px solid #2d2f36;
+      padding: 8px 16px;
+      font-size: 0.72rem;
+      color: #A0A0A0;
+      font-family: var(--font-mono);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .editor-status-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .editor-textarea {
+      width: 100%;
+      height: 500px;
+      background: var(--bg-dark-surface);
+      border: none;
+      padding: 18px;
+      color: #E2E8F0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+    }
+
+    .editor-textarea::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .editor-textarea::-webkit-scrollbar-track {
+      background: #101010;
+    }
+    .editor-textarea::-webkit-scrollbar-thumb {
+      background: #444444;
+    }
+
+    /* RETRO TERMINAL TOAST */
+    #toast-viewport {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 99999;
+      pointer-events: none;
+      max-width: calc(100vw - 40px);
+    }
+
+    .toast-box {
+      background: #FAF9F6;
+      border: 2px solid #101010;
+      padding: 10px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #101010;
+      box-shadow: 4px 4px 0 #101010;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: popIn 0.15s ease-out;
+      pointer-events: auto;
+      max-width: 440px;
+      word-break: break-word;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .toast-box.success {
+      border-left: 6px solid #101010;
+    }
+    .toast-box.error {
+      border-left: 6px solid #B91C1C;
+      background: #FEF2F2;
+    }
+    .toast-box.info {
+      border-left: 6px solid #101010;
+    }
+
+    .toast-box-prefix {
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      color: #767570;
+    }
+
+    /* Minimalist Pixel Spinner */
+    .pixel-spinner {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border: 2px solid #FFFFFF;
+      border-top-color: transparent;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================================
+       ACCOUNTS MONITOR & PRE-DISPATCH STYLES
+       ============================================================ */
+    .accounts-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    @media (max-width: 900px) {
+      .accounts-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .account-stat-card {
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-dark);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 2px 2px 0 #101010;
+    }
+    .account-stat-label {
+      font-family: var(--font-pixel);
+      font-size: 0.62rem;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .account-stat-val {
+      font-family: var(--font-pixel);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .account-stat-val.ok { color: #15803D; }
+    .account-stat-val.warn { color: #C2410C; }
+    .account-stat-val.error { color: #B91C1C; }
+
+    /* Active Combo Pipeline Flow */
+    .combo-pipeline-box {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-dark);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 3px 3px 0 #101010;
+    }
+    .pipeline-nodes-flow {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 2px 10px 2px;
+    }
+    .pipeline-step-node {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 200px;
+      max-width: 240px;
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-dark);
+      padding: 10px 12px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .pipeline-step-node.active-first {
+      border: 2px solid #101010;
+      background: #FFFFFF;
+      box-shadow: 2px 2px 0 #101010;
+    }
+    .pipeline-step-node.ignored {
+      border: 1px dashed #DC2626;
+      background: #FEF2F2;
+      opacity: 0.9;
+    }
+    .pipeline-step-node.next-in-line {
+      border: 2px solid #2563EB;
+      background: #EFF6FF;
+    }
+    .pipeline-step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .pipeline-step-num {
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      background: #101010;
+      color: #FAF9F6;
+      padding: 2px 6px;
+    }
+    .pipeline-step-node.ignored .pipeline-step-num {
+      background: #DC2626;
+    }
+    .pipeline-step-account {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .pipeline-step-model {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .pipeline-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-family: var(--font-pixel);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    /* Filters Bar */
+    .accounts-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 8px 0;
+    }
+    .filter-pills-cluster {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .filter-pill {
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-dark);
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.1s;
+    }
+    .filter-pill:hover {
+      background: var(--bg-surface);
+      color: var(--text-main);
+    }
+    .filter-pill.active {
+      background: #101010;
+      color: #FAF9F6;
+      border-color: #101010;
+      box-shadow: 2px 2px 0 #101010;
+    }
+
+    /* Account Cards Grid */
+    .accounts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .accounts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .account-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-dark);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 3px 3px 0 #101010;
+      position: relative;
+      transition: transform 0.1s;
+    }
+    .account-card.ready {
+      border-left: 6px solid #16A34A;
+    }
+    .account-card.ignored {
+      border-left: 6px solid #DC2626;
+      background: #FFFBFA;
+    }
+    .account-card.cooling {
+      border-left: 6px solid #D97706;
+    }
+    .account-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .account-card-provider {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .provider-pill {
+      font-family: var(--font-pixel);
+      font-size: 0.62rem;
+      padding: 2px 6px;
+      background: #101010;
+      color: #FAF9F6;
+      text-transform: uppercase;
+    }
+    .provider-pill.codex { background: #101010; }
+    .provider-pill.antigravity { background: #1E3A8A; color: #DBEAFE; }
+    .account-card-name {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-main);
+      word-break: break-all;
+    }
+    .account-verdict-badge {
+      font-family: var(--font-pixel);
+      font-size: 0.62rem;
+      padding: 4px 8px;
+      border: 1px solid;
+      text-transform: uppercase;
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+    }
+    .account-verdict-badge.ok {
+      background: #DCFCE7;
+      color: #14532D;
+      border-color: #86EFAC;
+    }
+    .account-verdict-badge.warn {
+      background: #FEF3C7;
+      color: #78350F;
+      border-color: #FCD34D;
+    }
+    .account-verdict-badge.error {
+      background: #FEE2E2;
+      color: #7F1D1D;
+      border-color: #FCA5A5;
+    }
+    .account-verdict-badge.muted {
+      background: #F3F4F6;
+      color: #4B5563;
+      border-color: #D1D5DB;
+    }
+
+    .account-reason-box {
+      font-size: 0.75rem;
+      line-height: 1.4;
+      padding: 8px 10px;
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-line);
+      color: var(--text-main);
+    }
+    .account-card.ignored .account-reason-box {
+      background: #FEF2F2;
+      border-color: #FECACA;
+      color: #991B1B;
+    }
+
+    .quota-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--bg-surface-alt);
+      padding: 10px;
+      border: 1px solid var(--border-line);
+    }
+    .quota-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .quota-row-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.70rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .quota-track {
+      width: 100%;
+      height: 8px;
+      background: #E5E5E5;
+      border: 1px solid #101010;
+      position: relative;
+      overflow: hidden;
+    }
+    .quota-fill {
+      height: 100%;
+      background: #101010;
+      transition: width 0.3s ease;
+    }
+    .quota-fill.exhausted {
+      background: #DC2626;
+    }
+    .quota-reset-text {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .telemetry-specs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      font-size: 0.70rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+    .telemetry-spec-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .telemetry-spec-row strong {
+      color: var(--text-main);
+    }
+
+    .account-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-line);
+    }
+    .account-card-actions .btn {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 0.70rem;
+      justify-content: center;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 1.6rem;
+      }
+      .actions-cluster {
+        width: 100%;
+      }
+      .actions-cluster .btn {
+        flex: 1;
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+    /* DIRTY STATE & COMBO STATUS PILLS */
+    .telemetry-item.dirty {
+      background: #FEF3C7;
+      border-color: #D97706;
+      color: #92400E;
+      font-weight: 700;
+      animation: pulse-border 2s infinite;
+    }
+    .telemetry-item.clean {
+      background: #F0FDF4;
+      border-color: #86EFAC;
+      color: #166534;
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-color: #D97706; }
+      50% { border-color: #F59E0B; }
+    }
+    .combo-status-bar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      background: var(--bg-surface-alt);
+      border: 2px solid var(--border-dark);
+      padding: 8px 14px;
+      font-size: 0.75rem;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .combo-status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .combo-pill {
+      font-family: var(--font-pixel);
+      font-size: 0.70rem;
+      padding: 2px 6px;
+      border: 1px solid var(--border-dark);
+      background: var(--bg-surface);
+    }
+    .combo-pill.saved {
+      background: #101010;
+      color: #FAF9F6;
+    }
+    .combo-pill.match {
+      background: #DCFCE7;
+      color: #15803D;
+      border-color: #15803D;
+    }
+    .combo-pill.changed {
+      background: #FEF3C7;
+      color: #B45309;
+      border-color: #D97706;
+      font-weight: 700;
+    }
+
+    /* MODAL STYLES */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(16, 16, 16, 0.65);
+      backdrop-filter: blur(2px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-dialog {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-dark);
+      box-shadow: 8px 8px 0px rgba(16, 16, 16, 0.85);
+      width: 100%;
+      max-width: 760px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      animation: modal-pop 0.15s ease-out;
+    }
+    @keyframes modal-pop {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-header {
+      padding: 12px 16px;
+      background: #101010;
+      color: #FAF9F6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-pixel);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+    .modal-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-line);
+      background: var(--bg-surface-alt);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* DIFF LINES */
+    .diff-line-add {
+      background: rgba(22, 163, 74, 0.15);
+      color: #15803D;
+      padding: 2px 6px;
+      border-left: 3px solid #16A34A;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      white-space: pre-wrap;
+    }
+    .diff-line-remove {
+      background: rgba(220, 38, 38, 0.15);
+      color: #DC2626;
+      padding: 2px 6px;
+      border-left: 3px solid #DC2626;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      white-space: pre-wrap;
+    }
+    .diff-line-ctx {
+      color: var(--text-dim);
+      padding: 2px 6px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      white-space: pre-wrap;
+    }
+
+    /* BACKUP LIST & DIAGNOSTICS GRID */
+    .backup-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--border-line);
+      margin-bottom: 8px;
+      background: var(--bg-surface);
+    }
+    .backup-item-row:hover {
+      border-color: var(--border-dark);
+      background: var(--bg-surface-alt);
+    }
+    .diag-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .diag-card {
+      border: 1px solid var(--border-dark);
+      padding: 12px;
+      background: var(--bg-surface);
+    }
+    .diag-card h4 {
+      font-family: var(--font-pixel);
+      font-size: 0.72rem;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border-line);
+      padding-bottom: 4px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="layout-wrapper">
+
+    <!-- Top Telemetry & Status Strip -->
+    <div class="top-strip">
+      <div class="top-brand">
+        <span class="pixel-sparkle"></span>
+        <span>CODEX // WORKSPACE_MANAGER_v0.162</span>
+        <span id="badge-demo-mode" style="display: none; background: #DC2626; color: #FAF9F6; font-family: var(--font-mono); font-size: 0.65rem; padding: 2px 6px; font-weight: 700; letter-spacing: 0.05em; border: 1px solid #FAF9F6; margin-left: 8px;">[DEMO MODE // MOCK ENVIRONMENT]</span>
+      </div>
+
+      <div class="top-telemetry">
+        <div id="status-dirty" class="telemetry-item clean" title="Estado de cambios respecto al archivo en disco">
+          <span class="status-dot success"></span>
+          <span>SIN CAMBIOS</span>
+        </div>
+        <div id="status-accounts" class="telemetry-item inactive" onclick="navigateTab('accounts')" style="cursor: pointer;" title="Monitor de Cuentas OmniRoute (Click para ver estado)">
+          <span class="pixel-dot"></span>
+          <span id="text-accounts">CUENTAS: VERIFICANDO</span>
+        </div>
+
+        <div id="status-omniroute" class="telemetry-item inactive" title="Conexión con OmniRoute (Puerto 20128)">
+          <span class="pixel-dot"></span>
+          <span id="text-omniroute">OMNIROUTE: VERIFICANDO</span>
+        </div>
+
+        <div id="status-server" class="telemetry-item inactive" title="Sincronizador con config.toml (Puerto 20129)">
+          <span class="pixel-dot"></span>
+          <span id="text-server">SYNC_SERVER: VERIFICANDO</span>
+        </div>
+
+        <div class="telemetry-item active">
+          <span class="pixel-dot active"></span>
+          <span>SYSTEM: READY</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editorial Scanline Bar -->
+    <div class="scanline-bar"></div>
+
+    <!-- Main Editorial Header -->
+    <header>
+      <div class="hero-text-col">
+        <h1 class="hero-title">CODEX AI MATRIX</h1>
+        <p class="hero-subtitle">
+          Panel de control y configuración técnica para agentes autónomos OpenAI Codex, enrutamiento local con OmniRoute y parámetros del sistema de ejecución.
+        </p>
+
+        <div class="pixel-callout">
+          <span>SYS_STATUS:</span>
+          <span id="callout-status-text">ESPERANDO RESPUESTA DE RUNTIME</span>
+          <span class="cursor-block"></span>
+        </div>
+      </div>
+
+      <div class="hero-actions-col">
+        <div class="actions-cluster">
+          <!-- Forzar Re-test Cuentas OmniRoute -->
+          <button id="btn-retest-connections" class="btn btn-outline" onclick="forceRetestAllAccounts()" title="Fuerza un re-test inmediato de todas las cuentas en OmniRoute, ignorando tiempos de espera y reiniciando disyuntores">
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span id="label-retest-connections">FORZAR RE-TEST CUENTAS</span>
+          </button>
+
+          <!-- Restart Desktop App Button -->
+          <button id="btn-restart-app" class="btn btn-outline" onclick="restartCodexDesktopApp()" title="Cierra ordenadamente ChatGPT y el daemon de forma limpia, y reabre la aplicación">
+            <svg class="icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="0"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+            <span id="label-restart-app">REINICIAR CHATGPT APP</span>
+          </button>
+
+          <!-- Ver Diff Modal -->
+          <button id="btn-open-diff" class="btn btn-outline" onclick="openDiffModal()" title="Visualizar diferencias entre la configuración en disco y los cambios en memoria">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+            <span>VER DIFF</span>
+          </button>
+
+          <!-- Backups Modal -->
+          <button id="btn-open-backups" class="btn btn-outline" onclick="openBackupsModal()" title="Consultar y restaurar respaldos automáticos de configuración">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"/></svg>
+            <span>RESPALDOS</span>
+          </button>
+
+          <!-- Diagnostics Modal -->
+          <button id="btn-open-diagnostics" class="btn btn-outline" onclick="openDiagnosticsModal()" title="Inspeccionar integridad del sistema y telemetría de OmniRoute">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>DIAGNÓSTICO</span>
+          </button>
+
+          <!-- Reload Button -->
+          <button class="btn btn-outline" onclick="reloadAll()" title="Recargar combos y configuración">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+            <span>RECARGAR</span>
+          </button>
+
+          <!-- Save Button -->
+          <button class="btn btn-solid-dark" onclick="saveConfiguration()" title="Guardar configuración en config.toml">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>GUARDAR CAMBIOS</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Technical 9-Tab Navigation Strip -->
+    <div class="nav-container">
+      <div class="nav-tabs-grid">
+        <button class="tab-trigger active" onclick="navigateTab('accounts')">
+          <span class="tab-num">[00]</span>
+          <span class="tab-text">MONITOR CUENTAS</span>
+        </button>
+
+        <button class="tab-trigger" onclick="navigateTab('models')">
+          <span class="tab-num">[01]</span>
+          <span class="tab-text">MODELOS & COMBOS</span>
+        </button>
+
+        <button class="tab-trigger" onclick="navigateTab('provider')">
+          <span class="tab-num">[02]</span>
+          <span class="tab-text">PROVEEDOR</span>
+        </button>
+
+        <button class="tab-trigger" onclick="navigateTab('security')">
+          <span class="tab-num">[03]</span>
+          <span class="tab-text">SEGURIDAD</span>
+        </button>
+
+        <button class="tab-trigger" onclick="navigateTab('reasoning')">
+          <span class="tab-num">[04]</span>
+          <span class="tab-text">RAZONAMIENTO</span>
+        </button>
+
+        <button class="tab-trigger" onclick="navigateTab('features')">
+          <span class="tab-num">[05]</span>
+          <span class="tab-text">FEATURES</span>
+        </button>
+
+        <button class="tab-trigger" onclick="navigateTab('desktop')">
+          <span class="tab-num">[06]</span>
+          <span class="tab-text">DESKTOP / TUI</span>
+        </button>
+
+        <button class="tab-trigger" onclick="navigateTab('plugins')">
+          <span class="tab-num">[07]</span>
+          <span class="tab-text">PLUGINS</span>
+        </button>
+
+        <button class="tab-trigger" onclick="navigateTab('raw')">
+          <span class="tab-num">[08]</span>
+          <span class="tab-text">CONFIG.TOML</span>
+        </button>
+      </div>
+      <div class="scanline-bar-subtle"></div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 0: MONITOR CUENTAS // PRE-DISPATCH
+         ------------------------------------------------------------- -->
+    <div id="pane-accounts" class="tab-pane active">
+      <!-- Main Accounts Header Card -->
+      <div class="spec-card">
+        <div class="spec-card-header" style="flex-wrap: wrap; gap: 12px;">
+          <div class="spec-header-left">
+            <span class="spec-tag">// RUNTIME_MONITOR: OMNIROUTE_PRE_DISPATCH_MATRIX</span>
+            <h2 class="spec-title">MONITOR DE CUENTAS & ENRUTAMIENTO EN VIVO</h2>
+            <p class="spec-desc">Visualiza en tiempo real si tus cuentas (Codex, Antigravity, etc.) serán utilizadas o ignoradas por OmniRoute antes de cada petición, el estado de sus disyuntores de circuito y sus límites de cuota (5h y 7d).</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <button id="btn-accounts-retest-all" class="btn btn-solid-dark" onclick="forceRetestAllAccounts()" style="font-size: 0.72rem; padding: 7px 14px;">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>FORZAR RE-TEST INMEDIATO (ALL)</span>
+            </button>
+            <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-family: var(--font-mono); cursor: pointer; user-select: none;">
+              <input type="checkbox" id="chk-auto-refresh-accounts" checked onchange="toggleAccountsAutoRefresh(this.checked)">
+              <span>AUTO-REFRESCO (15s)</span>
+            </label>
+            <span id="text-accounts-last-update" style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted);">ACTUALIZADO: --:--:--</span>
+          </div>
+        </div>
+
+        <!-- 4-Tile High Level Summary Matrix -->
+        <div class="accounts-summary-grid">
+          <div class="account-stat-card">
+            <span class="account-stat-label">TOTAL CUENTAS CONECTADAS</span>
+            <span id="stat-accounts-total" class="account-stat-val">--</span>
+          </div>
+          <div class="account-stat-card">
+            <span class="account-stat-label">LISTAS PARA DESPACHO</span>
+            <span id="stat-accounts-ready" class="account-stat-val ok">--</span>
+          </div>
+          <div class="account-stat-card">
+            <span class="account-stat-label">IGNORADAS / LÍMITE AGOTADO</span>
+            <span id="stat-accounts-ignored" class="account-stat-val error">--</span>
+          </div>
+          <div class="account-stat-card">
+            <span class="account-stat-label">EN COOLDOWN (429)</span>
+            <span id="stat-accounts-cooling" class="account-stat-val warn">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Combo Dispatch Pipeline Box -->
+      <div class="combo-pipeline-box">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="spec-tag" style="margin: 0;">// PIPELINE_DESPACHO_COMBO:</span>
+            <span id="text-pipeline-combo-name" style="font-family: var(--font-pixel); font-size: 0.85rem; color: var(--text-main); font-weight: 700;">coding-con-caro</span>
+          </div>
+          <span style="font-size: 0.70rem; color: var(--text-muted); font-family: var(--font-mono);">SECUENCIA DE RELEVO SEGÚN PRIORIDAD DEL COMBO</span>
+        </div>
+
+        <div id="pipeline-nodes-container" class="pipeline-nodes-flow">
+          <!-- Dynamically populated steps -->
+        </div>
+
+        <div id="pipeline-explanation-callout" class="account-reason-box" style="margin-top: 4px;">
+          <!-- Dynamically populated explanation of why accounts are used or bypassed -->
+        </div>
+      </div>
+
+      <!-- Filter Bar and Accounts Grid -->
+      <div class="accounts-filter-bar">
+        <div class="filter-pills-cluster">
+          <button class="filter-pill active" onclick="setAccountsFilter('all', this)" id="filter-btn-all">TODAS (<span id="filter-count-all">0</span>)</button>
+          <button class="filter-pill" onclick="setAccountsFilter('ready', this)">LISTAS (<span id="filter-count-ready">0</span>)</button>
+          <button class="filter-pill" onclick="setAccountsFilter('ignored', this)">IGNORADAS (<span id="filter-count-ignored">0</span>)</button>
+          <button class="filter-pill" onclick="setAccountsFilter('codex', this)">CODEX (<span id="filter-count-codex">0</span>)</button>
+          <button class="filter-pill" onclick="setAccountsFilter('antigravity', this)">ANTIGRAVITY (<span id="filter-count-antigravity">0</span>)</button>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.68rem;" onclick="clearAllCooldownsAndCBs()" title="Resetea todos los Circuit Breakers y limpia los bloqueos 429 de todas las cuentas">
+            ⚡ MASTER RESET DISYUNTORES
+          </button>
+          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.68rem;" onclick="syncAllActiveThreads()" title="Sincroniza todos los hilos activos de ChatGPT en SQLite al combo seleccionado">
+            🔄 SINCRONIZAR TODOS LOS CHATS AL COMBO
+          </button>
+        </div>
+      </div>
+
+      <div id="accounts-grid-container" class="accounts-grid">
+        <!-- Rendered Account Cards -->
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 1: MODELOS Y COMBOS
+         ------------------------------------------------------------- -->
+    <div id="pane-models" class="tab-pane">
+      <!-- Active Primary Model Card -->
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// CONFIGURATION_TARGET: MODEL_SLUG</span>
+            <h2 class="spec-title">MODELO PRINCIPAL ACTIVO</h2>
+            <p class="spec-desc">Define el identificador del modelo o combo que Codex solicitará al router backend.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-model">IDENTIFICADOR ACTIVO (model)</label>
+            <p class="form-unit-help">Ingresa directamente el nombre del modelo o combo de OmniRoute.</p>
+            <input type="text" id="input-model" placeholder="coding-con-caro" oninput="updateRawPreview()">
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="select-model">SELECTOR DIRECTO OMNIROUTE</label>
+            <p class="form-unit-help">Modelos y combos detectados dinámicamente en tiempo real.</p>
+            <select id="select-model" onchange="onSelectModelDropdown(this.value)">
+              <option value="">-- CARGANDO MODELOS DESDE OMNIROUTE... --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coding Combos Grid -->
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// CATEGORY: CODING_OPTIMIZED</span>
+            <h2 class="spec-title">COMBOS DESTACADOS PARA PROGRAMACIÓN</h2>
+            <p class="spec-desc">Enrutamientos preconfigurados para código y resolución de problemas de ingeniería.</p>
+          </div>
+        </div>
+
+        <div id="coding-combos-container" class="grid-3">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- General Combos Grid -->
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// CATEGORY: MULTI_ROUTING</span>
+            <h2 class="spec-title">OTROS COMBOS Y ENRUTAMIENTOS DISPONIBLES</h2>
+            <p class="spec-desc">Modelos automáticos de razonamiento, balance de coste y velocidad.</p>
+          </div>
+        </div>
+
+        <div id="other-combos-container" class="grid-3">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 2: PROVEEDOR LLM
+         ------------------------------------------------------------- -->
+    <div id="pane-provider" class="tab-pane">
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// BACKEND_SUBSYSTEM: MODEL_PROVIDER</span>
+            <h2 class="spec-title">PARÁMETROS DEL PROVEEDOR (model_provider)</h2>
+            <p class="spec-desc">Establece el endpoint HTTP y las credenciales de comunicación para Codex.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-model-provider">PROVEEDOR SELECCIONADO</label>
+            <p class="form-unit-help">Debe mantenerse en <code>omniroute</code> para aprovechar el router local.</p>
+            <select id="input-model-provider" onchange="onProviderChange(this.value)">
+              <option value="omniroute">OmniRoute (Router Local :20128)</option>
+              <option value="openai">OpenAI (Oficial / ChatGPT)</option>
+              <option value="anthropic">Anthropic (Claude Directo)</option>
+              <option value="ollama">Ollama (Local Engine)</option>
+              <option value="lmstudio">LM Studio (Local Server)</option>
+            </select>
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-provider-name">NOMBRE AMIGABLE (name)</label>
+            <p class="form-unit-help">Etiqueta descriptiva para registros y diagnósticos de doctor.</p>
+            <input type="text" id="input-provider-name" value="OmniRoute" oninput="updateRawPreview()">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-provider-base-url">BASE URL DEL ENDPOINT</label>
+            <p class="form-unit-help">Dirección HTTP del servidor compatible con la API de OpenAI v1.</p>
+            <input type="text" id="input-provider-base-url" value="http://localhost:20128/v1" oninput="updateRawPreview()">
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-provider-env-key">VARIABLE DE ENTORNO DE API KEY</label>
+            <p class="form-unit-help">Variable de entorno en Windows donde se almacena el token.</p>
+            <input type="text" id="input-provider-env-key" value="OMNIROUTE_API_KEY" oninput="updateRawPreview()">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-provider-wire-api">WIRE API PROTOCOL</label>
+            <p class="form-unit-help">Formato de intercambio de mensajes entre cliente y servidor.</p>
+            <select id="input-provider-wire-api" onchange="updateRawPreview()">
+              <option value="responses">responses (Nativo para OmniRoute y Codex)</option>
+              <option value="chat">chat (Completions estándar)</option>
+            </select>
+          </div>
+
+          <label class="retro-toggle-row">
+            <div class="toggle-meta">
+              <span class="toggle-code">requires_openai_auth</span>
+              <span class="toggle-desc">Exige tokens de ChatGPT interno. Inactivo para OmniRoute.</span>
+            </div>
+            <input type="checkbox" id="input-provider-requires-openai-auth" onchange="updateRawPreview()">
+            <div class="rocker-switch">
+              <span class="rocker-pill rocker-off">OFF</span>
+              <span class="rocker-pill rocker-on">ON</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 3: SEGURIDAD Y SANDBOX
+         ------------------------------------------------------------- -->
+    <div id="pane-security" class="tab-pane">
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// SECURITY_POLICY: EXECUTION_ISOLATION</span>
+            <h2 class="spec-title">POLÍTICAS DE SEGURIDAD Y SANDBOX</h2>
+            <p class="spec-desc">Controla los permisos sobre el sistema de archivos y las aprobaciones de comandos.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-sandbox-mode">MODO DE SANDBOX (sandbox_mode)</label>
+            <p class="form-unit-help">Nivel de contención para comandos y mutación de archivos.</p>
+            <select id="input-sandbox-mode" onchange="updateRawPreview()">
+              <option value="danger-full-access">danger-full-access (Sin restricciones de terminal ni disco)</option>
+              <option value="workspace-write">workspace-write (Solo escritura en la raíz del proyecto)</option>
+              <option value="read-only">read-only (Inspección estricta, sin escritura)</option>
+            </select>
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-approval-policy">POLÍTICA DE APROBACIÓN (approval_policy)</label>
+            <p class="form-unit-help">Criterio para solicitar confirmación interactiva al usuario.</p>
+            <select id="input-approval-policy" onchange="updateRawPreview()">
+              <option value="never">never (Ejecución autónoma sin interrupción)</option>
+              <option value="on-request">on-request (El agente decide cuándo consultar)</option>
+              <option value="always">always (Confirmar cada acción individual)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-approvals-reviewer">REVISOR DE APROBACIONES (approvals_reviewer)</label>
+            <p class="form-unit-help">Entidad encargada de autorizar o rechazar solicitudes.</p>
+            <select id="input-approvals-reviewer" onchange="updateRawPreview()">
+              <option value="user">user (Usuario humano interactivo)</option>
+              <option value="auto">auto (Revisión interna automática)</option>
+            </select>
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-windows-sandbox">SANDBOX WINDOWS (windows.sandbox)</label>
+            <p class="form-unit-help">Aislamiento en el subsistema de procesos de Windows.</p>
+            <select id="input-windows-sandbox" onchange="updateRawPreview()">
+              <option value="elevated">elevated (Privilegios completos de usuario actual)</option>
+              <option value="standard">standard (Contención estándar)</option>
+              <option value="restricted">restricted (Restricción estricta de tokens)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 4: RAZONAMIENTO Y COMPORTAMIENTO
+         ------------------------------------------------------------- -->
+    <div id="pane-reasoning" class="tab-pane">
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// INFERENCE_PARAMS: REASONING_ENGINE</span>
+            <h2 class="spec-title">PARÁMETROS DE RAZONAMIENTO Y VERBOSIDAD</h2>
+            <p class="spec-desc">Ajusta la profundidad de pensamiento y el formato de las respuestas generadas.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-reasoning-effort">ESFUERZO DE RAZONAMIENTO (model_reasoning_effort)</label>
+            <p class="form-unit-help">Presupuesto de tokens de pensamiento previo a la respuesta.</p>
+            <select id="input-reasoning-effort" onchange="updateRawPreview()">
+              <option value="none">none (Sin razonamiento extendido)</option>
+              <option value="low">low (Razonamiento ligero y ágil)</option>
+              <option value="medium">medium (Equilibrado para ingeniería)</option>
+              <option value="high">high (Análisis profundo de arquitectura)</option>
+              <option value="xhigh">xhigh (Extra alto para problemas complejos)</option>
+              <option value="max">max (Máximo disponible)</option>
+              <option value="ultra">ultra (Ultra con auto-delegación)</option>
+            </select>
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-reasoning-summary">RESUMEN DE PENSAMIENTO (model_reasoning_summary)</label>
+            <p class="form-unit-help">Presentación del proceso de pensamiento en los mensajes.</p>
+            <select id="input-reasoning-summary" onchange="updateRawPreview()">
+              <option value="auto">auto (Determinado por el cliente)</option>
+              <option value="detailed">detailed (Desglose analítico completo)</option>
+              <option value="concise">concise (Resumen sintético)</option>
+              <option value="none">none (Ocultar completamente)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-verbosity">VERBOSIDAD DE RESPUESTAS (model_verbosity)</label>
+            <p class="form-unit-help">Extensión y detalle en la explicación de las modificaciones.</p>
+            <select id="input-verbosity" onchange="updateRawPreview()">
+              <option value="low">low (Solo código y pasos esenciales)</option>
+              <option value="medium">medium (Equilibrado)</option>
+              <option value="high">high (Explicativo y exhaustivo)</option>
+            </select>
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-web-search">BÚSQUEDA WEB (web_search)</label>
+            <p class="form-unit-help">Capacidad de consultar documentación y APIs en línea.</p>
+            <select id="input-web-search" onchange="updateRawPreview()">
+              <option value="disabled">disabled (Desactivada)</option>
+              <option value="live">live (Búsqueda en tiempo real)</option>
+              <option value="cached">cached (Búsqueda con almacenamiento en caché)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <label class="retro-toggle-row">
+            <div class="toggle-meta">
+              <span class="toggle-code">hide_agent_reasoning</span>
+              <span class="toggle-desc">Oculta los bloques internos de pensamiento en la interfaz de chat.</span>
+            </div>
+            <input type="checkbox" id="input-hide-agent-reasoning" onchange="updateRawPreview()">
+            <div class="rocker-switch">
+              <span class="rocker-pill rocker-off">OFF</span>
+              <span class="rocker-pill rocker-on">ON</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 5: FUNCIONALIDADES (FEATURE FLAGS)
+         ------------------------------------------------------------- -->
+    <div id="pane-features" class="tab-pane">
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// SUBSYSTEM: FEATURE_FLAGS_MATRIX</span>
+            <h2 class="spec-title">BANDERAS DE FUNCIONALIDADES (codex features)</h2>
+            <p class="spec-desc">Activa o desactiva capacidades avanzadas de la arquitectura de Codex.</p>
+          </div>
+        </div>
+
+        <!-- Search Prompt Bar -->
+        <div class="search-prompt-wrap">
+          <span class="prompt-symbol">FILTER_FLAGS_&gt;</span>
+          <input type="text" id="filter-features" placeholder="Escribe el nombre de la bandera para filtrar..." oninput="filterFeatureList(this.value)">
+        </div>
+
+        <div id="features-container" class="grid-2">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 6: DESKTOP Y TUI
+         ------------------------------------------------------------- -->
+    <div id="pane-desktop" class="tab-pane">
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// CLIENT_PREFS: DESKTOP_AND_TUI</span>
+            <h2 class="spec-title">PREFERENCIAS DE INTERFAZ GRÁFICA Y TERMINAL</h2>
+            <p class="spec-desc">Ajusta la experiencia de usuario en la aplicación de escritorio y terminal.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-conversation-detail-mode">DETALLE DE CONVERSACIÓN (conversationDetailMode)</label>
+            <p class="form-unit-help">Nivel de visualización de comandos y herramientas ejecutadas.</p>
+            <select id="input-conversation-detail-mode" onchange="updateRawPreview()">
+              <option value="STEPS_COMMANDS">STEPS_COMMANDS (Pasos técnicos y comandos directos)</option>
+              <option value="STEPS_PROSE">STEPS_PROSE (Resumen en lenguaje natural)</option>
+              <option value="FULL">FULL (Detalle exhaustivo completo)</option>
+            </select>
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-follow-up-queue-mode">COLA DE MENSAJES (followUpQueueMode)</label>
+            <p class="form-unit-help">Comportamiento ante nuevos prompts mientras el agente trabaja.</p>
+            <select id="input-follow-up-queue-mode" onchange="updateRawPreview()">
+              <option value="queue">queue (Encolar para el siguiente turno)</option>
+              <option value="steer">steer (Redirigir inmediatamente el turno actual)</option>
+              <option value="off">off (Desactivar procesamiento concurrente)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-open-link-preference">APERTURA DE ENLACES EXTERNOS</label>
+            <p class="form-unit-help">Destino al hacer clic en URLs externas en el chat.</p>
+            <select id="input-open-link-preference" onchange="updateRawPreview()">
+              <option value="external-browser">external-browser (Navegador predeterminado del sistema)</option>
+              <option value="in-app-browser">in-app-browser (Navegador web integrado)</option>
+            </select>
+          </div>
+
+          <div class="form-unit">
+            <label class="form-unit-label" for="input-open-local-preference">APERTURA DE LOCALHOST</label>
+            <p class="form-unit-help">Destino para puertos locales en desarrollo (ej: localhost:3000).</p>
+            <select id="input-open-local-preference" onchange="updateRawPreview()">
+              <option value="external-browser">external-browser (Navegador predeterminado)</option>
+              <option value="in-app-browser">in-app-browser (Navegador integrado)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <label class="retro-toggle-row">
+            <div class="toggle-meta">
+              <span class="toggle-code">ambient-suggestions-enabled</span>
+              <span class="toggle-desc">Sugerencias proactivas y completados contextuales.</span>
+            </div>
+            <input type="checkbox" id="input-ambient-suggestions" onchange="updateRawPreview()">
+            <div class="rocker-switch">
+              <span class="rocker-pill rocker-off">OFF</span>
+              <span class="rocker-pill rocker-on">ON</span>
+            </div>
+          </label>
+
+          <label class="retro-toggle-row">
+            <div class="toggle-meta">
+              <span class="toggle-code">show-context-window-usage</span>
+              <span class="toggle-desc">Muestra medidor de consumo de tokens y ventana de contexto.</span>
+            </div>
+            <input type="checkbox" id="input-show-context-window-usage" onchange="updateRawPreview()">
+            <div class="rocker-switch">
+              <span class="rocker-pill rocker-off">OFF</span>
+              <span class="rocker-pill rocker-on">ON</span>
+            </div>
+          </label>
+
+          <label class="retro-toggle-row">
+            <div class="toggle-meta">
+              <span class="toggle-code">toys-confetti-enabled</span>
+              <span class="toggle-desc">Efecto visual discreto al concluir tareas exitosamente.</span>
+            </div>
+            <input type="checkbox" id="input-toys-confetti" onchange="updateRawPreview()">
+            <div class="rocker-switch">
+              <span class="rocker-pill rocker-off">OFF</span>
+              <span class="rocker-pill rocker-on">ON</span>
+            </div>
+          </label>
+
+          <label class="retro-toggle-row">
+            <div class="toggle-meta">
+              <span class="toggle-code">status_line_use_colors</span>
+              <span class="toggle-desc">Colores de diagnóstico en la barra de estado de terminal (TUI).</span>
+            </div>
+            <input type="checkbox" id="input-tui-colors" onchange="updateRawPreview()">
+            <div class="rocker-switch">
+              <span class="rocker-pill rocker-off">OFF</span>
+              <span class="rocker-pill rocker-on">ON</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 7: PLUGINS OFICIALES
+         ------------------------------------------------------------- -->
+    <div id="pane-plugins" class="tab-pane">
+      <div class="spec-card">
+        <div class="spec-card-header">
+          <div class="spec-header-left">
+            <span class="spec-tag">// ECOSYSTEM: BUNDLED_PLUGINS</span>
+            <h2 class="spec-title">PLUGINS OFICIALES Y RUNTIMES</h2>
+            <p class="spec-desc">Herramientas de inspección, compilación y acceso a servicios integrados.</p>
+          </div>
+        </div>
+
+        <div id="plugins-container" class="grid-2">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------
+         TAB 8: ARCHIVO CONFIG.TOML
+         ------------------------------------------------------------- -->
+    <div id="pane-raw" class="tab-pane">
+      <div class="dark-editor-wrapper">
+        <div class="editor-top-bar">
+          <div class="editor-status-text">
+            <span>FILE: config.toml</span>
+            <span>//</span>
+            <span id="config-file-path-display">PATH: ~/.codex/config.toml</span>
+            <span>//</span>
+            <span>ENCODING: UTF-8</span>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" style="padding: 5px 12px; font-size: 0.72rem;" onclick="copyTomlToClipboard()">
+              COPIAR AL BUFFER
+            </button>
+            <button class="btn btn-outline" style="padding: 5px 12px; font-size: 0.72rem;" onclick="downloadTomlFile()">
+              DESCARGAR .TOML
+            </button>
+          </div>
+        </div>
+
+        <textarea id="raw-toml-editor" class="editor-textarea" spellcheck="false" oninput="onRawTomlEdited()"></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Retro Terminal Toast Viewport -->
+  <div id="toast-viewport"></div>
+
+  <!-- -------------------------------------------------------------
+       CORE CLIENT-SIDE JAVASCRIPT LOGIC
+       Preserves 100% of DOM IDs, API endpoints, persistence and controls.
+       ------------------------------------------------------------- -->
+  
+  <!-- MODALS CONTAINER -->
+  <!-- Diff Modal -->
+  <div id="modal-diff" class="modal-overlay" onclick="if(event.target===this)closeModals()">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <span>[DIFF] COMPARACIÓN DE CAMBIOS // DISCO VS MEMORIA</span>
+        <button class="btn btn-sm" style="background:#FAF9F6; color:#101010; padding:2px 8px;" onclick="closeModals()">✕</button>
+      </div>
+      <div class="modal-body" id="diff-content" style="max-height:60vh; background:var(--bg-surface);">
+        <!-- Diff lines injected here -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModals()">CERRAR</button>
+        <button class="btn btn-primary" onclick="closeModals(); saveConfiguration();">GUARDAR CAMBIOS (Ctrl+S)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backups Modal -->
+  <div id="modal-backups" class="modal-overlay" onclick="if(event.target===this)closeModals()">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <span>[BACKUPS] RESPALDOS AUTOMÁTICOS DE CONFIGURACIÓN</span>
+        <button class="btn btn-sm" style="background:#FAF9F6; color:#101010; padding:2px 8px;" onclick="closeModals()">✕</button>
+      </div>
+      <div class="modal-body" id="backups-list">
+        <!-- Backups list injected here -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModals()">CERRAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagnostics Modal -->
+  <div id="modal-diagnostics" class="modal-overlay" onclick="if(event.target===this)closeModals()">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <span>[DIAGNOSTICS] INTEGRIDAD Y TELEMETRÍA DEL SISTEMA</span>
+        <button class="btn btn-sm" style="background:#FAF9F6; color:#101010; padding:2px 8px;" onclick="closeModals()">✕</button>
+      </div>
+      <div class="modal-body" id="diagnostics-content">
+        <!-- Diagnostics content injected here -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModals()">CERRAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conflict Modal -->
+  <div id="modal-conflict" class="modal-overlay">
+    <div class="modal-dialog" style="border-color:#DC2626;">
+      <div class="modal-header" style="background:#DC2626;">
+        <span>[ALERTA DE CONFLICTO] MODIFICACIÓN EXTERNA DETECTADA</span>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:12px; color:#DC2626; font-weight:700;">
+          El archivo config.toml fue modificado externamente en disco desde la última lectura.
+        </p>
+        <p style="margin-bottom:12px;">
+          Para evitar perder cambios concurrentes realizados por Codex u otro editor, elige cómo proceder:
+        </p>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="btn btn-outline" onclick="closeModals(); openDiffModal();">VER DIFERENCIAS</button>
+          <button class="btn btn-outline" onclick="closeModals(); checkServerAndLoad(); pushToast('RECARGADO DESDE DISCO', 'info');">DESCARTAR Y RECARGAR DE DISCO</button>
+          <button class="btn btn-primary" style="background:#DC2626; border-color:#DC2626; color:#FAF9F6;" onclick="closeModals(); saveConfiguration(true);">SOBRESCRIBIR FORZADO</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModals()">CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION & GLOBAL STATE
+    // ============================================================
+    const CONFIG_SERVER_URL = (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'http://127.0.0.1:20129';
+    
+    let initialDiskToml = '';
+    let currentFullToml = '';
+    let initialSavedModel = '';
+    let currentHash = '';
+    let isDirty = false;
+    let isServerConnected = false;
+    let isOmniRouteConnected = false;
+    let availableCombos = [];
+    let accountsData = null;
+    let currentAccountsFilter = 'all';
+    let accountsAutoRefreshTimer = null;
+
+    const KNOWN_FEATURES = [
+      { id: 'prevent_idle_sleep', desc: 'Evita la suspensión del sistema operativo durante ejecuciones prolongadas.', default: true },
+      { id: 'write_stdin_approval', desc: 'Solicita aprobación humana explícita antes de escribir en streams de stdin.', default: false },
+      { id: 'guardian_approval', desc: 'Validación predictiva contra operaciones potencialmente destructivas.', default: false },
+      { id: 'js_repl', desc: 'Ejecutor interactivo JavaScript / Node REPL en tiempo real.', default: false },
+      { id: 'fast_mode', desc: 'Prioriza latencia ultra baja en streaming de respuestas.', default: true },
+      { id: 'multi_agent', desc: 'Permite invocación de subagentes especializados para tareas paralelas.', default: true },
+      { id: 'memories', desc: 'Persiste hechos clave y contexto entre sesiones de trabajo.', default: false },
+      { id: 'in_app_browser', desc: 'Navegador interno para inspección y automatización web.', default: true },
+      { id: 'in_app_chat', desc: 'Streaming continuo de mensajes interactivos.', default: true },
+      { id: 'in_app_dictation', desc: 'Reconocimiento y dictado por voz.', default: true },
+      { id: 'goals', desc: 'Mantenimiento y trazabilidad de objetivos de trabajo.', default: true },
+      { id: 'worktrees', desc: 'Aislamiento de tareas en managed Git worktrees.', default: true },
+      { id: 'shell_tool', desc: 'Herramienta de terminal para comandos nativos de PowerShell / Bash.', default: true },
+      { id: 'sleep_tool', desc: 'Permite pausas asíncronas controladas en flujos de trabajo.', default: true },
+      { id: 'system_proxy_fallback', desc: 'Usa la configuración de proxy de Windows si la conexión directa falla.', default: true }
+    ];
+
+    const KNOWN_PLUGINS = [
+      { id: 'browser@openai-bundled', name: 'Browser Automation', desc: 'Inspección y automatización de páginas web con Chromium.' },
+      { id: 'visualize@openai-bundled', name: 'Data Visualizer', desc: 'Visualización de artefactos y gráficos en la aplicación.' },
+      { id: 'chrome@openai-bundled', name: 'Chrome Integration', desc: 'Control de pestañas y herramientas de desarrollo en Google Chrome.' },
+      { id: 'computer-use@openai-bundled', name: 'Computer Use', desc: 'Acceso y automatización de interfaces de usuario.' },
+      { id: 'unified-computer-use@openai-bundled', name: 'Unified Computer Use', desc: 'Control coordinado de teclado, mouse y pantalla.' },
+      { id: 'code-review@openai-bundled', name: 'Code Reviewer', desc: 'Auditoría automática de calidad de código y análisis de sintaxis.' },
+      { id: 'codex-app-tools@openai-bundled', name: 'Codex App Tools', desc: 'Herramientas de sistema integradas para la app de escritorio.' },
+      { id: 'google-calendar@openai-curated', name: 'Google Calendar', desc: 'Consulta y gestión de agenda en Google Calendar.' },
+      { id: 'slack@openai-curated', name: 'Slack Messaging', desc: 'Envío de notificaciones y lectura de canales de Slack.' },
+      { id: 'notion@openai-curated', name: 'Notion Workspace', desc: 'Interacción y edición de documentos en Notion.' },
+      { id: 'documents@openai-primary-runtime', name: 'Document Processor', desc: 'Procesamiento de documentos de texto estructurado.' },
+      { id: 'pdf@openai-primary-runtime', name: 'PDF Reader', desc: 'Extracción de texto e imágenes desde archivos PDF.' },
+      { id: 'spreadsheets@openai-primary-runtime', name: 'Spreadsheets', desc: 'Lectura y manipulación de datos tabulares (CSV, XLSX).' }
+    ];
+
+    // Canonical updateRawPreview hook for form input attributes
+    function updateRawPreview() {
+      const editor = document.getElementById('raw-toml-editor');
+      if (editor && typeof currentFullToml === 'string') {
+        editor.value = currentFullToml;
+      }
+      if (typeof markDirty === 'function') {
+        markDirty();
+      }
+    }
+    window.updateRawPreview = updateRawPreview;
+
+    // ============================================================
+    // UTILITIES & SANITIZATION
+    // ============================================================
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeRegex(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function formatTomlValue(val) {
+      if (typeof val === 'string') {
+        const escaped = val.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        return `"${escaped}"`;
+      }
+      if (typeof val === 'boolean') {
+        return val ? 'true' : 'false';
+      }
+      if (typeof val === 'number') {
+        return String(val);
+      }
+      if (Array.isArray(val)) {
+        return JSON.stringify(val);
+      }
+      return String(val);
+    }
+
+    /**
+     * Surgical Round-Trip TOML Engine: Modifica una clave específica dentro
+     * de una sección preservando el 100% de comentarios, espaciado, tablas y claves no mapeadas.
+     */
+    function updateFieldInToml(rawToml, section, key, newValue) {
+      const lines = (rawToml || '').split(/\r?\n/);
+      const formattedVal = formatTomlValue(newValue);
+      const keyRegex = new RegExp(`^(\\s*)${escapeRegex(key)}(\\s*=)(.*)$`);
+
+      if (!section || section === '') {
+        let updated = false;
+        let firstSectionIdx = -1;
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (/^\s*\[.*\]\s*$/.test(line)) {
+            if (firstSectionIdx === -1) firstSectionIdx = i;
+            break;
+          }
+          if (keyRegex.test(line)) {
+            const match = line.match(keyRegex);
+            lines[i] = `${match[1]}${key} = ${formattedVal}`;
+            updated = true;
+            break;
+          }
+        }
+
+        if (!updated) {
+          const newLine = `${key} = ${formattedVal}`;
+          if (firstSectionIdx !== -1) {
+            lines.splice(firstSectionIdx, 0, newLine);
+          } else {
+            lines.push(newLine);
+          }
+        }
+
+        return lines.join('\n');
+      }
+
+      const sectionHeaderRegex = new RegExp(`^\\s*\\[\\s*${escapeRegex(section)}\\s*\\]\\s*$`);
+      let inTargetSection = false;
+      let sectionStartIdx = -1;
+      let nextSectionIdx = -1;
+      let keyUpdated = false;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        if (/^\s*\[.*\]\s*$/.test(line)) {
+          if (sectionHeaderRegex.test(line)) {
+            inTargetSection = true;
+            sectionStartIdx = i;
+            continue;
+          } else if (inTargetSection) {
+            nextSectionIdx = i;
+            break;
+          }
+        }
+
+        if (inTargetSection) {
+          if (keyRegex.test(line)) {
+            const match = line.match(keyRegex);
+            lines[i] = `${match[1]}${key} = ${formattedVal}`;
+            keyUpdated = true;
+            break;
+          }
+        }
+      }
+
+      if (inTargetSection) {
+        if (!keyUpdated) {
+          const insertAt = nextSectionIdx !== -1 ? nextSectionIdx : lines.length;
+          lines.splice(insertAt, 0, `${key} = ${formattedVal}`);
+        }
+      } else {
+        lines.push('');
+        lines.push(`[${section}]`);
+        lines.push(`${key} = ${formattedVal}`);
+      }
+
+      return lines.join('\n');
+    }
+
+    function computeLineDiff(originalText, modifiedText) {
+      const origLines = (originalText || '').split(/\r?\n/);
+      const modLines = (modifiedText || '').split(/\r?\n/);
+      const diff = [];
+
+      const maxLen = Math.max(origLines.length, modLines.length);
+      for (let i = 0; i < maxLen; i++) {
+        const o = origLines[i];
+        const m = modLines[i];
+        if (o !== m) {
+          if (o !== undefined) diff.push({ type: 'remove', line: i + 1, content: o });
+          if (m !== undefined) diff.push({ type: 'add', line: i + 1, content: m });
+        }
+      }
+      return diff;
+    }
+
+    // ============================================================
+    // LIFECYCLE & INITIALIZATION
+    // ============================================================
+    window.addEventListener('DOMContentLoaded', async () => {
+      renderFeatureToggles();
+      renderPluginToggles();
+      bindFormChangeListeners();
+      
+      // Default: Land on Accounts Monitor as requested
+      navigateTab('accounts');
+      
+      await reloadAll();
+      toggleAccountsAutoRefresh(true);
+
+      // Keyboard shortcuts
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          saveConfiguration();
+        } else if (e.key === 'Escape') {
+          closeModals();
+        }
+      });
+
+      // Dirty warning on window close
+      window.addEventListener('beforeunload', (e) => {
+        if (isDirty) {
+          e.preventDefault();
+          e.returnValue = 'Tienes cambios no guardados en la configuración.';
+        }
+      });
+    });
+
+    async function reloadAll() {
+      await checkServerAndLoad();
+      await fetchOmniRouteModels();
+      await fetchOmniRouteAccounts();
+      updateHeroCallout();
+    }
+
+    function updateHeroCallout() {
+      const callout = document.getElementById('callout-status-text');
+      const activeModel = document.getElementById('input-model').value || 'coding-con-caro';
+      if (isOmniRouteConnected && isServerConnected) {
+        callout.textContent = `OMNIROUTE :20128 LISTO // ENRUTANDO '${activeModel}' A TRAVÉS DE MATRIX`;
+      } else if (!isOmniRouteConnected) {
+        callout.textContent = `ALERTA: OMNIROUTE NO RESPONDE EN :20128 // VERIFICAR SERVICIO LOCAL`;
+      } else {
+        callout.textContent = `SERVIDOR DE CONFIGURACIÓN :20129 DESCONECTADO`;
+      }
+    }
+
+    function markDirty() {
+      isDirty = (currentFullToml !== initialDiskToml);
+      const badge = document.getElementById('status-dirty');
+      const discardBtn = document.getElementById('btn-discard-changes');
+      const savedComboText = document.getElementById('text-saved-combo');
+      const selectedComboText = document.getElementById('text-selected-combo');
+
+      if (isDirty) {
+        if (badge) {
+          badge.className = 'telemetry-item dirty';
+          badge.innerHTML = '<span class="status-dot warning"></span><span>MODIFICADO (SIN GUARDAR)</span>';
+        }
+        if (discardBtn) discardBtn.style.display = 'inline-flex';
+      } else {
+        if (badge) {
+          badge.className = 'telemetry-item clean';
+          badge.innerHTML = '<span class="status-dot success"></span><span>SIN CAMBIOS</span>';
+        }
+        if (discardBtn) discardBtn.style.display = 'none';
+      }
+
+      const currentModel = document.getElementById('input-model').value;
+      if (savedComboText) savedComboText.textContent = initialSavedModel || 'NO CARGADO';
+      if (selectedComboText) {
+        if (currentModel === initialSavedModel) {
+          selectedComboText.textContent = currentModel;
+          selectedComboText.className = 'combo-pill match';
+        } else {
+          selectedComboText.textContent = `${currentModel} (SIN GUARDAR)`;
+          selectedComboText.className = 'combo-pill changed';
+        }
+      }
+    }
+
+    // ============================================================
+    // TAB NAVIGATION
+    // ============================================================
+    function navigateTab(tabId) {
+      document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(c => c.classList.remove('active'));
+
+      const targetBtn = Array.from(document.querySelectorAll('.tab-trigger')).find(b => b.getAttribute('onclick')?.includes(tabId));
+      if (targetBtn) targetBtn.classList.add('active');
+
+      const targetPane = document.getElementById(`pane-${tabId}`);
+      if (targetPane) targetPane.classList.add('active');
+
+      if (tabId === 'raw') {
+        const editor = document.getElementById('raw-toml-editor');
+        if (editor) editor.value = currentFullToml;
+      }
+    }
+
+    // ============================================================
+    // SERVER SYNC & CONFIG FETCHING
+    // ============================================================
+    async function checkServerAndLoad() {
+      const statusPill = document.getElementById('status-server');
+      const statusText = document.getElementById('text-server');
+
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/config`, { signal: AbortSignal.timeout(3000) });
+        if (res.ok) {
+          const data = await res.json();
+          initialDiskToml = data.toml;
+          currentFullToml = data.toml;
+          currentHash = data.hash;
+          isServerConnected = true;
+          statusPill.className = 'telemetry-item active';
+          statusText.textContent = 'SYNC_SERVER: ONLINE (20129)';
+
+          const pathDisplay = document.getElementById('config-file-path-display');
+          if (pathDisplay && data.path) {
+            pathDisplay.textContent = `PATH: ${data.path}`;
+          }
+
+          const demoBadge = document.getElementById('badge-demo-mode');
+          if (demoBadge) {
+            demoBadge.style.display = data.demoMode ? 'inline-block' : 'none';
+          }
+
+          parseAndPopulateForm(currentFullToml);
+          initialSavedModel = document.getElementById('input-model').value || 'coding-con-caro';
+          markDirty();
+          return;
+        }
+      } catch (err) {
+        console.warn('Servidor local de sincronización no accesible', err);
+      }
+
+      isServerConnected = false;
+      statusPill.className = 'telemetry-item inactive';
+      statusText.textContent = 'SYNC_SERVER: OFFLINE';
+      markDirty();
+    }
+
+    // ============================================================
+    // OMNIROUTE MODELS (VIA BACKEND PROXY - NO HARDCODED KEY)
+    // ============================================================
+    async function fetchOmniRouteModels() {
+      const statusPill = document.getElementById('status-omniroute');
+      const statusText = document.getElementById('text-omniroute');
+
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/omniroute/models`, {
+          signal: AbortSignal.timeout(4000)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const models = data.data || [];
+          isOmniRouteConnected = true;
+
+          availableCombos = models.filter(m => m.owned_by === 'combo' || m.id.startsWith('auto/') || m.id.includes('caro') || m.id.includes('coding'));
+          
+          statusPill.className = 'telemetry-item active';
+          statusText.textContent = `OMNIROUTE: ${availableCombos.length} COMBOS ONLINE`;
+
+          populateDropdownModels(models);
+          populateComboCards(availableCombos);
+          return;
+        }
+      } catch (err) {
+        console.warn('OmniRoute no disponible en puerto 20128', err);
+      }
+
+      isOmniRouteConnected = false;
+      statusPill.className = 'telemetry-item inactive';
+      statusText.textContent = 'OMNIROUTE: OFFLINE';
+      populateFallbackCombos();
+    }
+
+    function populateDropdownModels(models) {
+      const select = document.getElementById('select-model');
+      select.innerHTML = '<option value="">-- SELECCIONAR COMBO O MODELO --</option>';
+
+      const optGroupCombos = document.createElement('optgroup');
+      optGroupCombos.label = '⚡ COMBOS OMNIROUTE (RECOMENDADOS)';
+
+      const optGroupOthers = document.createElement('optgroup');
+      optGroupOthers.label = '🌐 MODELOS DIRECTOS DISPONIBLES';
+
+      models.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = `${m.id} [${m.owned_by || 'MODEL'}]`;
+
+        if (m.owned_by === 'combo' || m.id.startsWith('auto/') || m.id.includes('caro') || m.id.includes('coding')) {
+          optGroupCombos.appendChild(opt);
+        } else {
+          optGroupOthers.appendChild(opt);
+        }
+      });
+
+      select.appendChild(optGroupCombos);
+      select.appendChild(optGroupOthers);
+
+      const currentModel = document.getElementById('input-model').value;
+      if (currentModel) {
+        select.value = currentModel;
+      }
+    }
+
+    function populateComboCards(combos) {
+      const codingBox = document.getElementById('coding-combos-container');
+      const otherBox = document.getElementById('other-combos-container');
+      codingBox.innerHTML = '';
+      otherBox.innerHTML = '';
+
+      const current = document.getElementById('input-model').value;
+
+      const codingCombos = combos.filter(c => c.id.includes('coding') || c.id.includes('caro') || c.id.includes('codex'));
+      const otherCombos = combos.filter(c => !codingCombos.some(cc => cc.id === c.id));
+
+      codingCombos.forEach(c => {
+        codingBox.appendChild(createComboCard(c.id, c.owned_by, current === c.id));
+      });
+
+      otherCombos.forEach(c => {
+        otherBox.appendChild(createComboCard(c.id, c.owned_by, current === c.id));
+      });
+    }
+
+    function populateFallbackCombos() {
+      const fallback = [
+        { id: 'coding-con-caro', owned_by: 'combo' },
+        { id: 'coding-sin-codex', owned_by: 'combo' },
+        { id: 'auto/best-coding', owned_by: 'combo' },
+        { id: 'auto/pro-coding', owned_by: 'combo' },
+        { id: 'auto/coding', owned_by: 'combo' },
+        { id: 'auto/coding:fast', owned_by: 'combo' },
+        { id: 'claude-opus-5-5', owned_by: 'combo' },
+        { id: 'codex-caro', owned_by: 'combo' }
+      ];
+      populateComboCards(fallback);
+    }
+
+    function createComboCard(id, ownedBy, isSelected) {
+      const card = document.createElement('div');
+      card.className = `combo-item ${isSelected ? 'is-selected' : ''}`;
+      card.onclick = () => selectModel(id);
+
+      card.innerHTML = `
+        <div class="combo-topline">
+          <span class="combo-id">${escapeHtml(id)}</span>
+          <span class="combo-tag">${escapeHtml(ownedBy || 'COMBO')}</span>
+        </div>
+        <div class="combo-instruction">
+          <span class="active-indicator-symbol">ACTIVE █</span>
+          <span>// CLIC PARA ACTIVAR</span>
+        </div>
+      `;
+      return card;
+    }
+
+    function selectModel(modelId) {
+      if (!modelId) return;
+      document.getElementById('input-model').value = modelId;
+      document.getElementById('select-model').value = modelId;
+
+      document.querySelectorAll('.combo-item').forEach(c => {
+        const name = c.querySelector('.combo-id')?.textContent;
+        if (name === modelId) {
+          c.classList.add('is-selected');
+        } else {
+          c.classList.remove('is-selected');
+        }
+      });
+
+      // Surgical update of model field
+      currentFullToml = updateFieldInToml(currentFullToml, '', 'model', modelId);
+      const editor = document.getElementById('raw-toml-editor');
+      if (editor) editor.value = currentFullToml;
+
+      markDirty();
+      updateHeroCallout();
+      if (typeof renderActiveComboPipeline === 'function') renderActiveComboPipeline();
+      pushToast(`MODELO SELECCIONADO: ${modelId}`, 'info');
+    }
+
+    function onSelectModelDropdown(value) {
+      if (value) {
+        selectModel(value);
+      }
+    }
+
+    function onProviderChange(value) {
+      currentFullToml = updateFieldInToml(currentFullToml, '', 'model_provider', value);
+      markDirty();
+    }
+
+    // ============================================================
+    // FEATURES & PLUGINS RENDERING
+    // ============================================================
+    function renderFeatureToggles() {
+      const container = document.getElementById('features-container');
+      container.innerHTML = '';
+
+      KNOWN_FEATURES.forEach(f => {
+        const label = document.createElement('label');
+        label.className = 'retro-toggle-row feature-toggle';
+        label.dataset.filter = `${f.id} ${f.desc}`.toLowerCase();
+
+        label.innerHTML = `
+          <div class="toggle-meta">
+            <span class="toggle-code">${escapeHtml(f.id)}</span>
+            <span class="toggle-desc">${escapeHtml(f.desc)}</span>
+          </div>
+          <input type="checkbox" id="feature-${escapeHtml(f.id)}" onchange="onFeatureToggleChanged('${f.id}', this.checked)">
+          <div class="rocker-switch">
+            <span class="rocker-pill rocker-off">OFF</span>
+            <span class="rocker-pill rocker-on">ON</span>
+          </div>
+        `;
+        container.appendChild(label);
+      });
+    }
+
+    function onFeatureToggleChanged(featureId, isChecked) {
+      currentFullToml = updateFieldInToml(currentFullToml, 'features', featureId, isChecked);
+      markDirty();
+    }
+
+    function filterFeatureList(query) {
+      const q = query.toLowerCase().trim();
+      document.querySelectorAll('.feature-toggle').forEach(el => {
+        if (!q || el.dataset.filter.includes(q)) {
+          el.style.display = 'flex';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    function renderPluginToggles() {
+      const container = document.getElementById('plugins-container');
+      container.innerHTML = '';
+
+      KNOWN_PLUGINS.forEach(p => {
+        const label = document.createElement('label');
+        label.className = 'retro-toggle-row';
+
+        label.innerHTML = `
+          <div class="toggle-meta">
+            <span class="toggle-code">${escapeHtml(p.name)} [<code>${escapeHtml(p.id)}</code>]</span>
+            <span class="toggle-desc">${escapeHtml(p.desc)}</span>
+          </div>
+          <input type="checkbox" id="plugin-${escapePluginId(p.id)}" onchange="onPluginToggleChanged('${p.id}', this.checked)">
+          <div class="rocker-switch">
+            <span class="rocker-pill rocker-off">OFF</span>
+            <span class="rocker-pill rocker-on">ON</span>
+          </div>
+        `;
+        container.appendChild(label);
+      });
+    }
+
+    function onPluginToggleChanged(pluginId, isChecked) {
+      currentFullToml = updateFieldInToml(currentFullToml, `plugins.${pluginId}`, 'enabled', isChecked);
+      markDirty();
+    }
+
+    function escapePluginId(id) {
+      return id.replace(/[^a-zA-Z0-9]/g, '_');
+    }
+
+    // ============================================================
+    // BIND EVENT LISTENERS ON FORM INPUTS
+    // ============================================================
+    function bindFormChangeListeners() {
+      const bindings = [
+        { id: 'input-model', section: '', key: 'model' },
+        { id: 'input-model-provider', section: '', key: 'model_provider' },
+        { id: 'input-reasoning-effort', section: '', key: 'model_reasoning_effort' },
+        { id: 'input-reasoning-summary', section: '', key: 'model_reasoning_summary' },
+        { id: 'input-verbosity', section: '', key: 'model_verbosity' },
+        { id: 'input-hide-agent-reasoning', section: '', key: 'hide_agent_reasoning', bool: true },
+        { id: 'input-web-search', section: '', key: 'web_search' },
+        { id: 'input-sandbox-mode', section: '', key: 'sandbox_mode' },
+        { id: 'input-approval-policy', section: '', key: 'approval_policy' },
+        { id: 'input-approvals-reviewer', section: '', key: 'approvals_reviewer' },
+        { id: 'input-windows-sandbox', section: 'windows', key: 'sandbox' },
+        { id: 'input-provider-name', section: 'model_providers.omniroute', key: 'name' },
+        { id: 'input-provider-base-url', section: 'model_providers.omniroute', key: 'base_url' },
+        { id: 'input-provider-env-key', section: 'model_providers.omniroute', key: 'env_key' },
+        { id: 'input-provider-wire-api', section: 'model_providers.omniroute', key: 'wire_api' },
+        { id: 'input-provider-requires-openai-auth', section: 'model_providers.omniroute', key: 'requires_openai_auth', bool: true },
+        { id: 'input-conversation-detail-mode', section: 'desktop', key: 'conversationDetailMode' },
+        { id: 'input-follow-up-queue-mode', section: 'desktop', key: 'followUpQueueMode' },
+        { id: 'input-open-link-preference', section: 'desktop', key: 'open-link-in-target-preference' },
+        { id: 'input-open-local-preference', section: 'desktop', key: 'open-local-url-in-target-preference' },
+        { id: 'input-ambient-suggestions', section: 'desktop', key: 'ambient-suggestions-enabled', bool: true },
+        { id: 'input-show-context-window-usage', section: 'desktop', key: 'show-context-window-usage', bool: true },
+        { id: 'input-toys-confetti', section: 'desktop', key: 'toys-confetti-enabled', bool: true }
+      ];
+
+      bindings.forEach(b => {
+        const el = document.getElementById(b.id);
+        if (!el) return;
+        const eventType = el.tagName === 'SELECT' || el.type === 'checkbox' ? 'change' : 'input';
+        el.addEventListener(eventType, () => {
+          const val = b.bool ? el.checked : el.value;
+          currentFullToml = updateFieldInToml(currentFullToml, b.section, b.key, val);
+          const editor = document.getElementById('raw-toml-editor');
+          if (editor) editor.value = currentFullToml;
+          markDirty();
+          if (b.key === 'model') {
+            updateHeroCallout();
+            if (typeof renderActiveComboPipeline === 'function') renderActiveComboPipeline();
+          }
+        });
+      });
+    }
+
+    // ============================================================
+    // POPULATE FORM CONTROLS FROM TOML
+    // ============================================================
+    function parseAndPopulateForm(tomlText) {
+      const lines = (tomlText || '').split(/\r?\n/);
+
+      let currentSection = '';
+      const topLevel = {};
+      const features = {};
+      const plugins = {};
+      const desktop = {};
+      const windows = {};
+      const omnirouteProvider = {};
+
+      for (let rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('#')) continue;
+
+        const sectionMatch = line.match(/^\[(.*)\]$/);
+        if (sectionMatch) {
+          currentSection = sectionMatch[1];
+          continue;
+        }
+
+        const kvMatch = line.match(/^([a-zA-Z0-9_\-\.]+)\s*=\s*(.*)$/);
+        if (kvMatch) {
+          const key = kvMatch[1].trim();
+          let val = kvMatch[2].trim();
+
+          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
+          } else if (val === 'true') {
+            val = true;
+          } else if (val === 'false') {
+            val = false;
+          } else if (!isNaN(Number(val))) {
+            val = Number(val);
+          }
+
+          if (currentSection === '') {
+            topLevel[key] = val;
+          } else if (currentSection === 'features') {
+            features[key] = val;
+          } else if (currentSection.startsWith('plugins.')) {
+            const pluginName = currentSection.replace(/^plugins\./, '').replace(/^"|"$/g, '');
+            if (key === 'enabled') {
+              plugins[pluginName] = val;
+            }
+          } else if (currentSection === 'desktop') {
+            desktop[key] = val;
+          } else if (currentSection === 'windows') {
+            windows[key] = val;
+          } else if (currentSection === 'model_providers.omniroute') {
+            omnirouteProvider[key] = val;
+          }
+        }
+      }
+
+      if (topLevel.model !== undefined) document.getElementById('input-model').value = topLevel.model;
+      if (topLevel.model_provider !== undefined) document.getElementById('input-model-provider').value = topLevel.model_provider;
+      if (topLevel.model_reasoning_effort !== undefined) document.getElementById('input-reasoning-effort').value = topLevel.model_reasoning_effort;
+      if (topLevel.model_reasoning_summary !== undefined) document.getElementById('input-reasoning-summary').value = topLevel.model_reasoning_summary;
+      if (topLevel.model_verbosity !== undefined) document.getElementById('input-verbosity').value = topLevel.model_verbosity;
+      if (topLevel.web_search !== undefined) document.getElementById('input-web-search').value = topLevel.web_search;
+      if (topLevel.sandbox_mode !== undefined) document.getElementById('input-sandbox-mode').value = topLevel.sandbox_mode;
+      if (topLevel.approval_policy !== undefined) document.getElementById('input-approval-policy').value = topLevel.approval_policy;
+      if (topLevel.approvals_reviewer !== undefined) document.getElementById('input-approvals-reviewer').value = topLevel.approvals_reviewer;
+      document.getElementById('input-hide-agent-reasoning').checked = !!topLevel.hide_agent_reasoning;
+
+      if (windows.sandbox !== undefined) {
+        const winEl = document.getElementById('input-windows-sandbox');
+        if (winEl) winEl.value = windows.sandbox;
+      }
+
+      if (omnirouteProvider.name) document.getElementById('input-provider-name').value = omnirouteProvider.name;
+      if (omnirouteProvider.base_url) document.getElementById('input-provider-base-url').value = omnirouteProvider.base_url;
+      if (omnirouteProvider.env_key) document.getElementById('input-provider-env-key').value = omnirouteProvider.env_key;
+      if (omnirouteProvider.wire_api) document.getElementById('input-provider-wire-api').value = omnirouteProvider.wire_api;
+      document.getElementById('input-provider-requires-openai-auth').checked = !!omnirouteProvider.requires_openai_auth;
+
+      if (desktop.conversationDetailMode) document.getElementById('input-conversation-detail-mode').value = desktop.conversationDetailMode;
+      if (desktop.followUpQueueMode) document.getElementById('input-follow-up-queue-mode').value = desktop.followUpQueueMode;
+      if (desktop['open-link-in-target-preference']) document.getElementById('input-open-link-preference').value = desktop['open-link-in-target-preference'];
+      if (desktop['open-local-url-in-target-preference']) document.getElementById('input-open-local-preference').value = desktop['open-local-url-in-target-preference'];
+      document.getElementById('input-ambient-suggestions').checked = !!desktop['ambient-suggestions-enabled'];
+      document.getElementById('input-show-context-window-usage').checked = !!desktop['show-context-window-usage'];
+      document.getElementById('input-toys-confetti').checked = !!desktop['toys-confetti-enabled'];
+
+      KNOWN_FEATURES.forEach(f => {
+        const el = document.getElementById(`feature-${f.id}`);
+        if (el) {
+          el.checked = features[f.id] !== undefined ? !!features[f.id] : f.default;
+        }
+      });
+
+      KNOWN_PLUGINS.forEach(p => {
+        const el = document.getElementById(`plugin-${escapePluginId(p.id)}`);
+        if (el) {
+          el.checked = plugins[p.id] !== undefined ? !!plugins[p.id] : false;
+        }
+      });
+
+      const currentModel = topLevel.model || document.getElementById('input-model').value;
+      const select = document.getElementById('select-model');
+      if (select && currentModel) select.value = currentModel;
+      document.querySelectorAll('.combo-item').forEach(c => {
+        const name = c.querySelector('.combo-id')?.textContent;
+        if (name === currentModel) c.classList.add('is-selected');
+        else c.classList.remove('is-selected');
+      });
+      if (typeof renderActiveComboPipeline === 'function') renderActiveComboPipeline();
+    }
+
+    function onRawTomlEdited() {
+      const editor = document.getElementById('raw-toml-editor');
+      currentFullToml = editor.value;
+      parseAndPopulateForm(currentFullToml);
+      markDirty();
+    }
+
+    // ============================================================
+    // SAVE CONFIGURATION & CONFLICT HANDLING
+    // ============================================================
+    async function saveConfiguration(forceOverwrite = false) {
+      const saveBtn = document.getElementById('btn-save-config');
+      const origHtml = saveBtn ? saveBtn.innerHTML : '';
+      if (saveBtn) {
+        saveBtn.innerHTML = '<span class="pixel-spinner"></span> GUARDANDO...';
+        saveBtn.style.pointerEvents = 'none';
+      }
+
+      try {
+        if (!isServerConnected) {
+          pushToast('ERROR: SERVIDOR LOCAL DESCONECTADO', 'error');
+          return;
+        }
+
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/config`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            toml: currentFullToml,
+            expectedHash: currentHash,
+            forceOverwrite,
+            restartDaemon: true
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.status === 409) {
+          // Conflict detected!
+          const conflictModal = document.getElementById('modal-conflict');
+          if (conflictModal) conflictModal.classList.add('active');
+          pushToast('CONFLICTO: ARCHIVO MODIFICADO EN DISCO', 'warn');
+          return;
+        }
+
+        if (res.ok && data.success) {
+          initialDiskToml = currentFullToml;
+          currentHash = data.hash;
+          initialSavedModel = data.activeModel || document.getElementById('input-model').value;
+          markDirty();
+          pushToast('CONFIGURACIÓN GUARDADA // ESCRITURA ATÓMICA SATISFACTORIA', 'success');
+        } else {
+          pushToast(`ERROR: ${data.error || 'Fallo al guardar'}`, 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        pushToast(`ERROR DE RED: ${err.message}`, 'error');
+      } finally {
+        if (saveBtn) {
+          saveBtn.innerHTML = origHtml;
+          saveBtn.style.pointerEvents = 'auto';
+        }
+      }
+    }
+
+    function discardChanges() {
+      currentFullToml = initialDiskToml;
+      parseAndPopulateForm(currentFullToml);
+      const editor = document.getElementById('raw-toml-editor');
+      if (editor) editor.value = currentFullToml;
+      markDirty();
+      pushToast('CAMBIOS DESCARTADOS // CONFIGURACIÓN RESTAURADA DE DISCO', 'info');
+    }
+
+    // ============================================================
+    // RESTART DESKTOP APP & SYNC THREADS
+    // ============================================================
+    async function restartCodexDesktopApp() {
+      const btn = document.getElementById('btn-restart-app');
+      const label = document.getElementById('label-restart-app');
+      const origText = label.textContent;
+
+      label.innerHTML = '<span class="pixel-spinner"></span> REINICIANDO...';
+      btn.style.pointerEvents = 'none';
+
+      try {
+        if (isServerConnected) {
+          // 1. Guardar cambios pendientes si existen
+          if (isDirty) {
+            await fetch(`${CONFIG_SERVER_URL}/api/config`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ toml: currentFullToml, restartDaemon: false })
+            });
+            initialDiskToml = currentFullToml;
+            markDirty();
+          }
+
+          // 2. Ejecutar reinicio limpio
+          const res = await fetch(`${CONFIG_SERVER_URL}/api/restart-desktop-app`, { method: 'POST' });
+          if (res.ok) {
+            pushToast('CHATGPT DESKTOP: REINICIADO // CHATS ACTUALIZADOS', 'success');
+          } else {
+            pushToast('ERROR: FALLÓ EL REINICIO DE LA APP DE ESCRITORIO', 'error');
+          }
+        } else {
+          pushToast('ERROR: SERVIDOR LOCAL DESCONECTADO', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        pushToast('ERROR: FALLO DE RED CON EL SERVIDOR LOCAL', 'error');
+      } finally {
+        label.textContent = origText;
+        btn.style.pointerEvents = 'auto';
+      }
+    }
+
+    async function syncAllActiveThreads() {
+      const activeModel = document.getElementById('input-model').value || 'coding-con-caro';
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/sync-all-threads`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: activeModel, modelProvider: 'omniroute' }),
+          signal: AbortSignal.timeout(8000)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          pushToast(`HILOS SINCRONIZADOS: ${data.updatedCount} chats ahora usan '${activeModel}'`, 'success');
+        } else {
+          pushToast('ERROR AL SINCRONIZAR HILOS', 'error');
+        }
+      } catch (e) {
+        pushToast(`ERROR: ${e.message}`, 'error');
+      }
+    }
+
+    // ============================================================
+    // OMNIROUTE ACCOUNTS MONITOR & PRE-DISPATCH ENGINE
+    // ============================================================
+    function toggleAccountsAutoRefresh(enabled) {
+      if (accountsAutoRefreshTimer) {
+        clearInterval(accountsAutoRefreshTimer);
+        accountsAutoRefreshTimer = null;
+      }
+      if (enabled) {
+        accountsAutoRefreshTimer = setInterval(() => {
+          if (isServerConnected) {
+            fetchOmniRouteAccounts(false);
+          }
+        }, 15000);
+      }
+    }
+
+    function setAccountsFilter(filter, btn) {
+      currentAccountsFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderAccountsCards();
+    }
+
+    async function fetchOmniRouteAccounts(showToast = false) {
+      const statusPill = document.getElementById('status-accounts');
+      const statusText = document.getElementById('text-accounts');
+      const lastUpdateText = document.getElementById('text-accounts-last-update');
+
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/omniroute/accounts`, { signal: AbortSignal.timeout(6000) });
+        if (res.ok) {
+          accountsData = await res.json();
+          const { total, ready, ignored } = accountsData.summary || { total: 0, ready: 0, ignored: 0 };
+
+          statusPill.className = 'telemetry-item active';
+          statusText.textContent = `CUENTAS: ${ready}/${total} LISTAS`;
+
+          const now = new Date();
+          const timeStr = now.toTimeString().split(' ')[0];
+          if (lastUpdateText) lastUpdateText.textContent = `ACTUALIZADO: ${timeStr}`;
+
+          renderAccountsUI();
+          if (showToast) pushToast(`CUENTAS OMNIROUTE: ${ready}/${total} LISTAS PARA DESPACHO`, 'success');
+          return;
+        }
+      } catch (err) {
+        console.warn('Error al consultar cuentas desde config-manager-server:', err);
+      }
+
+      statusPill.className = 'telemetry-item inactive';
+      statusText.textContent = 'CUENTAS: OFFLINE';
+    }
+
+    function renderAccountsUI() {
+      if (!accountsData) return;
+
+      const { total, ready, ignored } = accountsData.summary || { total: 0, ready: 0, ignored: 0 };
+      const coolingCount = (accountsData.accounts || []).filter(a => a.is_cooling).length;
+
+      const statTotal = document.getElementById('stat-accounts-total');
+      const statReady = document.getElementById('stat-accounts-ready');
+      const statIgnored = document.getElementById('stat-accounts-ignored');
+      const statCooling = document.getElementById('stat-accounts-cooling');
+
+      if (statTotal) statTotal.textContent = total;
+      if (statReady) statReady.textContent = ready;
+      if (statIgnored) statIgnored.textContent = ignored;
+      if (statCooling) statCooling.textContent = coolingCount;
+
+      const allAccs = accountsData.accounts || [];
+      const readyAccs = allAccs.filter(a => !a.evaluation?.willIgnore);
+      const ignoredAccs = allAccs.filter(a => a.evaluation?.willIgnore);
+      const codexAccs = allAccs.filter(a => a.provider === 'codex');
+      const antiAccs = allAccs.filter(a => a.provider === 'antigravity');
+
+      const cAll = document.getElementById('filter-count-all');
+      const cReady = document.getElementById('filter-count-ready');
+      const cIgnored = document.getElementById('filter-count-ignored');
+      const cCodex = document.getElementById('filter-count-codex');
+      const cAnti = document.getElementById('filter-count-antigravity');
+
+      if (cAll) cAll.textContent = allAccs.length;
+      if (cReady) cReady.textContent = readyAccs.length;
+      if (cIgnored) cIgnored.textContent = ignoredAccs.length;
+      if (cCodex) cCodex.textContent = codexAccs.length;
+      if (cAnti) cAnti.textContent = antiAccs.length;
+
+      renderActiveComboPipeline();
+      renderAccountsCards();
+    }
+
+    /**
+     * Render del Pipeline: Cumple Sección 7.66 de la especificación:
+     * NUNCA sustituye silenciosamente otro combo si el seleccionado no existe en telemetría.
+     */
+    function renderActiveComboPipeline() {
+      if (!accountsData || !accountsData.combos) return;
+
+      const activeModel = document.getElementById('input-model').value || 'coding-con-caro';
+      const comboNameEl = document.getElementById('text-pipeline-combo-name');
+      if (comboNameEl) comboNameEl.textContent = activeModel;
+
+      const container = document.getElementById('pipeline-nodes-container');
+      const explanationEl = document.getElementById('pipeline-explanation-callout');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Búsqueda exacta del combo seleccionado
+      const activeCombo = accountsData.combos.find(c => c.name === activeModel || c.id === activeModel);
+
+      if (!activeCombo) {
+        // Alerta honesta: No inventar secuencias de fallback
+        container.innerHTML = `
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #DC2626; padding: 14px; border: 1px dashed #DC2626; background: rgba(220, 38, 38, 0.05); width: 100%;">
+            <strong>COMBO NO ENCONTRADO EN LA TELEMETRÍA</strong><br>
+            El combo seleccionado <code>${escapeHtml(activeModel)}</code> no coincide con ninguna definición registrada en OmniRoute.
+            Verifica que el nombre sea correcto o selecciona uno de los combos disponibles en [01] MODELOS & COMBOS.
+          </div>
+        `;
+        if (explanationEl) {
+          explanationEl.innerHTML = `<strong>TELEMETRÍA NO DISPONIBLE:</strong> No se puede predecir la secuencia de despacho porque el combo '${escapeHtml(activeModel)}' no está registrado en la base de datos de OmniRoute.`;
+        }
+        return;
+      }
+
+      if (!activeCombo.models || activeCombo.models.length === 0) {
+        container.innerHTML = '<div style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono); padding:10px;">No hay modelos configurados en este combo.</div>';
+        if (explanationEl) explanationEl.textContent = 'Selecciona o escribe un combo en la pestaña [01] MODELOS & COMBOS para visualizar su secuencia de despacho.';
+        return;
+      }
+
+      let activeTargetAssigned = false;
+      let firstIgnoredReason = '';
+
+      activeCombo.models.forEach((m, idx) => {
+        const isIgnored = m.willIgnore || m.connection?.evaluation?.willIgnore;
+        const isFirstActive = !isIgnored && !activeTargetAssigned;
+        if (isFirstActive) activeTargetAssigned = true;
+
+        if (isIgnored && !firstIgnoredReason) {
+          firstIgnoredReason = `OmniRoute detectó que ${m.label || m.model} está en estado [${m.statusBadge || 'IGNORADA'}]: ${m.connection?.evaluation?.reason || 'Límite alcanzado'}. Se salta inmediatamente sin reintentos innecesarios.`;
+        }
+
+        const node = document.createElement('div');
+        node.className = `pipeline-step-node ${isIgnored ? 'ignored' : (isFirstActive ? 'active-first' : '')}`;
+
+        const badgeClass = isIgnored ? 'warn' : 'ok';
+        const badgeText = m.statusBadge || (isIgnored ? 'IGNORADA' : 'LISTA');
+
+        node.innerHTML = `
+          <div class="pipeline-step-header">
+            <span class="pipeline-step-num">#${idx + 1}</span>
+            <span class="account-verdict-badge ${badgeClass}">${escapeHtml(badgeText)}</span>
+          </div>
+          <div class="pipeline-step-account" title="${escapeHtml(m.label || m.connection?.email || m.connectionId)}">
+            ${escapeHtml(m.label || m.connection?.email || m.connectionId || 'Conexión')}
+          </div>
+          <div class="pipeline-step-model">${escapeHtml(m.model)}</div>
+          ${isFirstActive ? '<div style="font-family:var(--font-pixel); font-size:0.60rem; color:#15803D; font-weight:700; margin-top:2px;">▶ OBJETIVO ACTIVO EN CURSO</div>' : ''}
+          ${isIgnored ? '<div style="font-family:var(--font-pixel); font-size:0.58rem; color:#DC2626; margin-top:2px;">✖ SALTADA POR PRE-DISPATCH</div>' : ''}
+        `;
+        container.appendChild(node);
+
+        if (idx < activeCombo.models.length - 1) {
+          const arrow = document.createElement('div');
+          arrow.className = 'pipeline-arrow';
+          arrow.textContent = '➔';
+          container.appendChild(arrow);
+        }
+      });
+
+      if (explanationEl) {
+        if (firstIgnoredReason) {
+          explanationEl.innerHTML = `<strong>PRE-DISPATCH GATE ACTIVO:</strong> ${escapeHtml(firstIgnoredReason)} Las peticiones se canalizan al siguiente objetivo disponible según la estrategia de prioridad.`;
+        } else {
+          explanationEl.innerHTML = `<strong>PRE-DISPATCH GATE ACTIVO:</strong> Todas las cuentas del combo están saludables y listas para despachar según orden de prioridad (#1 ➔ #2 ➔ ...).`;
+        }
+      }
+    }
+
+    function renderAccountsCards() {
+      if (!accountsData || !accountsData.accounts) return;
+
+      const container = document.getElementById('accounts-grid-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      let list = accountsData.accounts;
+      if (currentAccountsFilter === 'ready') {
+        list = list.filter(a => !a.evaluation?.willIgnore);
+      } else if (currentAccountsFilter === 'ignored') {
+        list = list.filter(a => a.evaluation?.willIgnore);
+      } else if (currentAccountsFilter === 'codex') {
+        list = list.filter(a => a.provider === 'codex');
+      } else if (currentAccountsFilter === 'antigravity') {
+        list = list.filter(a => a.provider === 'antigravity');
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; padding: 24px; text-align: center; font-family: var(--font-mono); color: var(--text-muted); border: 2px dashed var(--border-line);">NO HAY CUENTAS QUE COINCIDAN CON EL FILTRO SELECCIONADO</div>';
+        return;
+      }
+
+      list.forEach(acc => {
+        const isIgnored = acc.evaluation?.willIgnore;
+        const isCooling = acc.is_cooling;
+        const cardClass = isIgnored ? 'ignored' : (isCooling ? 'cooling' : 'ready');
+        const badgeClass = acc.evaluation?.level === 'ok' ? 'ok' : (acc.evaluation?.level === 'error' ? 'error' : 'warn');
+
+        const card = document.createElement('div');
+        card.className = `account-card ${cardClass}`;
+
+        let quotaHtml = '';
+        if (acc.quota) {
+          const pct5h = Math.min(100, Math.round((acc.quota.usage5h / Math.max(1, acc.quota.limit5h)) * 100));
+          const pct7d = Math.min(100, Math.round((acc.quota.usage7d / Math.max(1, acc.quota.limit7d)) * 100));
+          const is5hExhausted = pct5h >= 100;
+          const is7dExhausted = pct7d >= 100;
+
+          quotaHtml = `
+            <div class="quota-section">
+              <div class="quota-item">
+                <div class="quota-row-label">
+                  <span>VENTANA 5 HORAS:</span>
+                  <span>${acc.quota.usage5h} / ${acc.quota.limit5h} (${pct5h}%)</span>
+                </div>
+                <div class="quota-track">
+                  <div class="quota-fill ${is5hExhausted ? 'exhausted' : ''}" style="width: ${pct5h}%;"></div>
+                </div>
+                <div class="quota-reset-text">Reinicia: ${escapeHtml(acc.quota.resetAt5h || 'N/A')}</div>
+              </div>
+
+              <div class="quota-item" style="margin-top: 4px;">
+                <div class="quota-row-label">
+                  <span>VENTANA 7 DÍAS (SEMANAL):</span>
+                  <span>${acc.quota.usage7d} / ${acc.quota.limit7d} (${pct7d}%)</span>
+                </div>
+                <div class="quota-track">
+                  <div class="quota-fill ${is7dExhausted ? 'exhausted' : ''}" style="width: ${pct7d}%;"></div>
+                </div>
+                <div class="quota-reset-text">Reinicia: ${escapeHtml(acc.quota.resetAt7d || 'N/A')}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        const lastTestedStr = acc.last_tested ? new Date(acc.last_tested).toLocaleTimeString() : 'NUNCA';
+        const cbState = acc.circuit_breaker?.state || 'CLOSED';
+        const cbFailures = acc.circuit_breaker?.failure_count || 0;
+
+        card.innerHTML = `
+          <div class="account-card-header">
+            <div class="account-card-provider">
+              <span class="provider-pill ${escapeHtml(acc.provider)}">${escapeHtml(acc.provider)}</span>
+              <span class="account-card-name" title="${escapeHtml(acc.name || acc.email)}">${escapeHtml(acc.name || acc.email)}</span>
+            </div>
+            <span class="account-verdict-badge ${badgeClass}">${escapeHtml(acc.evaluation?.badge || 'VERIFICANDO')}</span>
+          </div>
+
+          <div class="account-reason-box">
+            <strong>${isIgnored ? 'OMNIROUTE IGNORARÁ ESTA CUENTA:' : 'ESTADO OPERATIVO:'}</strong>
+            ${escapeHtml(acc.evaluation?.reason || 'Sin detalles adicionales.')}
+          </div>
+
+          ${quotaHtml}
+
+          <div class="telemetry-specs-grid">
+            <div class="telemetry-spec-row">
+              <span>SALUD:</span>
+              <strong>${escapeHtml(acc.test_status.toUpperCase())} (${escapeHtml(lastTestedStr)})</strong>
+            </div>
+            <div class="telemetry-spec-row">
+              <span>DISYUNTOR:</span>
+              <strong style="color: ${cbState === 'OPEN' ? '#DC2626' : '#15803D'}">${escapeHtml(cbState)} (${cbFailures} err)</strong>
+            </div>
+            <div class="telemetry-spec-row">
+              <span>COOLDOWN:</span>
+              <strong style="color: ${isCooling ? '#D97706' : 'inherit'}">${isCooling ? `${acc.cooling_remaining_seconds}s rest.` : 'NINGUNO'}</strong>
+            </div>
+            <div class="telemetry-spec-row">
+              <span>PRIORIDAD:</span>
+              <strong>NIVEL ${acc.priority || 1}</strong>
+            </div>
+          </div>
+
+          <div class="account-card-actions">
+            <button class="btn btn-outline" onclick="testSingleConnection('${escapeHtml(acc.id)}', this)" title="Fuerza un re-test inmediato de esta cuenta">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>RE-TEST</span>
+            </button>
+            <button class="btn btn-outline" onclick="clearConnectionCooldown('${escapeHtml(acc.id)}', this)" title="Limpia cualquier cooldown 429 y resetea el disyuntor">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+              <span>RESET COOLDOWN</span>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    async function forceRetestAllAccounts() {
+      const btn1 = document.getElementById('btn-retest-connections');
+      const btn2 = document.getElementById('btn-accounts-retest-all');
+      const label1 = document.getElementById('label-retest-connections');
+
+      if (btn1) btn1.style.pointerEvents = 'none';
+      if (btn2) btn2.style.pointerEvents = 'none';
+      if (label1) label1.innerHTML = '<span class="pixel-spinner"></span> TESTEANDO...';
+
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/omniroute/test-all`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(15000)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          accountsData = data.data;
+          renderAccountsUI();
+          pushToast(`RE-TEST COMPLETADO: ${accountsData.summary?.ready}/${accountsData.summary?.total} CUENTAS LISTAS`, 'success');
+        } else {
+          pushToast('ERROR AL EJECUTAR RE-TEST EN OMNIROUTE', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        pushToast(`FALLO DE RED AL RE-TESTEAR: ${err.message}`, 'error');
+      } finally {
+        if (btn1) btn1.style.pointerEvents = 'auto';
+        if (btn2) btn2.style.pointerEvents = 'auto';
+        if (label1) label1.textContent = 'FORZAR RE-TEST CUENTAS';
+      }
+    }
+
+    async function testSingleConnection(connectionId, btnEl) {
+      if (!btnEl) return;
+      const origHtml = btnEl.innerHTML;
+      btnEl.innerHTML = '<span class="pixel-spinner"></span>';
+      btnEl.style.pointerEvents = 'none';
+
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/omniroute/test-connection`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ connectionId }),
+          signal: AbortSignal.timeout(8000)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          accountsData = data.data;
+          renderAccountsUI();
+          pushToast('RE-TEST DE CUENTA COMPLETADO', 'success');
+        } else {
+          pushToast('FALLÓ EL TEST DE LA CUENTA', 'error');
+        }
+      } catch (err) {
+        pushToast(`ERROR: ${err.message}`, 'error');
+      } finally {
+        btnEl.innerHTML = origHtml;
+        btnEl.style.pointerEvents = 'auto';
+      }
+    }
+
+    async function clearConnectionCooldown(connectionId, btnEl) {
+      if (!btnEl) return;
+      const origHtml = btnEl.innerHTML;
+      btnEl.innerHTML = '<span class="pixel-spinner"></span>';
+      btnEl.style.pointerEvents = 'none';
+
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/omniroute/clear-cooldown`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ connectionId }),
+          signal: AbortSignal.timeout(8000)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          accountsData = data.data;
+          renderAccountsUI();
+          pushToast('COOLDOWN Y DISYUNTOR REINICIADOS EXITOSAMENTE', 'success');
+        } else {
+          pushToast('NO SE PUDO LIMPIAR EL COOLDOWN', 'error');
+        }
+      } catch (err) {
+        pushToast(`ERROR: ${err.message}`, 'error');
+      } finally {
+        btnEl.innerHTML = origHtml;
+        btnEl.style.pointerEvents = 'auto';
+      }
+    }
+
+    async function clearAllCooldownsAndCBs() {
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/omniroute/clear-all`, {
+          method: 'POST',
+          signal: AbortSignal.timeout(8000)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          accountsData = data.data;
+          renderAccountsUI();
+          pushToast('MASTER RESET: DISYUNTORES Y ENFRIAMIENTOS RESTABLECIDOS', 'success');
+        } else {
+          pushToast('ERROR AL RESTABLECER DISYUNTORES', 'error');
+        }
+      } catch (e) {
+        pushToast(`ERROR: ${e.message}`, 'error');
+      }
+    }
+
+    // ============================================================
+    // MODAL DIALOG CONTROLS
+    // ============================================================
+    function closeModals() {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+    }
+
+    function openDiffModal() {
+      const diffModal = document.getElementById('modal-diff');
+      const diffOutput = document.getElementById('diff-content');
+      const diff = computeLineDiff(initialDiskToml, currentFullToml);
+
+      if (diff.length === 0) {
+        diffOutput.innerHTML = '<div style="padding:20px; color:var(--text-muted); text-align:center;">No hay diferencias con la versión guardada en disco.</div>';
+      } else {
+        diffOutput.innerHTML = diff.map(d => {
+          const prefix = d.type === 'add' ? '+ ' : (d.type === 'remove' ? '- ' : '  ');
+          const cls = d.type === 'add' ? 'diff-line-add' : (d.type === 'remove' ? 'diff-line-remove' : 'diff-line-ctx');
+          return `<div class="${cls}"><code>${prefix}${escapeHtml(d.content)}</code></div>`;
+        }).join('');
+      }
+      diffModal.classList.add('active');
+    }
+
+    async function openBackupsModal() {
+      const modal = document.getElementById('modal-backups');
+      const listEl = document.getElementById('backups-list');
+      listEl.innerHTML = '<div style="padding:16px;">Cargando lista de respaldos...</div>';
+      modal.classList.add('active');
+
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/config/backups`);
+        const data = await res.json();
+        if (!data.backups || data.backups.length === 0) {
+          listEl.innerHTML = '<div style="padding:16px; color:var(--text-muted);">No hay respaldos automáticos registrados aún.</div>';
+          return;
+        }
+        listEl.innerHTML = data.backups.map(b => `
+          <div class="backup-item-row">
+            <div>
+              <strong>${escapeHtml(b.name)}</strong>
+              <div style="font-size:0.75rem; color:var(--text-muted);">${new Date(b.time).toLocaleString()} &bull; ${b.size} bytes</div>
+            </div>
+            <button class="btn btn-sm btn-outline" onclick="restoreBackup('${escapeHtml(b.name)}')">RESTAURAR</button>
+          </div>
+        `).join('');
+      } catch (e) {
+        listEl.innerHTML = `<div style="padding:16px; color:#DC2626;">Error cargando respaldos: ${escapeHtml(e.message)}</div>`;
+      }
+    }
+
+    async function restoreBackup(filename) {
+      if (!confirm(`¿Confirmas restaurar el respaldo '${filename}'? La configuración actual será reemplazada de inmediato.`)) return;
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/config/restore-backup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          closeModals();
+          await reloadAll();
+          pushToast(`RESPALDO RESTAURADO: ${filename}`, 'success');
+        } else {
+          pushToast(`ERROR: ${data.error || 'No se pudo restaurar el respaldo'}`, 'error');
+        }
+      } catch (e) {
+        pushToast(`ERROR: ${e.message}`, 'error');
+      }
+    }
+
+    async function openDiagnosticsModal() {
+      const modal = document.getElementById('modal-diagnostics');
+      const contentEl = document.getElementById('diagnostics-content');
+      contentEl.innerHTML = '<div style="padding:16px;">Ejecutando diagnóstico integral...</div>';
+      modal.classList.add('active');
+
+      try {
+        const res = await fetch(`${CONFIG_SERVER_URL}/api/diagnostics`);
+        const data = await res.json();
+        contentEl.innerHTML = `
+          <div class="diag-grid">
+            <div class="diag-card">
+              <h4>SERVIDOR LOCAL</h4>
+              <div>Puerto: <strong>${data.serverPort}</strong></div>
+              <div>Estado: <strong style="color:#15803D;">OPERATIVO</strong></div>
+            </div>
+            <div class="diag-card">
+              <h4>OMNIROUTE GATEWAY</h4>
+              <div>URL: <strong>${escapeHtml(data.omniRoute.url)}</strong></div>
+              <div>Estado: <strong style="color:${data.omniRoute.online ? '#15803D' : '#DC2626'};">${data.omniRoute.status}</strong></div>
+            </div>
+            <div class="diag-card">
+              <h4>CONFIG.TOML OPERATIVO</h4>
+              <div>Tamaño: <strong>${data.configToml?.size || 0} bytes</strong></div>
+              <div>SHA256: <code>${data.configToml?.hash ? data.configToml.hash.substring(0, 16) + '...' : 'N/A'}</code></div>
+            </div>
+            <div class="diag-card">
+              <h4>CUENTAS & TELEMETRÍA</h4>
+              <div>Total: <strong>${data.accountsSummary?.total || 0}</strong> &bull; Listas: <strong>${data.accountsSummary?.ready || 0}</strong></div>
+              <div>Combos detectados: <strong>${data.combosAvailable?.length || 0}</strong></div>
+            </div>
+          </div>
+          <pre id="raw-diag-json" style="background:#0c0d10; color:#FAF9F6; padding:12px; margin-top:12px; font-size:0.75rem; max-height:200px; overflow:auto;">${escapeHtml(JSON.stringify(data, null, 2))}</pre>
+          <button class="btn btn-outline" style="margin-top:10px;" onclick="copyDiagnosticsReport()">COPIAR INFORME REDACTADO</button>
+        `;
+      } catch (e) {
+        contentEl.innerHTML = `<div style="padding:16px; color:#DC2626;">Fallo al obtener diagnóstico: ${escapeHtml(e.message)}</div>`;
+      }
+    }
+
+    function copyDiagnosticsReport() {
+      const code = document.getElementById('raw-diag-json')?.textContent;
+      if (code) {
+        navigator.clipboard.writeText(code).then(() => {
+          pushToast('INFORME DE DIAGNÓSTICO COPIADO AL PORTAPAPELES', 'info');
+        });
+      }
+    }
+
+    // ============================================================
+    // TOASTS & CLIPBOARD
+    // ============================================================
+    function copyTomlToClipboard() {
+      const toml = currentFullToml;
+      navigator.clipboard.writeText(toml).then(() => {
+        pushToast('BUFFER: CONFIGURACIÓN COPIADA AL PORTAPAPELES', 'info');
+      });
+    }
+
+    function downloadTomlFile() {
+      const toml = currentFullToml;
+      const blob = new Blob([toml], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'config.toml';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function pushToast(message, type = 'info') {
+      const viewport = document.getElementById('toast-viewport');
+      if (!viewport) return;
+      const toast = document.createElement('div');
+      toast.className = `toast-box ${type}`;
+      toast.innerHTML = `
+        <span class="toast-box-prefix">[SYS_EVENT]</span>
+        <span>${escapeHtml(message)}</span>
+        <span class="cursor-block"></span>
+      `;
+      viewport.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+        toast.style.transition = 'all 0.15s ease';
+        setTimeout(() => toast.remove(), 180);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

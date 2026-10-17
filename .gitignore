@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+package-lock.json.bak
+
+# Private and local-only operator space
+.local-private/
+private/
+secrets/
+
+# Environment files
+.env*
+!.env.example
+
+# Local databases and runtime state
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.lock
+
+# User configuration and backup exports
+config.toml*
+*.backup-*
+
+# Logs, diagnostics, and temporary files
+*.log
+*.tmp
+*.tmp-*
+npm-debug.log*
+
+# Test output and Playwright artifacts
+test-results/
+playwright-report/
+blob-report/
+coverage/
+tests/.temp-sandbox/
+
+# OS metadata
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

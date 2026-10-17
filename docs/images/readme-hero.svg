@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 220" width="880" height="220">
+  <defs>
+    <style>
+      .bg { fill: #0b0c10; }
+      .grid { stroke: #181a24; stroke-width: 1; }
+      .border { stroke: #3a3d52; stroke-width: 2; fill: none; }
+      .corner { fill: #61afef; }
+      .title { font-family: 'Courier New', monospace; font-size: 28px; font-weight: 900; fill: #fafafa; letter-spacing: 3px; }
+      .accent { fill: #61afef; }
+      .tag { font-family: 'Courier New', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; fill: #98c379; }
+      .sub { font-family: 'Courier New', monospace; font-size: 13px; fill: #abb2bf; letter-spacing: 1.2px; }
+      .meta { font-family: 'Courier New', monospace; font-size: 10px; fill: #5c6370; }
+      .pill { fill: #1e222b; stroke: #3a3d52; stroke-width: 1; rx: 3; }
+      .pill-text { font-family: 'Courier New', monospace; font-size: 10px; fill: #abb2bf; font-weight: 700; }
+    </style>
+    <pattern id="grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#141721" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="880" height="220" class="bg"/>
+  <rect width="880" height="220" fill="url(#grid-pattern)"/>
+
+  <!-- Outer Frame -->
+  <rect x="16" y="16" width="848" height="188" class="border"/>
+  
+  <!-- Corner Brackets -->
+  <polygon points="12,12 28,12 28,16 16,16 16,28 12,28" class="corner"/>
+  <polygon points="868,12 852,12 852,16 864,16 864,28 868,28" class="corner"/>
+  <polygon points="12,208 28,208 28,204 16,204 16,192 12,192" class="corner"/>
+  <polygon points="868,208 852,208 852,204 864,204 864,192 868,192" class="corner"/>
+
+  <!-- Top Status Line -->
+  <text x="36" y="44" class="tag">// CODEX_AI_MATRIX // DESKTOP_CONTROL_PLANE // v2.1.0</text>
+  <line x1="36" y1="52" x2="844" y2="52" stroke="#2c313c" stroke-width="1"/>
+
+  <!-- Main Title -->
+  <text x="36" y="96" class="title">CODEX <tspan class="accent">CONFIG</tspan> MANAGER</text>
+  <text x="36" y="124" class="sub">High-Precision TOML Orchestration, Live Telemetry &amp; Reasoning Matrix for Windows</text>
+
+  <!-- Status / Feature Badges -->
+  <g transform="translate(36, 148)">
+    <!-- Pill 1 -->
+    <rect x="0" y="0" width="135" height="24" class="pill"/>
+    <circle cx="12" cy="12" r="4" fill="#98c379"/>
+    <text x="24" y="16" class="pill-text">SURGICAL TOML</text>
+
+    <!-- Pill 2 -->
+    <rect x="145" y="0" width="165" height="24" class="pill"/>
+    <circle cx="157" cy="12" r="4" fill="#61afef"/>
+    <text x="169" y="16" class="pill-text">7 REASONING LEVELS</text>
+
+    <!-- Pill 3 -->
+    <rect x="320" y="0" width="170" height="24" class="pill"/>
+    <circle cx="332" cy="12" r="4" fill="#e5c07b"/>
+    <text x="344" y="16" class="pill-text">OMNIROUTE TELEMETRY</text>
+
+    <!-- Pill 4 -->
+    <rect x="500" y="0" width="155" height="24" class="pill"/>
+    <circle cx="512" cy="12" r="4" fill="#c678dd"/>
+    <text x="524" y="16" class="pill-text">LOCAL HOST BRIDGE</text>
+
+    <!-- Pill 5 -->
+    <rect x="665" y="0" width="145" height="24" class="pill"/>
+    <circle cx="677" cy="12" r="4" fill="#98c379"/>
+    <text x="689" y="16" class="pill-text">WINDOWS 10 / 11</text>
+  </g>
+
+  <!-- Footer Technical Meta -->
+  <text x="36" y="194" class="meta">ENCODING: UTF-8 // PROTOCOL: HTTP LOOPBACK (127.0.0.1:20129) // ARCHITECTURE: SINGLE-FILE UI + ATOMIC NODE BRIDGE</text>
+</svg>
