@@ -5,12 +5,19 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
-import { DatabaseSync } from 'node:sqlite';
 import {
   computeHash,
   validateToml,
   generateDiff
 } from './toml-engine.mjs';
+
+let DatabaseSync = null;
+try {
+  const sqlite = await import('node:sqlite');
+  DatabaseSync = sqlite.DatabaseSync;
+} catch (e) {
+  // node:sqlite is available natively in Node.js >= 22.5.0
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -289,7 +296,7 @@ export function getOmniRouteApiKey() {
     return process.env.OMNIROUTE_API_KEY;
   }
   try {
-    if (fs.existsSync(OMNIROUTE_DB_PATH)) {
+    if (DatabaseSync && fs.existsSync(OMNIROUTE_DB_PATH)) {
       const db = new DatabaseSync(OMNIROUTE_DB_PATH);
       db.exec('PRAGMA busy_timeout = 3000;');
       const row = db.prepare('SELECT key FROM api_keys WHERE is_active = 1 LIMIT 1').get();
@@ -306,7 +313,7 @@ export function getOmniRouteApiKey() {
  * DOES NOT mutate database records on GET requests.
  */
 export function getOmniRouteAccountsData() {
-  if (!fs.existsSync(OMNIROUTE_DB_PATH)) {
+  if (!DatabaseSync || !fs.existsSync(OMNIROUTE_DB_PATH)) {
     return { error: 'OmniRoute database no encontrada', connections: [], combos: [], summary: { total: 0, ready: 0, ignored: 0 } };
   }
 
@@ -690,7 +697,7 @@ export function createServer() {
           const activeProvider = validation.data?.model_provider || 'omniroute';
           let threadsUpdated = 0;
 
-          if (activeModel && fs.existsSync(STATE_DB_PATH)) {
+          if (DatabaseSync && activeModel && fs.existsSync(STATE_DB_PATH)) {
             try {
               const db = new DatabaseSync(STATE_DB_PATH);
               db.exec('PRAGMA busy_timeout = 5000;');
@@ -995,7 +1002,7 @@ export function createServer() {
           });
 
           try {
-            if (fs.existsSync(OMNIROUTE_DB_PATH)) {
+            if (DatabaseSync && fs.existsSync(OMNIROUTE_DB_PATH)) {
               const db = new DatabaseSync(OMNIROUTE_DB_PATH);
               db.exec('PRAGMA busy_timeout = 3000;');
               db.prepare("UPDATE domain_circuit_breakers SET state = 'CLOSED', failure_count = 0 WHERE name LIKE ?").run(`%${connectionId}%`);
@@ -1031,7 +1038,7 @@ export function createServer() {
       }
 
       try {
-        if (fs.existsSync(OMNIROUTE_DB_PATH)) {
+        if (DatabaseSync && fs.existsSync(OMNIROUTE_DB_PATH)) {
           const db = new DatabaseSync(OMNIROUTE_DB_PATH);
           db.exec('PRAGMA busy_timeout = 5000;');
           db.prepare("UPDATE domain_circuit_breakers SET state = 'CLOSED', failure_count = 0").run();
@@ -1073,7 +1080,7 @@ export function createServer() {
             return;
           }
 
-          if (fs.existsSync(STATE_DB_PATH)) {
+          if (DatabaseSync && fs.existsSync(STATE_DB_PATH)) {
             const db = new DatabaseSync(STATE_DB_PATH);
             db.exec('PRAGMA busy_timeout = 5000;');
             const r = db.prepare('UPDATE threads SET model = ?, model_provider = ? WHERE archived = 0').run(targetModel, targetProvider);
