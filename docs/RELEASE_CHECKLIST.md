@@ -1,10 +1,10 @@
-# Pre-Release Quality Gates & Verification Checklist (v2.1.1)
+# Pre-Release Quality Gates & Verification Checklist (v2.2.0)
 
-Every release of **Codex Config Manager** must satisfy the 14 mandatory release gates prior to public distribution.
+Every release of **Codex Config Manager** must satisfy the 16 mandatory release gates prior to public distribution.
 
 ---
 
-## Release Gates Matrix (G1–G14)
+## Release Gates Matrix (G1–G16)
 
 | Gate | Requirement | Verification Method | Status |
 | :--- | :--- | :--- | :---: |
@@ -18,10 +18,12 @@ Every release of **Codex Config Manager** must satisfy the 14 mandatory release 
 | **G8** | **Security & Hardening Suite** | 27 security tests in `tests/security.test.mjs` pass cleanly (Loopback, Origin, env loader, DI). | :white_check_mark: PASS |
 | **G9** | **Real Disk Persistence E2E Suite** | 29 isolated disk persistence and recovery tests in `tests/e2e-disk-persistence.test.mjs` pass cleanly. | :white_check_mark: PASS |
 | **G10** | **Playwright UI E2E Suite** | 20 end-to-end browser automation tests in `tests/e2e.test.mjs` pass cleanly in an isolated sandbox. | :white_check_mark: PASS |
-| **G11** | **Synthetic Privacy-Safe Imagery** | Protected screenshots in `docs/images/` using synthetic demo accounts; separate `docs:screenshots` script. | :white_check_mark: PASS |
-| **G12** | **Single-File Frontend Architecture** | Verified `src/web/index.html` is a standalone, vanilla HTML5+CSS+JS document without external node/npm build dependencies. | :white_check_mark: PASS |
-| **G13** | **Path Portability & CI Compatibility** | Paths resolved via `process.env.USERPROFILE || os.homedir()`, overridable via environment variables. Dynamic parent folder resolution in VBS scripts. | :white_check_mark: PASS |
-| **G14** | **Documentation & Community Standards** | Relative repository links in `README.md`, truthful Node `>=22.5.0` engine requirement, `SECURITY.md`, `LICENSE` (MIT), `CONTRIBUTING.md`, `CHANGELOG.md`, `docs/ARCHITECTURE.md`, and `docs/TESTING.md`. | :white_check_mark: PASS |
+| **G11** | **Static i18n & Translation Quality** | 22 tests in `tests/i18n-static.test.mjs` assert dictionary symmetry, key integrity, date formatting, and Spanish default. | :white_check_mark: PASS |
+| **G12** | **Bilingual Playwright E2E Suite** | 22 tests in `tests/e2e-i18n.test.mjs` verify zero-reload toggling, DOM updates, dirty state preservation, and F5 localStorage persistence. | :white_check_mark: PASS |
+| **G13** | **Synthetic Privacy-Safe Imagery** | Protected screenshots in `docs/images/` including `dashboard-en.png` using synthetic demo accounts; separate `docs:screenshots` script. | :white_check_mark: PASS |
+| **G14** | **Single-File Frontend Architecture** | Verified `src/web/index.html` is a standalone, vanilla HTML5+CSS+JS document with embedded dictionaries and zero npm build dependencies. | :white_check_mark: PASS |
+| **G15** | **Path Portability & CI Compatibility** | Paths resolved via `process.env.USERPROFILE || os.homedir()`, overridable via environment variables. Dynamic parent folder resolution in VBS scripts. | :white_check_mark: PASS |
+| **G16** | **Documentation & Community Standards** | Relative repository links in `README.md`, truthful Node `>=22.5.0` engine requirement, `SECURITY.md`, `LICENSE` (MIT), `CONTRIBUTING.md`, `CHANGELOG.md`, `docs/ARCHITECTURE.md`, `docs/TESTING.md`, and `docs/I18N.md`. | :white_check_mark: PASS |
 
 ---
 
@@ -29,10 +31,10 @@ Every release of **Codex Config Manager** must satisfy the 14 mandatory release 
 
 ```text
 ================================================================
- SUMMARY AUDIT RESULTS (v2.1.1)
+ SUMMARY AUDIT RESULTS (v2.2.0)
 ================================================================
-Total Test Scenarios Executed : 121
-Total Passed                  : 121
+Total Test Scenarios Executed : 165
+Total Passed                  : 165
 Total Failed                  : 0
 Total Regressions             : 0
 Release Gate Decision         : ALL GATES PASS -> AUTHORIZED FOR RELEASE

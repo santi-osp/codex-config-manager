@@ -13,11 +13,13 @@ The testing suite consists of four decoupled layers:
 |                               TEST EXECUTION MATRIX                               |
 +-----------------------------------------------------------------------------------+
 | 1. Unit Tests         | tests/toml-engine.test.mjs           | 45 Test Scenarios  |
-| 2. Security Suite     | tests/security.test.mjs              | 27 Test Scenarios  |
-| 3. Real Disk E2E      | tests/e2e-disk-persistence.test.mjs  | 29 Test Scenarios  |
-| 4. Playwright UI E2E  | tests/e2e.test.mjs                   | 20 Test Scenarios  |
+| 2. Static i18n Suite  | tests/i18n-static.test.mjs           | 22 Test Scenarios  |
+| 3. Security Suite     | tests/security.test.mjs              | 27 Test Scenarios  |
+| 4. Real Disk E2E      | tests/e2e-disk-persistence.test.mjs  | 29 Test Scenarios  |
+| 5. Playwright UI E2E  | tests/e2e.test.mjs                   | 20 Test Scenarios  |
+| 6. Bilingual i18n E2E | tests/e2e-i18n.test.mjs              | 22 Test Scenarios  |
 +-----------------------+--------------------------------------+--------------------+
-| TOTAL COVERAGE        | 121 Automated Scenarios              | 100% Pass Rate     |
+| TOTAL COVERAGE        | 165 Automated Scenarios              | 100% Pass Rate     |
 +-----------------------------------------------------------------------------------+
 ```
 
@@ -100,9 +102,36 @@ npm run docs:screenshots
 
 ---
 
+## 5. Static Translation Quality & Dictionary Suite (`tests/i18n-static.test.mjs`)
+
+Audits dictionary symmetry, key integrity, and template placeholders:
+- **Dictionary Symmetry**: Asserts that all 340 translation keys exist symmetrically in both `es` and `en` namespaces.
+- **Placeholder Parity**: Confirms interpolation placeholders (e.g. `{time}`, `{model}`, `{error}`) match across languages.
+- **DOM Attribute Coverage**: Verifies every `data-i18n*` attribute in `index.html` resolves to a valid dictionary key.
+- **Strict Spanish Default**: Asserts `<html lang="es">` is statically hardcoded in source markup.
+- **Resilient Formatting**: Validates localized dates, timestamps, and `"N/A"` null-coalescing logic.
+
+To run static i18n tests:
+```bash
+npm run test:i18n
+```
+
+---
+
+## 6. Bilingual i18n Browser E2E Suite (`tests/e2e-i18n.test.mjs`)
+
+Validates runtime language toggling and desktop user experience:
+- **Instant In-Place Toggling**: Switches UI language without full page navigation or loss of scroll position.
+- **State Preservation**: Verifies active dirty state, form inputs, selected tabs, and filter pills persist across language switches.
+- **Modal Responsiveness**: Asserts open modals (Diff, Diagnostics, Backups) translate dynamically in place.
+- **Keyboard Navigation**: Tests keyboard accessibility (`Enter`/`Space`) on retro-pixel segmented toggle buttons.
+- **Local Persistence**: Verifies `localStorage.getItem('preferred_language')` restores selected locale upon browser reload (`F5`).
+
+---
+
 ## Running the Complete Suite
 
-To execute all four suites in sequence:
+To execute all six suites in sequence:
 
 ```bash
 npm test

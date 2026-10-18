@@ -33,7 +33,7 @@ test-results/
 playwright-report/
 blob-report/
 coverage/
-tests/.temp-sandbox/
+tests/.temp-sandbox*/
 
 # OS metadata
 Thumbs.db

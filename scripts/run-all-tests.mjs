@@ -10,9 +10,11 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 
 const suites = [
   { name: 'Unit Suite (TOML Engine Surgical Round-Trip)', script: 'tests/toml-engine.test.mjs' },
+  { name: 'Static i18n & Translation Quality Suite', script: 'tests/i18n-static.test.mjs' },
   { name: 'Security & Hardening Suite', script: 'tests/security.test.mjs' },
   { name: 'Real Disk Persistence & Recovery E2E Suite', script: 'tests/e2e-disk-persistence.test.mjs' },
-  { name: 'Playwright Synthetic UI Demo E2E Suite', script: 'tests/e2e.test.mjs' }
+  { name: 'Playwright Synthetic UI Demo E2E Suite', script: 'tests/e2e.test.mjs' },
+  { name: 'Playwright Bilingual i18n E2E Suite', script: 'tests/e2e-i18n.test.mjs' }
 ];
 
 async function runSuite({ name, script }) {

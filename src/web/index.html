@@ -206,6 +206,56 @@
       background: #101010;
     }
 
+    /* LANGUAGE SELECTOR */
+    .lang-selector {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border-dark);
+      background: var(--bg-surface);
+      padding: 1px;
+      font-family: var(--font-pixel);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      user-select: none;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 2px 7px;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: background-color 0.1s ease, color 0.1s ease;
+    }
+
+    .lang-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-surface-alt);
+    }
+
+    .lang-btn.active {
+      background: var(--bg-dark);
+      color: var(--text-inv);
+      cursor: default;
+    }
+
+    .lang-btn:focus-visible {
+      outline: 2px solid var(--bg-dark);
+      outline-offset: 1px;
+    }
+
+    .lang-divider {
+      color: var(--border-line);
+      font-size: 0.68rem;
+      padding: 0 1px;
+      pointer-events: none;
+    }
+
+
     /* HEADER EDITORIAL HERO */
     header {
       background: var(--bg-surface);
@@ -1438,28 +1488,33 @@
       </div>
 
       <div class="top-telemetry">
-        <div id="status-dirty" class="telemetry-item clean" title="Estado de cambios respecto al archivo en disco">
+        <div class="lang-selector" role="group" aria-label="Selector de idioma / Language selector" data-i18n-aria-label="a11y.lang_selector">
+          <button type="button" id="btn-lang-es" class="lang-btn active" data-lang="es" aria-pressed="true" onclick="setLanguage('es')">ES</button>
+          <span class="lang-divider" aria-hidden="true">|</span>
+          <button type="button" id="btn-lang-en" class="lang-btn" data-lang="en" aria-pressed="false" onclick="setLanguage('en')">EN</button>
+        </div>
+        <div id="status-dirty" class="telemetry-item clean" title="Estado de cambios respecto al archivo en disco" data-i18n-title="telemetry.dirty_title">
           <span class="status-dot success"></span>
           <span>SIN CAMBIOS</span>
         </div>
-        <div id="status-accounts" class="telemetry-item inactive" onclick="navigateTab('accounts')" style="cursor: pointer;" title="Monitor de Cuentas OmniRoute (Click para ver estado)">
+        <div id="status-accounts" class="telemetry-item inactive" onclick="navigateTab('accounts')" style="cursor: pointer;" title="Monitor de Cuentas OmniRoute (Click para ver estado)" data-i18n-title="telemetry.accounts_title">
           <span class="pixel-dot"></span>
           <span id="text-accounts">CUENTAS: VERIFICANDO</span>
         </div>
 
-        <div id="status-omniroute" class="telemetry-item inactive" title="Conexión con OmniRoute (Puerto 20128)">
+        <div id="status-omniroute" class="telemetry-item inactive" title="Conexión con OmniRoute (Puerto 20128)" data-i18n-title="telemetry.omniroute_title">
           <span class="pixel-dot"></span>
           <span id="text-omniroute">OMNIROUTE: VERIFICANDO</span>
         </div>
 
-        <div id="status-server" class="telemetry-item inactive" title="Sincronizador con config.toml (Puerto 20129)">
+        <div id="status-server" class="telemetry-item inactive" title="Sincronizador con config.toml (Puerto 20129)" data-i18n-title="telemetry.server_title">
           <span class="pixel-dot"></span>
           <span id="text-server">SYNC_SERVER: VERIFICANDO</span>
         </div>
 
         <div class="telemetry-item active">
           <span class="pixel-dot active"></span>
-          <span>SYSTEM: READY</span>
+          <span data-i18n="telemetry.system_ready">SYSTEM: READY</span>
         </div>
       </div>
     </div>
@@ -1470,13 +1525,13 @@
     <!-- Main Editorial Header -->
     <header>
       <div class="hero-text-col">
-        <h1 class="hero-title">CODEX AI MATRIX</h1>
-        <p class="hero-subtitle">
+        <h1 class="hero-title" data-i18n="header.hero_title">CODEX AI MATRIX</h1>
+        <p class="hero-subtitle" data-i18n="header.hero_subtitle">
           Panel de control y configuración técnica para agentes autónomos OpenAI Codex, enrutamiento local con OmniRoute y parámetros del sistema de ejecución.
         </p>
 
         <div class="pixel-callout">
-          <span>SYS_STATUS:</span>
+          <span data-i18n="header.sys_status_label">SYS_STATUS:</span>
           <span id="callout-status-text">ESPERANDO RESPUESTA DE RUNTIME</span>
           <span class="cursor-block"></span>
         </div>
@@ -1485,45 +1540,45 @@
       <div class="hero-actions-col">
         <div class="actions-cluster">
           <!-- Forzar Re-test Cuentas OmniRoute -->
-          <button id="btn-retest-connections" class="btn btn-outline" onclick="forceRetestAllAccounts()" title="Fuerza un re-test inmediato de todas las cuentas en OmniRoute, ignorando tiempos de espera y reiniciando disyuntores">
+          <button id="btn-retest-connections" class="btn btn-outline" onclick="forceRetestAllAccounts()" title="Fuerza un re-test inmediato de todas las cuentas en OmniRoute, ignorando tiempos de espera y reiniciando disyuntores" data-i18n-title="header.btn_retest_title">
             <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span id="label-retest-connections">FORZAR RE-TEST CUENTAS</span>
+            <span id="label-retest-connections" data-i18n="header.btn_retest">FORZAR RE-TEST CUENTAS</span>
           </button>
 
           <!-- Restart Desktop App Button -->
-          <button id="btn-restart-app" class="btn btn-outline" onclick="restartCodexDesktopApp()" title="Cierra ordenadamente ChatGPT y el daemon de forma limpia, y reabre la aplicación">
+          <button id="btn-restart-app" class="btn btn-outline" onclick="restartCodexDesktopApp()" title="Cierra ordenadamente ChatGPT y el daemon de forma limpia, y reabre la aplicación" data-i18n-title="header.btn_restart_title">
             <svg class="icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="0"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
-            <span id="label-restart-app">REINICIAR CHATGPT APP</span>
+            <span id="label-restart-app" data-i18n="header.btn_restart">REINICIAR CHATGPT APP</span>
           </button>
 
           <!-- Ver Diff Modal -->
-          <button id="btn-open-diff" class="btn btn-outline" onclick="openDiffModal()" title="Visualizar diferencias entre la configuración en disco y los cambios en memoria">
+          <button id="btn-open-diff" class="btn btn-outline" onclick="openDiffModal()" title="Visualizar diferencias entre la configuración en disco y los cambios en memoria" data-i18n-title="header.btn_diff_title">
             <svg class="icon" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
-            <span>VER DIFF</span>
+            <span data-i18n="header.btn_diff">VER DIFF</span>
           </button>
 
           <!-- Backups Modal -->
-          <button id="btn-open-backups" class="btn btn-outline" onclick="openBackupsModal()" title="Consultar y restaurar respaldos automáticos de configuración">
+          <button id="btn-open-backups" class="btn btn-outline" onclick="openBackupsModal()" title="Consultar y restaurar respaldos automáticos de configuración" data-i18n-title="header.btn_backups_title">
             <svg class="icon" viewBox="0 0 24 24"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"/></svg>
-            <span>RESPALDOS</span>
+            <span data-i18n="header.btn_backups">RESPALDOS</span>
           </button>
 
           <!-- Diagnostics Modal -->
-          <button id="btn-open-diagnostics" class="btn btn-outline" onclick="openDiagnosticsModal()" title="Inspeccionar integridad del sistema y telemetría de OmniRoute">
+          <button id="btn-open-diagnostics" class="btn btn-outline" onclick="openDiagnosticsModal()" title="Inspeccionar integridad del sistema y telemetría de OmniRoute" data-i18n-title="header.btn_diagnostics_title">
             <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-            <span>DIAGNÓSTICO</span>
+            <span data-i18n="header.btn_diagnostics">DIAGNÓSTICO</span>
           </button>
 
           <!-- Reload Button -->
-          <button class="btn btn-outline" onclick="reloadAll()" title="Recargar combos y configuración">
+          <button class="btn btn-outline" onclick="reloadAll()" title="Recargar combos y configuración" data-i18n-title="header.btn_reload_title">
             <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-            <span>RECARGAR</span>
+            <span data-i18n="header.btn_reload">RECARGAR</span>
           </button>
 
           <!-- Save Button -->
-          <button class="btn btn-solid-dark" onclick="saveConfiguration()" title="Guardar configuración en config.toml">
+          <button class="btn btn-solid-dark" onclick="saveConfiguration()" title="Guardar configuración en config.toml" data-i18n-title="header.btn_save_title">
             <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span>GUARDAR CAMBIOS</span>
+            <span data-i18n="header.btn_save">GUARDAR CAMBIOS</span>
           </button>
         </div>
       </div>
@@ -1534,47 +1589,47 @@
       <div class="nav-tabs-grid">
         <button class="tab-trigger active" onclick="navigateTab('accounts')">
           <span class="tab-num">[00]</span>
-          <span class="tab-text">MONITOR CUENTAS</span>
+          <span class="tab-text" data-i18n="nav.accounts">MONITOR CUENTAS</span>
         </button>
 
         <button class="tab-trigger" onclick="navigateTab('models')">
           <span class="tab-num">[01]</span>
-          <span class="tab-text">MODELOS & COMBOS</span>
+          <span class="tab-text" data-i18n="nav.models">MODELOS & COMBOS</span>
         </button>
 
         <button class="tab-trigger" onclick="navigateTab('provider')">
           <span class="tab-num">[02]</span>
-          <span class="tab-text">PROVEEDOR</span>
+          <span class="tab-text" data-i18n="nav.provider">PROVEEDOR</span>
         </button>
 
         <button class="tab-trigger" onclick="navigateTab('security')">
           <span class="tab-num">[03]</span>
-          <span class="tab-text">SEGURIDAD</span>
+          <span class="tab-text" data-i18n="nav.security">SEGURIDAD</span>
         </button>
 
         <button class="tab-trigger" onclick="navigateTab('reasoning')">
           <span class="tab-num">[04]</span>
-          <span class="tab-text">RAZONAMIENTO</span>
+          <span class="tab-text" data-i18n="nav.reasoning">RAZONAMIENTO</span>
         </button>
 
         <button class="tab-trigger" onclick="navigateTab('features')">
           <span class="tab-num">[05]</span>
-          <span class="tab-text">FEATURES</span>
+          <span class="tab-text" data-i18n="nav.features">FEATURES</span>
         </button>
 
         <button class="tab-trigger" onclick="navigateTab('desktop')">
           <span class="tab-num">[06]</span>
-          <span class="tab-text">DESKTOP / TUI</span>
+          <span class="tab-text" data-i18n="nav.desktop">DESKTOP / TUI</span>
         </button>
 
         <button class="tab-trigger" onclick="navigateTab('plugins')">
           <span class="tab-num">[07]</span>
-          <span class="tab-text">PLUGINS</span>
+          <span class="tab-text" data-i18n="nav.plugins">PLUGINS</span>
         </button>
 
         <button class="tab-trigger" onclick="navigateTab('raw')">
           <span class="tab-num">[08]</span>
-          <span class="tab-text">CONFIG.TOML</span>
+          <span class="tab-text" data-i18n="nav.toml">CONFIG.TOML</span>
         </button>
       </div>
       <div class="scanline-bar-subtle"></div>
@@ -1588,18 +1643,18 @@
       <div class="spec-card">
         <div class="spec-card-header" style="flex-wrap: wrap; gap: 12px;">
           <div class="spec-header-left">
-            <span class="spec-tag">// RUNTIME_MONITOR: OMNIROUTE_PRE_DISPATCH_MATRIX</span>
-            <h2 class="spec-title">MONITOR DE CUENTAS & ENRUTAMIENTO EN VIVO</h2>
-            <p class="spec-desc">Visualiza en tiempo real si tus cuentas (Codex, Antigravity, etc.) serán utilizadas o ignoradas por OmniRoute antes de cada petición, el estado de sus disyuntores de circuito y sus límites de cuota (5h y 7d).</p>
+            <span class="spec-tag" data-i18n="accounts.spec_tag">// RUNTIME_MONITOR: OMNIROUTE_PRE_DISPATCH_MATRIX</span>
+            <h2 class="spec-title" data-i18n="accounts.spec_title">MONITOR DE CUENTAS & ENRUTAMIENTO EN VIVO</h2>
+            <p class="spec-desc" data-i18n="accounts.spec_desc">Visualiza en tiempo real si tus cuentas (Codex, Antigravity, etc.) serán utilizadas o ignoradas por OmniRoute antes de cada petición, el estado de sus disyuntores de circuito y sus límites de cuota (5h y 7d).</p>
           </div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <button id="btn-accounts-retest-all" class="btn btn-solid-dark" onclick="forceRetestAllAccounts()" style="font-size: 0.72rem; padding: 7px 14px;">
               <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>FORZAR RE-TEST INMEDIATO (ALL)</span>
+              <span data-i18n="accounts.btn_retest_all">FORZAR RE-TEST INMEDIATO (ALL)</span>
             </button>
             <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-family: var(--font-mono); cursor: pointer; user-select: none;">
               <input type="checkbox" id="chk-auto-refresh-accounts" checked onchange="toggleAccountsAutoRefresh(this.checked)">
-              <span>AUTO-REFRESCO (15s)</span>
+              <span data-i18n="accounts.chk_autorefresh">AUTO-REFRESCO (15s)</span>
             </label>
             <span id="text-accounts-last-update" style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted);">ACTUALIZADO: --:--:--</span>
           </div>
@@ -1608,19 +1663,19 @@
         <!-- 4-Tile High Level Summary Matrix -->
         <div class="accounts-summary-grid">
           <div class="account-stat-card">
-            <span class="account-stat-label">TOTAL CUENTAS CONECTADAS</span>
+            <span class="account-stat-label" data-i18n="accounts.stat_total">TOTAL CUENTAS CONECTADAS</span>
             <span id="stat-accounts-total" class="account-stat-val">--</span>
           </div>
           <div class="account-stat-card">
-            <span class="account-stat-label">LISTAS PARA DESPACHO</span>
+            <span class="account-stat-label" data-i18n="accounts.stat_ready">LISTAS PARA DESPACHO</span>
             <span id="stat-accounts-ready" class="account-stat-val ok">--</span>
           </div>
           <div class="account-stat-card">
-            <span class="account-stat-label">IGNORADAS / LÍMITE AGOTADO</span>
+            <span class="account-stat-label" data-i18n="accounts.stat_ignored">IGNORADAS / LÍMITE AGOTADO</span>
             <span id="stat-accounts-ignored" class="account-stat-val error">--</span>
           </div>
           <div class="account-stat-card">
-            <span class="account-stat-label">EN COOLDOWN (429)</span>
+            <span class="account-stat-label" data-i18n="accounts.stat_cooling">EN COOLDOWN (429)</span>
             <span id="stat-accounts-cooling" class="account-stat-val warn">--</span>
           </div>
         </div>
@@ -1630,10 +1685,10 @@
       <div class="combo-pipeline-box">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="spec-tag" style="margin: 0;">// PIPELINE_DESPACHO_COMBO:</span>
+            <span class="spec-tag" style="margin: 0;" data-i18n="pipeline.spec_tag">// PIPELINE_DESPACHO_COMBO:</span>
             <span id="text-pipeline-combo-name" style="font-family: var(--font-pixel); font-size: 0.85rem; color: var(--text-main); font-weight: 700;">coding-con-caro</span>
           </div>
-          <span style="font-size: 0.70rem; color: var(--text-muted); font-family: var(--font-mono);">SECUENCIA DE RELEVO SEGÚN PRIORIDAD DEL COMBO</span>
+          <span style="font-size: 0.70rem; color: var(--text-muted); font-family: var(--font-mono);" data-i18n="pipeline.spec_desc">SECUENCIA DE RELEVO SEGÚN PRIORIDAD DEL COMBO</span>
         </div>
 
         <div id="pipeline-nodes-container" class="pipeline-nodes-flow">
@@ -1648,18 +1703,18 @@
       <!-- Filter Bar and Accounts Grid -->
       <div class="accounts-filter-bar">
         <div class="filter-pills-cluster">
-          <button class="filter-pill active" onclick="setAccountsFilter('all', this)" id="filter-btn-all">TODAS (<span id="filter-count-all">0</span>)</button>
-          <button class="filter-pill" onclick="setAccountsFilter('ready', this)">LISTAS (<span id="filter-count-ready">0</span>)</button>
-          <button class="filter-pill" onclick="setAccountsFilter('ignored', this)">IGNORADAS (<span id="filter-count-ignored">0</span>)</button>
-          <button class="filter-pill" onclick="setAccountsFilter('codex', this)">CODEX (<span id="filter-count-codex">0</span>)</button>
-          <button class="filter-pill" onclick="setAccountsFilter('antigravity', this)">ANTIGRAVITY (<span id="filter-count-antigravity">0</span>)</button>
+          <button class="filter-pill active" onclick="setAccountsFilter('all', this)" id="filter-btn-all"><span data-i18n="accounts.filter_all">TODAS</span> (<span id="filter-count-all">0</span>)</button>
+          <button class="filter-pill" onclick="setAccountsFilter('ready', this)" id="filter-btn-ready"><span data-i18n="accounts.filter_ready">LISTAS</span> (<span id="filter-count-ready">0</span>)</button>
+          <button class="filter-pill" onclick="setAccountsFilter('ignored', this)" id="filter-btn-ignored"><span data-i18n="accounts.filter_ignored">IGNORADAS</span> (<span id="filter-count-ignored">0</span>)</button>
+          <button class="filter-pill" onclick="setAccountsFilter('codex', this)" id="filter-btn-codex"><span data-i18n="accounts.filter_codex">CODEX</span> (<span id="filter-count-codex">0</span>)</button>
+          <button class="filter-pill" onclick="setAccountsFilter('antigravity', this)" id="filter-btn-antigravity"><span data-i18n="accounts.filter_antigravity">ANTIGRAVITY</span> (<span id="filter-count-antigravity">0</span>)</button>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.68rem;" onclick="clearAllCooldownsAndCBs()" title="Resetea todos los Circuit Breakers y limpia los bloqueos 429 de todas las cuentas">
-            ⚡ MASTER RESET DISYUNTORES
+          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.68rem;" onclick="clearAllCooldownsAndCBs()" title="Resetea todos los Circuit Breakers y limpia los bloqueos 429 de todas las cuentas" data-i18n-title="accounts.btn_master_reset_title">
+            <span data-i18n="accounts.btn_master_reset">⚡ MASTER RESET DISYUNTORES</span>
           </button>
-          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.68rem;" onclick="syncAllActiveThreads()" title="Sincroniza todos los hilos activos de ChatGPT en SQLite al combo seleccionado">
-            🔄 SINCRONIZAR TODOS LOS CHATS AL COMBO
+          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.68rem;" onclick="syncAllActiveThreads()" title="Sincroniza todos los hilos activos de ChatGPT en SQLite al combo seleccionado" data-i18n-title="accounts.btn_sync_threads_title">
+            <span data-i18n="accounts.btn_sync_threads">🔄 SINCRONIZAR TODOS LOS CHATS AL COMBO</span>
           </button>
         </div>
       </div>
@@ -1677,24 +1732,24 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// CONFIGURATION_TARGET: MODEL_SLUG</span>
-            <h2 class="spec-title">MODELO PRINCIPAL ACTIVO</h2>
-            <p class="spec-desc">Define el identificador del modelo o combo que Codex solicitará al router backend.</p>
+            <span class="spec-tag" data-i18n="models.primary_tag">// CONFIGURATION_TARGET: MODEL_SLUG</span>
+            <h2 class="spec-title" data-i18n="models.primary_title">MODELO PRINCIPAL ACTIVO</h2>
+            <p class="spec-desc" data-i18n="models.primary_desc">Define el identificador del modelo o combo que Codex solicitará al router backend.</p>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-model">IDENTIFICADOR ACTIVO (model)</label>
-            <p class="form-unit-help">Ingresa directamente el nombre del modelo o combo de OmniRoute.</p>
+            <label class="form-unit-label" for="input-model" data-i18n="models.input_model_label">IDENTIFICADOR ACTIVO (model)</label>
+            <p class="form-unit-help" data-i18n="models.input_model_help">Ingresa directamente el nombre del modelo o combo de OmniRoute.</p>
             <input type="text" id="input-model" placeholder="coding-con-caro" oninput="updateRawPreview()">
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="select-model">SELECTOR DIRECTO OMNIROUTE</label>
-            <p class="form-unit-help">Modelos y combos detectados dinámicamente en tiempo real.</p>
+            <label class="form-unit-label" for="select-model" data-i18n="models.select_model_label">SELECTOR DIRECTO OMNIROUTE</label>
+            <p class="form-unit-help" data-i18n="models.select_model_help">Modelos y combos detectados dinámicamente en tiempo real.</p>
             <select id="select-model" onchange="onSelectModelDropdown(this.value)">
-              <option value="">-- CARGANDO MODELOS DESDE OMNIROUTE... --</option>
+              <option value="" data-i18n="models.loading_models">-- CARGANDO MODELOS DESDE OMNIROUTE... --</option>
             </select>
           </div>
         </div>
@@ -1704,9 +1759,9 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// CATEGORY: CODING_OPTIMIZED</span>
-            <h2 class="spec-title">COMBOS DESTACADOS PARA PROGRAMACIÓN</h2>
-            <p class="spec-desc">Enrutamientos preconfigurados para código y resolución de problemas de ingeniería.</p>
+            <span class="spec-tag" data-i18n="models.coding_combos_tag">// CATEGORY: CODING_OPTIMIZED</span>
+            <h2 class="spec-title" data-i18n="models.coding_combos_title">COMBOS DESTACADOS PARA PROGRAMACIÓN</h2>
+            <p class="spec-desc" data-i18n="models.coding_combos_desc">Enrutamientos preconfigurados para código y resolución de problemas de ingeniería.</p>
           </div>
         </div>
 
@@ -1719,9 +1774,9 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// CATEGORY: MULTI_ROUTING</span>
-            <h2 class="spec-title">OTROS COMBOS Y ENRUTAMIENTOS DISPONIBLES</h2>
-            <p class="spec-desc">Modelos automáticos de razonamiento, balance de coste y velocidad.</p>
+            <span class="spec-tag" data-i18n="models.other_combos_tag">// CATEGORY: MULTI_ROUTING</span>
+            <h2 class="spec-title" data-i18n="models.other_combos_title">OTROS COMBOS Y ENRUTAMIENTOS DISPONIBLES</h2>
+            <p class="spec-desc" data-i18n="models.other_combos_desc">Modelos automáticos de razonamiento, balance de coste y velocidad.</p>
           </div>
         </div>
 
@@ -1738,16 +1793,16 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// BACKEND_SUBSYSTEM: MODEL_PROVIDER</span>
-            <h2 class="spec-title">PARÁMETROS DEL PROVEEDOR (model_provider)</h2>
-            <p class="spec-desc">Establece el endpoint HTTP y las credenciales de comunicación para Codex.</p>
+            <span class="spec-tag" data-i18n="provider.spec_tag">// BACKEND_SUBSYSTEM: MODEL_PROVIDER</span>
+            <h2 class="spec-title" data-i18n="provider.spec_title">PARÁMETROS DEL PROVEEDOR (model_provider)</h2>
+            <p class="spec-desc" data-i18n="provider.spec_desc">Establece el endpoint HTTP y las credenciales de comunicación para Codex.</p>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-model-provider">PROVEEDOR SELECCIONADO</label>
-            <p class="form-unit-help">Debe mantenerse en <code>omniroute</code> para aprovechar el router local.</p>
+            <label class="form-unit-label" for="input-model-provider" data-i18n="provider.select_label">PROVEEDOR SELECCIONADO</label>
+            <p class="form-unit-help" data-i18n="provider.select_help">Debe mantenerse en <code>omniroute</code> para aprovechar el router local.</p>
             <select id="input-model-provider" onchange="onProviderChange(this.value)">
               <option value="omniroute">OmniRoute (Router Local :20128)</option>
               <option value="openai">OpenAI (Oficial / ChatGPT)</option>
@@ -1758,30 +1813,30 @@
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="input-provider-name">NOMBRE AMIGABLE (name)</label>
-            <p class="form-unit-help">Etiqueta descriptiva para registros y diagnósticos de doctor.</p>
+            <label class="form-unit-label" for="input-provider-name" data-i18n="provider.name_label">NOMBRE AMIGABLE (name)</label>
+            <p class="form-unit-help" data-i18n="provider.name_help">Etiqueta descriptiva para registros y diagnósticos de doctor.</p>
             <input type="text" id="input-provider-name" value="OmniRoute" oninput="updateRawPreview()">
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-provider-base-url">BASE URL DEL ENDPOINT</label>
-            <p class="form-unit-help">Dirección HTTP del servidor compatible con la API de OpenAI v1.</p>
+            <label class="form-unit-label" for="input-provider-base-url" data-i18n="provider.url_label">BASE URL DEL ENDPOINT</label>
+            <p class="form-unit-help" data-i18n="provider.url_help">Dirección HTTP del servidor compatible con la API de OpenAI v1.</p>
             <input type="text" id="input-provider-base-url" value="http://localhost:20128/v1" oninput="updateRawPreview()">
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="input-provider-env-key">VARIABLE DE ENTORNO DE API KEY</label>
-            <p class="form-unit-help">Variable de entorno en Windows donde se almacena el token.</p>
+            <label class="form-unit-label" for="input-provider-env-key" data-i18n="provider.key_label">VARIABLE DE ENTORNO DE API KEY</label>
+            <p class="form-unit-help" data-i18n="provider.key_help">Variable de entorno en Windows donde se almacena el token.</p>
             <input type="text" id="input-provider-env-key" value="OMNIROUTE_API_KEY" oninput="updateRawPreview()">
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-provider-wire-api">WIRE API PROTOCOL</label>
-            <p class="form-unit-help">Formato de intercambio de mensajes entre cliente y servidor.</p>
+            <label class="form-unit-label" for="input-provider-wire-api" data-i18n="provider.wire_api_label">WIRE API PROTOCOL</label>
+            <p class="form-unit-help" data-i18n="provider.wire_api_help">Formato de intercambio de mensajes entre cliente y servidor.</p>
             <select id="input-provider-wire-api" onchange="updateRawPreview()">
               <option value="responses">responses (Nativo para OmniRoute y Codex)</option>
               <option value="chat">chat (Completions estándar)</option>
@@ -1791,7 +1846,7 @@
           <label class="retro-toggle-row">
             <div class="toggle-meta">
               <span class="toggle-code">requires_openai_auth</span>
-              <span class="toggle-desc">Exige tokens de ChatGPT interno. Inactivo para OmniRoute.</span>
+              <span class="toggle-desc" data-i18n="provider.requires_openai_auth_desc">Exige tokens de ChatGPT interno. Inactivo para OmniRoute.</span>
             </div>
             <input type="checkbox" id="input-provider-requires-openai-auth" onchange="updateRawPreview()">
             <div class="rocker-switch">
@@ -1810,51 +1865,51 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// SECURITY_POLICY: EXECUTION_ISOLATION</span>
-            <h2 class="spec-title">POLÍTICAS DE SEGURIDAD Y SANDBOX</h2>
-            <p class="spec-desc">Controla los permisos sobre el sistema de archivos y las aprobaciones de comandos.</p>
+            <span class="spec-tag" data-i18n="security.spec_tag">// SECURITY_POLICY: EXECUTION_ISOLATION</span>
+            <h2 class="spec-title" data-i18n="security.spec_title">POLÍTICAS DE SEGURIDAD Y SANDBOX</h2>
+            <p class="spec-desc" data-i18n="security.spec_desc">Controla los permisos sobre el sistema de archivos y las aprobaciones de comandos.</p>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-sandbox-mode">MODO DE SANDBOX (sandbox_mode)</label>
-            <p class="form-unit-help">Nivel de contención para comandos y mutación de archivos.</p>
+            <label class="form-unit-label" for="input-sandbox-mode" data-i18n="security.sandbox_mode_label">MODO DE SANDBOX (sandbox_mode)</label>
+            <p class="form-unit-help" data-i18n="security.sandbox_mode_help">Nivel de contención para comandos y mutación de archivos.</p>
             <select id="input-sandbox-mode" onchange="updateRawPreview()">
-              <option value="danger-full-access">danger-full-access (Sin restricciones de terminal ni disco)</option>
-              <option value="workspace-write">workspace-write (Solo escritura en la raíz del proyecto)</option>
-              <option value="read-only">read-only (Inspección estricta, sin escritura)</option>
+              <option value="danger-full-access" data-i18n="security.opt_sandbox_danger">danger-full-access (Sin restricciones de terminal ni disco)</option>
+              <option value="workspace-write" data-i18n="security.opt_sandbox_write">workspace-write (Solo escritura en la raíz del proyecto)</option>
+              <option value="read-only" data-i18n="security.opt_sandbox_readonly">read-only (Inspección estricta, sin escritura)</option>
             </select>
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="input-approval-policy">POLÍTICA DE APROBACIÓN (approval_policy)</label>
-            <p class="form-unit-help">Criterio para solicitar confirmación interactiva al usuario.</p>
+            <label class="form-unit-label" for="input-approval-policy" data-i18n="security.approval_policy_label">POLÍTICA DE APROBACIÓN (approval_policy)</label>
+            <p class="form-unit-help" data-i18n="security.approval_policy_help">Criterio para solicitar confirmación interactiva al usuario.</p>
             <select id="input-approval-policy" onchange="updateRawPreview()">
-              <option value="never">never (Ejecución autónoma sin interrupción)</option>
-              <option value="on-request">on-request (El agente decide cuándo consultar)</option>
-              <option value="always">always (Confirmar cada acción individual)</option>
+              <option value="never" data-i18n="security.opt_approval_never">never (Ejecución autónoma sin interrupción)</option>
+              <option value="on-request" data-i18n="security.opt_approval_on_request">on-request (El agente decide cuándo consultar)</option>
+              <option value="always" data-i18n="security.opt_approval_always">always (Confirmar cada acción individual)</option>
             </select>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-approvals-reviewer">REVISOR DE APROBACIONES (approvals_reviewer)</label>
-            <p class="form-unit-help">Entidad encargada de autorizar o rechazar solicitudes.</p>
+            <label class="form-unit-label" for="input-approvals-reviewer" data-i18n="security.reviewer_label">REVISOR DE APROBACIONES (approvals_reviewer)</label>
+            <p class="form-unit-help" data-i18n="security.reviewer_help">Entidad encargada de autorizar o rechazar solicitudes.</p>
             <select id="input-approvals-reviewer" onchange="updateRawPreview()">
-              <option value="user">user (Usuario humano interactivo)</option>
-              <option value="auto">auto (Revisión interna automática)</option>
+              <option value="user" data-i18n="security.opt_reviewer_user">user (Usuario humano interactivo)</option>
+              <option value="auto" data-i18n="security.opt_reviewer_auto">auto (Revisión interna automática)</option>
             </select>
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="input-windows-sandbox">SANDBOX WINDOWS (windows.sandbox)</label>
-            <p class="form-unit-help">Aislamiento en el subsistema de procesos de Windows.</p>
+            <label class="form-unit-label" for="input-windows-sandbox" data-i18n="security.win_sandbox_label">SANDBOX WINDOWS (windows.sandbox)</label>
+            <p class="form-unit-help" data-i18n="security.win_sandbox_help">Aislamiento en el subsistema de procesos de Windows.</p>
             <select id="input-windows-sandbox" onchange="updateRawPreview()">
-              <option value="elevated">elevated (Privilegios completos de usuario actual)</option>
-              <option value="standard">standard (Contención estándar)</option>
-              <option value="restricted">restricted (Restricción estricta de tokens)</option>
+              <option value="elevated" data-i18n="security.opt_win_sandbox_elevated">elevated (Privilegios completos de usuario actual)</option>
+              <option value="standard" data-i18n="security.opt_win_sandbox_standard">standard (Contención estándar)</option>
+              <option value="restricted" data-i18n="security.opt_win_sandbox_restricted">restricted (Restricción estricta de tokens)</option>
             </select>
           </div>
         </div>
@@ -1868,57 +1923,57 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// INFERENCE_PARAMS: REASONING_ENGINE</span>
-            <h2 class="spec-title">PARÁMETROS DE RAZONAMIENTO Y VERBOSIDAD</h2>
-            <p class="spec-desc">Ajusta la profundidad de pensamiento y el formato de las respuestas generadas.</p>
+            <span class="spec-tag" data-i18n="reasoning.spec_tag">// INFERENCE_PARAMS: REASONING_ENGINE</span>
+            <h2 class="spec-title" data-i18n="reasoning.spec_title">PARÁMETROS DE RAZONAMIENTO Y VERBOSIDAD</h2>
+            <p class="spec-desc" data-i18n="reasoning.spec_desc">Ajusta la profundidad de pensamiento y el formato de las respuestas generadas.</p>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-reasoning-effort">ESFUERZO DE RAZONAMIENTO (model_reasoning_effort)</label>
-            <p class="form-unit-help">Presupuesto de tokens de pensamiento previo a la respuesta.</p>
+            <label class="form-unit-label" for="input-reasoning-effort" data-i18n="reasoning.effort_label">ESFUERZO DE RAZONAMIENTO (model_reasoning_effort)</label>
+            <p class="form-unit-help" data-i18n="reasoning.effort_help">Presupuesto de tokens de pensamiento previo a la respuesta.</p>
             <select id="input-reasoning-effort" onchange="updateRawPreview()">
-              <option value="none">none (Sin razonamiento extendido)</option>
-              <option value="low">low (Razonamiento ligero y ágil)</option>
-              <option value="medium">medium (Equilibrado para ingeniería)</option>
-              <option value="high">high (Análisis profundo de arquitectura)</option>
-              <option value="xhigh">xhigh (Extra alto para problemas complejos)</option>
-              <option value="max">max (Máximo disponible)</option>
-              <option value="ultra">ultra (Ultra con auto-delegación)</option>
+              <option value="none" data-i18n="reasoning.opt_effort_none">none (Sin razonamiento extendido)</option>
+              <option value="low" data-i18n="reasoning.opt_effort_low">low (Razonamiento ligero y ágil)</option>
+              <option value="medium" data-i18n="reasoning.opt_effort_medium">medium (Equilibrado para ingeniería)</option>
+              <option value="high" data-i18n="reasoning.opt_effort_high">high (Análisis profundo de arquitectura)</option>
+              <option value="xhigh" data-i18n="reasoning.opt_effort_xhigh">xhigh (Extra alto para problemas complejos)</option>
+              <option value="max" data-i18n="reasoning.opt_effort_max">max (Máximo disponible)</option>
+              <option value="ultra" data-i18n="reasoning.opt_effort_ultra">ultra (Ultra con auto-delegación)</option>
             </select>
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="input-reasoning-summary">RESUMEN DE PENSAMIENTO (model_reasoning_summary)</label>
-            <p class="form-unit-help">Presentación del proceso de pensamiento en los mensajes.</p>
+            <label class="form-unit-label" for="input-reasoning-summary" data-i18n="reasoning.summary_label">RESUMEN DE PENSAMIENTO (model_reasoning_summary)</label>
+            <p class="form-unit-help" data-i18n="reasoning.summary_help">Presentación del proceso de pensamiento en los mensajes.</p>
             <select id="input-reasoning-summary" onchange="updateRawPreview()">
-              <option value="auto">auto (Determinado por el cliente)</option>
-              <option value="detailed">detailed (Desglose analítico completo)</option>
-              <option value="concise">concise (Resumen sintético)</option>
-              <option value="none">none (Ocultar completamente)</option>
+              <option value="auto" data-i18n="reasoning.opt_summary_auto">auto (Determinado por el cliente)</option>
+              <option value="detailed" data-i18n="reasoning.opt_summary_detailed">detailed (Desglose analítico completo)</option>
+              <option value="concise" data-i18n="reasoning.opt_summary_concise">concise (Resumen sintético)</option>
+              <option value="none" data-i18n="reasoning.opt_summary_none">none (Ocultar completamente)</option>
             </select>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-verbosity">VERBOSIDAD DE RESPUESTAS (model_verbosity)</label>
-            <p class="form-unit-help">Extensión y detalle en la explicación de las modificaciones.</p>
+            <label class="form-unit-label" for="input-verbosity" data-i18n="reasoning.verbosity_label">VERBOSIDAD DE RESPUESTAS (model_verbosity)</label>
+            <p class="form-unit-help" data-i18n="reasoning.verbosity_help">Extensión y detalle en la explicación de las modificaciones.</p>
             <select id="input-verbosity" onchange="updateRawPreview()">
-              <option value="low">low (Solo código y pasos esenciales)</option>
-              <option value="medium">medium (Equilibrado)</option>
-              <option value="high">high (Explicativo y exhaustivo)</option>
+              <option value="low" data-i18n="reasoning.opt_verbosity_low">low (Solo código y pasos esenciales)</option>
+              <option value="medium" data-i18n="reasoning.opt_verbosity_medium">medium (Equilibrado)</option>
+              <option value="high" data-i18n="reasoning.opt_verbosity_high">high (Explicativo y exhaustivo)</option>
             </select>
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="input-web-search">BÚSQUEDA WEB (web_search)</label>
-            <p class="form-unit-help">Capacidad de consultar documentación y APIs en línea.</p>
+            <label class="form-unit-label" for="input-web-search" data-i18n="reasoning.web_search_label">BÚSQUEDA WEB (web_search)</label>
+            <p class="form-unit-help" data-i18n="reasoning.web_search_help">Capacidad de consultar documentación y APIs en línea.</p>
             <select id="input-web-search" onchange="updateRawPreview()">
-              <option value="disabled">disabled (Desactivada)</option>
-              <option value="live">live (Búsqueda en tiempo real)</option>
-              <option value="cached">cached (Búsqueda con almacenamiento en caché)</option>
+              <option value="disabled" data-i18n="reasoning.opt_web_disabled">disabled (Desactivada)</option>
+              <option value="live" data-i18n="reasoning.opt_web_live">live (Búsqueda en tiempo real)</option>
+              <option value="cached" data-i18n="reasoning.opt_web_cached">cached (Búsqueda con almacenamiento en caché)</option>
             </select>
           </div>
         </div>
@@ -1927,7 +1982,7 @@
           <label class="retro-toggle-row">
             <div class="toggle-meta">
               <span class="toggle-code">hide_agent_reasoning</span>
-              <span class="toggle-desc">Oculta los bloques internos de pensamiento en la interfaz de chat.</span>
+              <span class="toggle-desc" data-i18n="reasoning.hide_reasoning_desc">Oculta los bloques internos de pensamiento en la interfaz de chat.</span>
             </div>
             <input type="checkbox" id="input-hide-agent-reasoning" onchange="updateRawPreview()">
             <div class="rocker-switch">
@@ -1946,16 +2001,16 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// SUBSYSTEM: FEATURE_FLAGS_MATRIX</span>
-            <h2 class="spec-title">BANDERAS DE FUNCIONALIDADES (codex features)</h2>
-            <p class="spec-desc">Activa o desactiva capacidades avanzadas de la arquitectura de Codex.</p>
+            <span class="spec-tag" data-i18n="features.spec_tag">// SUBSYSTEM: FEATURE_FLAGS_MATRIX</span>
+            <h2 class="spec-title" data-i18n="features.spec_title">BANDERAS DE FUNCIONALIDADES (codex features)</h2>
+            <p class="spec-desc" data-i18n="features.spec_desc">Activa o desactiva capacidades avanzadas de la arquitectura de Codex.</p>
           </div>
         </div>
 
         <!-- Search Prompt Bar -->
         <div class="search-prompt-wrap">
           <span class="prompt-symbol">FILTER_FLAGS_&gt;</span>
-          <input type="text" id="filter-features" placeholder="Escribe el nombre de la bandera para filtrar..." oninput="filterFeatureList(this.value)">
+          <input type="text" id="filter-features" placeholder="Escribe el nombre de la bandera para filtrar..." data-i18n-placeholder="features.search_placeholder" oninput="filterFeatureList(this.value)">
         </div>
 
         <div id="features-container" class="grid-2">
@@ -1971,50 +2026,50 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// CLIENT_PREFS: DESKTOP_AND_TUI</span>
-            <h2 class="spec-title">PREFERENCIAS DE INTERFAZ GRÁFICA Y TERMINAL</h2>
-            <p class="spec-desc">Ajusta la experiencia de usuario en la aplicación de escritorio y terminal.</p>
+            <span class="spec-tag" data-i18n="desktop.spec_tag">// CLIENT_PREFS: DESKTOP_AND_TUI</span>
+            <h2 class="spec-title" data-i18n="desktop.spec_title">PREFERENCIAS DE INTERFAZ GRÁFICA Y TERMINAL</h2>
+            <p class="spec-desc" data-i18n="desktop.spec_desc">Ajusta la experiencia de usuario en la aplicación de escritorio y terminal.</p>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-conversation-detail-mode">DETALLE DE CONVERSACIÓN (conversationDetailMode)</label>
-            <p class="form-unit-help">Nivel de visualización de comandos y herramientas ejecutadas.</p>
+            <label class="form-unit-label" for="input-conversation-detail-mode" data-i18n="desktop.detail_mode_label">DETALLE DE CONVERSACIÓN (conversationDetailMode)</label>
+            <p class="form-unit-help" data-i18n="desktop.detail_mode_help">Nivel de visualización de comandos y herramientas ejecutadas.</p>
             <select id="input-conversation-detail-mode" onchange="updateRawPreview()">
-              <option value="STEPS_COMMANDS">STEPS_COMMANDS (Pasos técnicos y comandos directos)</option>
-              <option value="STEPS_PROSE">STEPS_PROSE (Resumen en lenguaje natural)</option>
-              <option value="FULL">FULL (Detalle exhaustivo completo)</option>
+              <option value="STEPS_COMMANDS" data-i18n="desktop.opt_detail_commands">STEPS_COMMANDS (Pasos técnicos y comandos directos)</option>
+              <option value="STEPS_PROSE" data-i18n="desktop.opt_detail_prose">STEPS_PROSE (Resumen en lenguaje natural)</option>
+              <option value="FULL" data-i18n="desktop.opt_detail_full">FULL (Detalle exhaustivo completo)</option>
             </select>
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="input-follow-up-queue-mode">COLA DE MENSAJES (followUpQueueMode)</label>
-            <p class="form-unit-help">Comportamiento ante nuevos prompts mientras el agente trabaja.</p>
+            <label class="form-unit-label" for="input-follow-up-queue-mode" data-i18n="desktop.queue_mode_label">COLA DE MENSAJES (followUpQueueMode)</label>
+            <p class="form-unit-help" data-i18n="desktop.queue_mode_help">Comportamiento ante nuevos prompts mientras el agente trabaja.</p>
             <select id="input-follow-up-queue-mode" onchange="updateRawPreview()">
-              <option value="queue">queue (Encolar para el siguiente turno)</option>
-              <option value="steer">steer (Redirigir inmediatamente el turno actual)</option>
-              <option value="off">off (Desactivar procesamiento concurrente)</option>
+              <option value="queue" data-i18n="desktop.opt_queue_queue">queue (Encolar para el siguiente turno)</option>
+              <option value="steer" data-i18n="desktop.opt_queue_steer">steer (Redirigir inmediatamente el turno actual)</option>
+              <option value="off" data-i18n="desktop.opt_queue_off">off (Desactivar procesamiento concurrente)</option>
             </select>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="form-unit">
-            <label class="form-unit-label" for="input-open-link-preference">APERTURA DE ENLACES EXTERNOS</label>
-            <p class="form-unit-help">Destino al hacer clic en URLs externas en el chat.</p>
+            <label class="form-unit-label" for="input-open-link-preference" data-i18n="desktop.open_link_label">APERTURA DE ENLACES EXTERNOS</label>
+            <p class="form-unit-help" data-i18n="desktop.open_link_help">Destino al hacer clic en URLs externas en el chat.</p>
             <select id="input-open-link-preference" onchange="updateRawPreview()">
-              <option value="external-browser">external-browser (Navegador predeterminado del sistema)</option>
-              <option value="in-app-browser">in-app-browser (Navegador web integrado)</option>
+              <option value="external-browser" data-i18n="desktop.opt_link_external">external-browser (Navegador predeterminado del sistema)</option>
+              <option value="in-app-browser" data-i18n="desktop.opt_link_in_app">in-app-browser (Navegador web integrado)</option>
             </select>
           </div>
 
           <div class="form-unit">
-            <label class="form-unit-label" for="input-open-local-preference">APERTURA DE LOCALHOST</label>
-            <p class="form-unit-help">Destino para puertos locales en desarrollo (ej: localhost:3000).</p>
+            <label class="form-unit-label" for="input-open-local-preference" data-i18n="desktop.open_local_label">APERTURA DE LOCALHOST</label>
+            <p class="form-unit-help" data-i18n="desktop.open_local_help">Destino para puertos locales en desarrollo (ej: localhost:3000).</p>
             <select id="input-open-local-preference" onchange="updateRawPreview()">
-              <option value="external-browser">external-browser (Navegador predeterminado)</option>
-              <option value="in-app-browser">in-app-browser (Navegador integrado)</option>
+              <option value="external-browser" data-i18n="desktop.opt_local_external">external-browser (Navegador predeterminado)</option>
+              <option value="in-app-browser" data-i18n="desktop.opt_local_in_app">in-app-browser (Navegador integrado)</option>
             </select>
           </div>
         </div>
@@ -2023,7 +2078,7 @@
           <label class="retro-toggle-row">
             <div class="toggle-meta">
               <span class="toggle-code">ambient-suggestions-enabled</span>
-              <span class="toggle-desc">Sugerencias proactivas y completados contextuales.</span>
+              <span class="toggle-desc" data-i18n="desktop.ambient_suggestions_desc">Sugerencias proactivas y completados contextuales.</span>
             </div>
             <input type="checkbox" id="input-ambient-suggestions" onchange="updateRawPreview()">
             <div class="rocker-switch">
@@ -2035,7 +2090,7 @@
           <label class="retro-toggle-row">
             <div class="toggle-meta">
               <span class="toggle-code">show-context-window-usage</span>
-              <span class="toggle-desc">Muestra medidor de consumo de tokens y ventana de contexto.</span>
+              <span class="toggle-desc" data-i18n="desktop.context_window_desc">Muestra medidor de consumo de tokens y ventana de contexto.</span>
             </div>
             <input type="checkbox" id="input-show-context-window-usage" onchange="updateRawPreview()">
             <div class="rocker-switch">
@@ -2047,7 +2102,7 @@
           <label class="retro-toggle-row">
             <div class="toggle-meta">
               <span class="toggle-code">toys-confetti-enabled</span>
-              <span class="toggle-desc">Efecto visual discreto al concluir tareas exitosamente.</span>
+              <span class="toggle-desc" data-i18n="desktop.toys_confetti_desc">Efecto visual discreto al concluir tareas exitosamente.</span>
             </div>
             <input type="checkbox" id="input-toys-confetti" onchange="updateRawPreview()">
             <div class="rocker-switch">
@@ -2059,7 +2114,7 @@
           <label class="retro-toggle-row">
             <div class="toggle-meta">
               <span class="toggle-code">status_line_use_colors</span>
-              <span class="toggle-desc">Colores de diagnóstico en la barra de estado de terminal (TUI).</span>
+              <span class="toggle-desc" data-i18n="desktop.tui_colors_desc">Colores de diagnóstico en la barra de estado de terminal (TUI).</span>
             </div>
             <input type="checkbox" id="input-tui-colors" onchange="updateRawPreview()">
             <div class="rocker-switch">
@@ -2078,9 +2133,9 @@
       <div class="spec-card">
         <div class="spec-card-header">
           <div class="spec-header-left">
-            <span class="spec-tag">// ECOSYSTEM: BUNDLED_PLUGINS</span>
-            <h2 class="spec-title">PLUGINS OFICIALES Y RUNTIMES</h2>
-            <p class="spec-desc">Herramientas de inspección, compilación y acceso a servicios integrados.</p>
+            <span class="spec-tag" data-i18n="plugins.spec_tag">// ECOSYSTEM: BUNDLED_PLUGINS</span>
+            <h2 class="spec-title" data-i18n="plugins.spec_title">PLUGINS OFICIALES Y RUNTIMES</h2>
+            <p class="spec-desc" data-i18n="plugins.spec_desc">Herramientas de inspección, compilación y acceso a servicios integrados.</p>
           </div>
         </div>
 
@@ -2097,19 +2152,19 @@
       <div class="dark-editor-wrapper">
         <div class="editor-top-bar">
           <div class="editor-status-text">
-            <span>FILE: config.toml</span>
+            <span data-i18n="toml.file_label">FILE: config.toml</span>
             <span>//</span>
             <span id="config-file-path-display">PATH: ~/.codex/config.toml</span>
             <span>//</span>
-            <span>ENCODING: UTF-8</span>
+            <span data-i18n="toml.encoding_label">ENCODING: UTF-8</span>
           </div>
 
           <div style="display: flex; gap: 8px;">
             <button class="btn btn-outline" style="padding: 5px 12px; font-size: 0.72rem;" onclick="copyTomlToClipboard()">
-              COPIAR AL BUFFER
+              <span data-i18n="toml.btn_copy">COPIAR AL BUFFER</span>
             </button>
             <button class="btn btn-outline" style="padding: 5px 12px; font-size: 0.72rem;" onclick="downloadTomlFile()">
-              DESCARGAR .TOML
+              <span data-i18n="toml.btn_download">DESCARGAR .TOML</span>
             </button>
           </div>
         </div>
@@ -2133,15 +2188,15 @@
   <div id="modal-diff" class="modal-overlay" onclick="if(event.target===this)closeModals()">
     <div class="modal-dialog">
       <div class="modal-header">
-        <span>[DIFF] COMPARACIÓN DE CAMBIOS // DISCO VS MEMORIA</span>
+        <span data-i18n="modals.diff_title">[DIFF] COMPARACIÓN DE CAMBIOS // DISCO VS MEMORIA</span>
         <button class="btn btn-sm" style="background:#FAF9F6; color:#101010; padding:2px 8px;" onclick="closeModals()">✕</button>
       </div>
       <div class="modal-body" id="diff-content" style="max-height:60vh; background:var(--bg-surface);">
         <!-- Diff lines injected here -->
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModals()">CERRAR</button>
-        <button class="btn btn-primary" onclick="closeModals(); saveConfiguration();">GUARDAR CAMBIOS (Ctrl+S)</button>
+        <button class="btn btn-outline" onclick="closeModals()"><span data-i18n="modals.btn_close">CERRAR</span></button>
+        <button class="btn btn-primary" onclick="closeModals(); saveConfiguration();"><span data-i18n="modals.btn_save_shortcut">GUARDAR CAMBIOS (Ctrl+S)</span></button>
       </div>
     </div>
   </div>
@@ -2150,14 +2205,14 @@
   <div id="modal-backups" class="modal-overlay" onclick="if(event.target===this)closeModals()">
     <div class="modal-dialog">
       <div class="modal-header">
-        <span>[BACKUPS] RESPALDOS AUTOMÁTICOS DE CONFIGURACIÓN</span>
+        <span data-i18n="modals.backups_title">[BACKUPS] RESPALDOS AUTOMÁTICOS DE CONFIGURACIÓN</span>
         <button class="btn btn-sm" style="background:#FAF9F6; color:#101010; padding:2px 8px;" onclick="closeModals()">✕</button>
       </div>
       <div class="modal-body" id="backups-list">
         <!-- Backups list injected here -->
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModals()">CERRAR</button>
+        <button class="btn btn-outline" onclick="closeModals()"><span data-i18n="modals.btn_close">CERRAR</span></button>
       </div>
     </div>
   </div>
@@ -2166,14 +2221,14 @@
   <div id="modal-diagnostics" class="modal-overlay" onclick="if(event.target===this)closeModals()">
     <div class="modal-dialog">
       <div class="modal-header">
-        <span>[DIAGNOSTICS] INTEGRIDAD Y TELEMETRÍA DEL SISTEMA</span>
+        <span data-i18n="modals.diag_title">[DIAGNOSTICS] INTEGRIDAD Y TELEMETRÍA DEL SISTEMA</span>
         <button class="btn btn-sm" style="background:#FAF9F6; color:#101010; padding:2px 8px;" onclick="closeModals()">✕</button>
       </div>
       <div class="modal-body" id="diagnostics-content">
         <!-- Diagnostics content injected here -->
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModals()">CERRAR</button>
+        <button class="btn btn-outline" onclick="closeModals()"><span data-i18n="modals.btn_close">CERRAR</span></button>
       </div>
     </div>
   </div>
@@ -2182,23 +2237,23 @@
   <div id="modal-conflict" class="modal-overlay">
     <div class="modal-dialog" style="border-color:#DC2626;">
       <div class="modal-header" style="background:#DC2626;">
-        <span>[ALERTA DE CONFLICTO] MODIFICACIÓN EXTERNA DETECTADA</span>
+        <span data-i18n="modals.conflict_title">[ALERTA DE CONFLICTO] MODIFICACIÓN EXTERNA DETECTADA</span>
       </div>
       <div class="modal-body">
-        <p style="margin-bottom:12px; color:#DC2626; font-weight:700;">
+        <p style="margin-bottom:12px; color:#DC2626; font-weight:700;" data-i18n="modals.conflict_body1">
           El archivo config.toml fue modificado externamente en disco desde la última lectura.
         </p>
-        <p style="margin-bottom:12px;">
+        <p style="margin-bottom:12px;" data-i18n="modals.conflict_body2">
           Para evitar perder cambios concurrentes realizados por Codex u otro editor, elige cómo proceder:
         </p>
         <div style="display:flex; gap:10px; margin-top:16px;">
-          <button class="btn btn-outline" onclick="closeModals(); openDiffModal();">VER DIFERENCIAS</button>
-          <button class="btn btn-outline" onclick="closeModals(); checkServerAndLoad(); pushToast('RECARGADO DESDE DISCO', 'info');">DESCARTAR Y RECARGAR DE DISCO</button>
-          <button class="btn btn-primary" style="background:#DC2626; border-color:#DC2626; color:#FAF9F6;" onclick="closeModals(); saveConfiguration(true);">SOBRESCRIBIR FORZADO</button>
+          <button class="btn btn-outline" onclick="closeModals(); openDiffModal();" data-i18n="modals.conflict_btn_diff">VER DIFERENCIAS</button>
+          <button class="btn btn-outline" onclick="closeModals(); checkServerAndLoad(); pushToast(t('toasts.reloaded'), 'info');" data-i18n="modals.conflict_btn_discard">DESCARTAR Y RECARGAR DE DISCO</button>
+          <button class="btn btn-primary" style="background:#DC2626; border-color:#DC2626; color:#FAF9F6;" onclick="closeModals(); saveConfiguration(true);" data-i18n="modals.conflict_btn_overwrite">SOBRESCRIBIR FORZADO</button>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModals()">CANCELAR</button>
+        <button class="btn btn-outline" onclick="closeModals()"><span data-i18n="modals.btn_cancel">CANCELAR</span></button>
       </div>
     </div>
   </div>
@@ -2208,6 +2263,1023 @@
     // CONFIGURATION & GLOBAL STATE
     // ============================================================
     const CONFIG_SERVER_URL = (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'http://127.0.0.1:20129';
+
+    // ============================================================
+    // INTERNATIONALIZATION (i18n) DICTIONARIES & LOGIC
+    // ============================================================
+    const MESSAGES = {
+  "es": {
+    "common": {
+      "save_changes": "GUARDAR CAMBIOS",
+      "discard_changes": "DESCARTAR",
+      "close": "CERRAR",
+      "cancel": "CANCELAR",
+      "restore": "RESTAURAR",
+      "retest": "RE-TEST",
+      "reset_cooldown": "RESET COOLDOWN",
+      "loading": "CARGANDO...",
+      "na": "N/A",
+      "never": "NUNCA",
+      "none": "NINGUNO",
+      "active": "ACTIVO",
+      "inactive": "INACTIVO",
+      "unsaved": "SIN GUARDAR",
+      "not_loaded": "NO CARGADO"
+    },
+    "nav": {
+      "accounts": "MONITOR CUENTAS",
+      "models": "MODELOS & COMBOS",
+      "provider": "PROVEEDOR",
+      "security": "SEGURIDAD",
+      "reasoning": "RAZONAMIENTO",
+      "features": "FEATURES",
+      "desktop": "DESKTOP / TUI",
+      "plugins": "PLUGINS",
+      "toml": "CONFIG.TOML"
+    },
+    "telemetry": {
+      "no_changes": "SIN CAMBIOS",
+      "modified": "MODIFICADO (SIN GUARDAR)",
+      "dirty_title": "Estado de cambios respecto al archivo en disco",
+      "accounts_checking": "CUENTAS: VERIFICANDO",
+      "accounts_ready": "CUENTAS: {ready}/{total} LISTAS",
+      "accounts_title": "Monitor de Cuentas OmniRoute (Click para ver estado)",
+      "omniroute_checking": "OMNIROUTE: VERIFICANDO",
+      "omniroute_online": "OMNIROUTE: ONLINE",
+      "omniroute_offline": "OMNIROUTE: OFFLINE",
+      "omniroute_title": "Conexión con OmniRoute (Puerto 20128)",
+      "server_checking": "SYNC_SERVER: VERIFICANDO",
+      "server_online": "SYNC_SERVER: ONLINE",
+      "server_offline": "SYNC_SERVER: OFFLINE",
+      "server_title": "Sincronizador con config.toml (Puerto 20129)",
+      "system_ready": "SYSTEM: READY",
+      "demo_mode": "[DEMO MODE // MOCK ENVIRONMENT]"
+    },
+    "header": {
+      "hero_title": "CODEX AI MATRIX",
+      "hero_subtitle": "Panel de control y configuración técnica para agentes autónomos OpenAI Codex, enrutamiento local con OmniRoute y parámetros del sistema de ejecución.",
+      "sys_status_label": "SYS_STATUS:",
+      "status_waiting": "ESPERANDO RESPUESTA DE RUNTIME",
+      "status_connected": "OMNIROUTE :20128 LISTO // ENRUTANDO '{model}' A TRAVÉS DE MATRIX",
+      "status_omniroute_down": "ALERTA: OMNIROUTE NO RESPONDE EN :20128 // VERIFICAR SERVICIO LOCAL",
+      "status_server_down": "SERVIDOR DE CONFIGURACIÓN :20129 DESCONECTADO",
+      "btn_retest": "FORZAR RE-TEST CUENTAS",
+      "btn_retest_testing": "TESTEANDO...",
+      "btn_retest_title": "Fuerza un re-test inmediato de todas las cuentas en OmniRoute, ignorando tiempos de espera y reiniciando disyuntores",
+      "btn_restart": "REINICIAR CHATGPT APP",
+      "btn_restart_title": "Cierra ordenadamente ChatGPT y el daemon de forma limpia, y reabre la aplicación",
+      "btn_diff": "VER DIFF",
+      "btn_diff_title": "Visualizar diferencias entre la configuración en disco y los cambios en memoria",
+      "btn_backups": "RESPALDOS",
+      "btn_backups_title": "Consultar y restaurar respaldos automáticos de configuración",
+      "btn_diagnostics": "DIAGNÓSTICO",
+      "btn_diagnostics_title": "Inspeccionar integridad del sistema y telemetría de OmniRoute",
+      "btn_reload": "RECARGAR",
+      "btn_reload_title": "Recargar combos y configuración",
+      "btn_save": "GUARDAR CAMBIOS",
+      "btn_save_title": "Guardar configuración en config.toml"
+    },
+    "accounts": {
+      "spec_tag": "// RUNTIME_MONITOR: OMNIROUTE_PRE_DISPATCH_MATRIX",
+      "spec_title": "MONITOR DE CUENTAS & ENRUTAMIENTO EN VIVO",
+      "spec_desc": "Visualiza en tiempo real si tus cuentas (Codex, Antigravity, etc.) serán utilizadas o ignoradas por OmniRoute antes de cada petición, el estado de sus disyuntores de circuito y sus límites de cuota (5h y 7d).",
+      "btn_retest_all": "FORZAR RE-TEST INMEDIATO (ALL)",
+      "chk_autorefresh": "AUTO-REFRESCO (15s)",
+      "updated_at": "ACTUALIZADO: {time}",
+      "stat_total": "TOTAL CUENTAS CONECTADAS",
+      "stat_ready": "LISTAS PARA DESPACHO",
+      "stat_ignored": "IGNORADAS / LÍMITE AGOTADO",
+      "stat_cooling": "EN COOLDOWN (429)",
+      "filter_label": "FILTRAR CUENTAS:",
+      "filter_all": "TODAS",
+      "filter_ready": "LISTAS",
+      "filter_ignored": "IGNORADAS",
+      "filter_codex": "CODEX",
+      "filter_antigravity": "ANTIGRAVITY",
+      "btn_master_reset": "⚡ MASTER RESET DISYUNTORES",
+      "btn_master_reset_title": "Resetea todos los Circuit Breakers y limpia los bloqueos 429 de todas las cuentas",
+      "btn_sync_threads": "🔄 SINCRONIZAR TODOS LOS CHATS AL COMBO",
+      "btn_sync_threads_title": "Sincroniza todos los hilos activos de ChatGPT en SQLite al combo seleccionado",
+      "no_accounts_match": "NO HAY CUENTAS QUE COINCIDAN CON EL FILTRO SELECCIONADO",
+      "quota_5h_label": "VENTANA 5 HORAS:",
+      "quota_7d_label": "VENTANA 7 DÍAS (SEMANAL):",
+      "quota_resets_at": "Reinicia: {time}",
+      "reason_box_ignored": "OMNIROUTE IGNORARÁ ESTA CUENTA:",
+      "reason_box_ready": "ESTADO OPERATIVO:",
+      "spec_health": "SALUD:",
+      "spec_cb": "DISYUNTOR:",
+      "spec_cooldown": "COOLDOWN:",
+      "spec_priority": "PRIORIDAD:",
+      "priority_level": "NIVEL {priority}",
+      "cooldown_remaining": "{seconds}s rest.",
+      "cb_errors": "{count} err",
+      "btn_retest_single_title": "Fuerza un re-test inmediato de esta cuenta",
+      "btn_clear_cooldown_title": "Limpia cualquier cooldown 429 y resetea el disyuntor",
+      "badge_ready": "LISTA PARA EL COMBO",
+      "reason_ready": "Conexión activa, disyuntor cerrado y credenciales validadas.",
+      "badge_disabled": "DESACTIVADA",
+      "reason_disabled": "La conexión está marcada como inactiva en OmniRoute.",
+      "badge_cb_open": "DISYUNTOR ABIERTO",
+      "reason_cb_open": "Circuit Breaker abierto ({failures} fallos consecutivos).",
+      "badge_cooldown": "ENFRIAMIENTO ({seconds}s)",
+      "reason_cooldown": "Rate-limited (HTTP 429). En enfriamiento hasta las {time}.",
+      "badge_cred_failed": "FALLO CREDENCIALES",
+      "reason_cred_failed": "Credential Gate: {error}",
+      "badge_quota_5h": "CUOTA 5H AGOTADA",
+      "reason_quota_5h": "Límite 5h alcanzado ({usage}/{limit}). Reinicia a las {time}.",
+      "badge_quota_7d": "CUOTA 7D AGOTADA",
+      "reason_quota_7d": "Límite semanal alcanzado ({usage}/{limit}). Reinicia el {date}."
+    },
+    "pipeline": {
+      "spec_tag": "// ACTIVE_COMBO_DISPATCH_FLOW:",
+      "spec_title": "SECUENCIA DE EJECUCIÓN (PRE-DISPATCH)",
+      "spec_desc": "Muestra el orden exacto en que OmniRoute enviará la petición entre tus modelos configurados, saltando al instante las cuentas que han alcanzado su límite o tienen disyuntor abierto.",
+      "active_target": "▶ OBJETIVO ACTIVO EN CURSO",
+      "skipped_target": "✖ SALTADA POR PRE-DISPATCH",
+      "badge_ready": "LISTA",
+      "badge_ignored": "IGNORADA",
+      "not_found_title": "COMBO NO ENCONTRADO EN LA TELEMETRÍA",
+      "not_found_desc": "El combo seleccionado '{model}' no coincide con ninguna definición registrada en OmniRoute. Verifica que el nombre sea correcto o selecciona uno de los combos disponibles en [01] MODELOS & COMBOS.",
+      "not_found_callout": "TELEMETRÍA NO DISPONIBLE: No se puede predecir la secuencia de despacho porque el combo '{model}' no está registrado en la base de datos de OmniRoute.",
+      "no_models": "No hay modelos configurados en este combo.",
+      "select_prompt": "Selecciona o escribe un combo en la pestaña [01] MODELOS & COMBOS para visualizar su secuencia de despacho.",
+      "gate_active_prefix": "PRE-DISPATCH GATE ACTIVO:",
+      "gate_healthy": "Todas las cuentas del combo están saludables y listas para despachar según orden de prioridad (#1 ➔ #2 ➔ ...).",
+      "gate_skipped": "OmniRoute detectó que {model} está en estado [{badge}]: {reason}. Se salta inmediatamente sin reintentos innecesarios. Las peticiones se canalizan al siguiente objetivo disponible según la estrategia de prioridad."
+    },
+    "models": {
+      "primary_tag": "// CONFIGURATION_TARGET: MODEL_SLUG",
+      "primary_title": "MODELO PRINCIPAL ACTIVO",
+      "primary_desc": "Define el identificador del modelo o combo que Codex solicitará al router backend.",
+      "input_model_label": "IDENTIFICADOR ACTIVO (model)",
+      "input_model_help": "Ingresa directamente el nombre del modelo o combo de OmniRoute.",
+      "select_model_label": "SELECTOR DIRECTO OMNIROUTE",
+      "select_model_help": "Modelos y combos detectados dinámicamente en tiempo real.",
+      "loading_models": "-- CARGANDO MODELOS DESDE OMNIROUTE... --",
+      "saved_in_disk": "GUARDADO EN DISCO:",
+      "selected_in_memory": "SELECCIONADO EN MEMORIA:",
+      "btn_discard_label": "DESCARTAR",
+      "coding_combos_tag": "// CATEGORY: CODING_OPTIMIZED",
+      "coding_combos_title": "COMBOS DESTACADOS PARA PROGRAMACIÓN",
+      "coding_combos_desc": "Enrutamientos preconfigurados para código y resolución de problemas de ingeniería.",
+      "other_combos_tag": "// CATEGORY: MULTI_ROUTING",
+      "other_combos_title": "OTROS COMBOS Y ENRUTAMIENTOS DISPONIBLES",
+      "other_combos_desc": "Modelos automáticos de razonamiento, balance de coste y velocidad.",
+      "card_active_badge": "ACTIVO",
+      "btn_select_combo": "SELECCIONAR"
+    },
+    "provider": {
+      "spec_tag": "// BACKEND_SUBSYSTEM: MODEL_PROVIDER",
+      "spec_title": "PARÁMETROS DEL PROVEEDOR (model_provider)",
+      "spec_desc": "Establece el endpoint HTTP y las credenciales de comunicación para Codex.",
+      "select_label": "PROVEEDOR SELECCIONADO",
+      "select_help": "Debe mantenerse en omniroute para aprovechar el router local.",
+      "name_label": "NOMBRE AMIGABLE (name)",
+      "name_help": "Etiqueta descriptiva para registros y diagnósticos de doctor.",
+      "url_label": "BASE URL DEL ENDPOINT",
+      "url_help": "Dirección HTTP del servidor compatible con la API de OpenAI v1.",
+      "key_label": "VARIABLE DE ENTORNO DE API KEY",
+      "key_help": "Variable de entorno en Windows donde se almacena el token.",
+      "wire_api_label": "WIRE API PROTOCOL",
+      "wire_api_help": "Formato de intercambio de mensajes entre cliente y servidor.",
+      "requires_openai_auth_desc": "Exige tokens de ChatGPT interno. Inactivo para OmniRoute."
+    },
+    "security": {
+      "spec_tag": "// SECURITY_POLICY: EXECUTION_ISOLATION",
+      "spec_title": "POLÍTICAS DE SEGURIDAD Y SANDBOX",
+      "spec_desc": "Controla los permisos sobre el sistema de archivos y las aprobaciones de comandos.",
+      "sandbox_mode_label": "MODO DE SANDBOX (sandbox_mode)",
+      "sandbox_mode_help": "Nivel de contención para comandos y mutación de archivos.",
+      "opt_sandbox_danger": "danger-full-access (Sin restricciones de terminal ni disco)",
+      "opt_sandbox_write": "workspace-write (Solo escritura en la raíz del proyecto)",
+      "opt_sandbox_readonly": "read-only (Inspección estricta, sin escritura)",
+      "approval_policy_label": "POLÍTICA DE APROBACIÓN (approval_policy)",
+      "approval_policy_help": "Criterio para solicitar confirmación interactiva al usuario.",
+      "opt_approval_never": "never (Ejecución autónoma sin interrupción)",
+      "opt_approval_on_request": "on-request (El agente decide cuándo consultar)",
+      "opt_approval_always": "always (Confirmar cada acción individual)",
+      "reviewer_label": "REVISOR DE APROBACIONES (approvals_reviewer)",
+      "reviewer_help": "Entidad encargada de autorizar o rechazar solicitudes.",
+      "opt_reviewer_user": "user (Usuario humano interactivo)",
+      "opt_reviewer_auto": "auto (Revisión interna automática)",
+      "win_sandbox_label": "SANDBOX WINDOWS (windows.sandbox)",
+      "win_sandbox_help": "Aislamiento en el subsistema de procesos de Windows.",
+      "opt_win_sandbox_elevated": "elevated (Privilegios completos de usuario actual)",
+      "opt_win_sandbox_standard": "standard (Contención estándar)",
+      "opt_win_sandbox_restricted": "restricted (Restricción estricta de tokens)"
+    },
+    "reasoning": {
+      "spec_tag": "// INFERENCE_PARAMS: REASONING_ENGINE",
+      "spec_title": "PARÁMETROS DE RAZONAMIENTO Y VERBOSIDAD",
+      "spec_desc": "Ajusta la profundidad de pensamiento y el formato de las respuestas generadas.",
+      "effort_label": "ESFUERZO DE RAZONAMIENTO (model_reasoning_effort)",
+      "effort_help": "Presupuesto de tokens de pensamiento previo a la respuesta.",
+      "opt_effort_none": "none (Sin razonamiento extendido)",
+      "opt_effort_low": "low (Razonamiento ligero y ágil)",
+      "opt_effort_medium": "medium (Equilibrado para ingeniería)",
+      "opt_effort_high": "high (Análisis profundo de arquitectura)",
+      "opt_effort_xhigh": "xhigh (Extra alto para problemas complejos)",
+      "opt_effort_max": "max (Máximo disponible)",
+      "opt_effort_ultra": "ultra (Ultra con auto-delegación)",
+      "summary_label": "RESUMEN DE PENSAMIENTO (model_reasoning_summary)",
+      "summary_help": "Presentación del proceso de pensamiento en los mensajes.",
+      "opt_summary_auto": "auto (Determinado por el cliente)",
+      "opt_summary_detailed": "detailed (Desglose analítico completo)",
+      "opt_summary_concise": "concise (Resumen sintético)",
+      "opt_summary_none": "none (Ocultar completamente)",
+      "verbosity_label": "VERBOSIDAD DE RESPUESTAS (model_verbosity)",
+      "verbosity_help": "Extensión y detalle en la explicación de las modificaciones.",
+      "opt_verbosity_low": "low (Solo código y pasos esenciales)",
+      "opt_verbosity_medium": "medium (Equilibrado)",
+      "opt_verbosity_high": "high (Explicativo y exhaustivo)",
+      "web_search_label": "BÚSQUEDA WEB (web_search)",
+      "web_search_help": "Capacidad de consultar documentación y APIs en línea.",
+      "opt_web_disabled": "disabled (Desactivada)",
+      "opt_web_live": "live (Búsqueda en tiempo real)",
+      "opt_web_cached": "cached (Búsqueda con almacenamiento en caché)",
+      "hide_reasoning_desc": "Oculta los bloques internos de pensamiento en la interfaz de chat."
+    },
+    "features": {
+      "spec_tag": "// SUBSYSTEM: FEATURE_FLAGS_MATRIX",
+      "spec_title": "BANDERAS DE FUNCIONALIDADES (codex features)",
+      "spec_desc": "Activa o desactiva capacidades avanzadas de la arquitectura de Codex.",
+      "search_placeholder": "Escribe el nombre de la bandera para filtrar...",
+      "prevent_idle_sleep": "Evita la suspensión del sistema operativo durante ejecuciones prolongadas.",
+      "write_stdin_approval": "Solicita aprobación humana explícita antes de escribir en streams de stdin.",
+      "guardian_approval": "Validación predictiva contra operaciones potencialmente destructivas.",
+      "js_repl": "Ejecutor interactivo JavaScript / Node REPL en tiempo real.",
+      "fast_mode": "Prioriza latencia ultra baja en streaming de respuestas.",
+      "multi_agent": "Permite invocación de subagentes especializados para tareas paralelas.",
+      "memories": "Persiste hechos clave y contexto entre sesiones de trabajo.",
+      "in_app_browser": "Navegador interno para inspección y automatización web.",
+      "in_app_chat": "Streaming continuo de mensajes interactivos.",
+      "in_app_dictation": "Reconocimiento y dictado por voz.",
+      "goals": "Mantenimiento y trazabilidad de objetivos de trabajo.",
+      "worktrees": "Aislamiento de tareas en managed Git worktrees.",
+      "shell_tool": "Herramienta de terminal para comandos nativos de PowerShell / Bash.",
+      "sleep_tool": "Permite pausas asíncronas controladas en flujos de trabajo.",
+      "system_proxy_fallback": "Usa la configuración de proxy de Windows si la conexión directa falla."
+    },
+    "desktop": {
+      "spec_tag": "// CLIENT_PREFS: DESKTOP_AND_TUI",
+      "spec_title": "PREFERENCIAS DE INTERFAZ GRÁFICA Y TERMINAL",
+      "spec_desc": "Ajusta la experiencia de usuario en la aplicación de escritorio y terminal.",
+      "detail_mode_label": "DETALLE DE CONVERSACIÓN (conversationDetailMode)",
+      "detail_mode_help": "Nivel de visualización de comandos y herramientas ejecutadas.",
+      "opt_detail_commands": "STEPS_COMMANDS (Pasos técnicos y comandos directos)",
+      "opt_detail_prose": "STEPS_PROSE (Resumen en lenguaje natural)",
+      "opt_detail_full": "FULL (Detalle exhaustivo completo)",
+      "queue_mode_label": "COLA DE MENSAJES (followUpQueueMode)",
+      "queue_mode_help": "Comportamiento ante nuevos prompts mientras el agente trabaja.",
+      "opt_queue_queue": "queue (Encolar para el siguiente turno)",
+      "opt_queue_steer": "steer (Redirigir inmediatamente el turno actual)",
+      "opt_queue_off": "off (Desactivar procesamiento concurrente)",
+      "open_link_label": "APERTURA DE ENLACES EXTERNOS",
+      "open_link_help": "Destino al hacer clic en URLs externas en el chat.",
+      "opt_link_external": "external-browser (Navegador predeterminado del sistema)",
+      "opt_link_in_app": "in-app-browser (Navegador web integrado)",
+      "open_local_label": "APERTURA DE LOCALHOST",
+      "open_local_help": "Destino para puertos locales en desarrollo (ej: localhost:3000).",
+      "opt_local_external": "external-browser (Navegador predeterminado)",
+      "opt_local_in_app": "in-app-browser (Navegador integrado)",
+      "ambient_suggestions_desc": "Sugerencias proactivas y completados contextuales.",
+      "context_window_desc": "Muestra medidor de consumo de tokens y ventana de contexto.",
+      "toys_confetti_desc": "Efecto visual discreto al concluir tareas exitosamente.",
+      "tui_colors_desc": "Colores de diagnóstico en la barra de estado de terminal (TUI)."
+    },
+    "plugins": {
+      "spec_tag": "// ECOSYSTEM: BUNDLED_PLUGINS",
+      "spec_title": "PLUGINS OFICIALES Y RUNTIMES",
+      "spec_desc": "Herramientas de inspección, compilación y acceso a servicios integrados.",
+      "browser@openai-bundled": {
+        "name": "Browser Automation",
+        "desc": "Inspección y automatización de páginas web con Chromium."
+      },
+      "visualize@openai-bundled": {
+        "name": "Data Visualizer",
+        "desc": "Visualización de artefactos y gráficos en la aplicación."
+      },
+      "chrome@openai-bundled": {
+        "name": "Chrome Integration",
+        "desc": "Control de pestañas y herramientas de desarrollo en Google Chrome."
+      },
+      "computer-use@openai-bundled": {
+        "name": "Computer Use",
+        "desc": "Acceso y automatización de interfaces de usuario."
+      },
+      "unified-computer-use@openai-bundled": {
+        "name": "Unified Computer Use",
+        "desc": "Control coordinado de teclado, mouse y pantalla."
+      },
+      "code-review@openai-bundled": {
+        "name": "Code Reviewer",
+        "desc": "Auditoría automática de calidad de código y análisis de sintaxis."
+      },
+      "codex-app-tools@openai-bundled": {
+        "name": "Codex App Tools",
+        "desc": "Herramientas de sistema integradas para la app de escritorio."
+      },
+      "google-calendar@openai-curated": {
+        "name": "Google Calendar",
+        "desc": "Consulta y gestión de agenda en Google Calendar."
+      },
+      "slack@openai-curated": {
+        "name": "Slack Messaging",
+        "desc": "Envío de notificaciones y lectura de canales de Slack."
+      },
+      "notion@openai-curated": {
+        "name": "Notion Workspace",
+        "desc": "Interacción y edición de documentos en Notion."
+      },
+      "documents@openai-primary-runtime": {
+        "name": "Document Processor",
+        "desc": "Procesamiento de documentos de texto estructurado."
+      },
+      "pdf@openai-primary-runtime": {
+        "name": "PDF Reader",
+        "desc": "Extracción de texto e imágenes desde archivos PDF."
+      },
+      "spreadsheets@openai-primary-runtime": {
+        "name": "Spreadsheets",
+        "desc": "Lectura y manipulación de datos tabulares (CSV, XLSX)."
+      }
+    },
+    "toml": {
+      "file_label": "FILE: config.toml",
+      "path_label": "PATH: ~/.codex/config.toml",
+      "encoding_label": "ENCODING: UTF-8",
+      "btn_copy": "COPIAR AL BUFFER",
+      "btn_download": "DESCARGAR .TOML"
+    },
+    "modals": {
+      "btn_close": "CERRAR",
+      "btn_cancel": "CANCELAR",
+      "diff_title": "[DIFF] COMPARACIÓN DE CAMBIOS // DISCO VS MEMORIA",
+      "diff_empty": "No hay diferencias con la versión guardada en disco.",
+      "btn_save_shortcut": "GUARDAR CAMBIOS (Ctrl+S)",
+      "backups_title": "[BACKUPS] RESPALDOS AUTOMÁTICOS DE CONFIGURACIÓN",
+      "backups_loading": "Cargando lista de respaldos...",
+      "backups_empty": "No hay respaldos automáticos registrados aún.",
+      "btn_restore": "RESTAURAR",
+      "confirm_restore": "¿Confirmas restaurar el respaldo '{filename}'? La configuración actual será reemplazada de inmediato.",
+      "diag_title": "[DIAGNOSTICS] INTEGRIDAD Y TELEMETRÍA DEL SISTEMA",
+      "diag_loading": "Ejecutando diagnóstico integral...",
+      "diag_local_server": "SERVIDOR LOCAL",
+      "diag_omniroute": "OMNIROUTE GATEWAY",
+      "diag_config": "CONFIG.TOML OPERATIVO",
+      "diag_accounts": "CUENTAS & TELEMETRÍA",
+      "diag_port": "Puerto:",
+      "diag_status": "Estado:",
+      "diag_operational": "OPERATIVO",
+      "diag_size": "Tamaño:",
+      "diag_total": "Total:",
+      "diag_ready": "Listas:",
+      "diag_combos_detected": "Combos detectados:",
+      "btn_copy_diag": "COPIAR INFORME REDACTADO",
+      "conflict_title": "[ALERTA DE CONFLICTO] MODIFICACIÓN EXTERNA DETECTADA",
+      "conflict_body1": "El archivo config.toml fue modificado externamente en disco desde la última lectura.",
+      "conflict_body2": "Para evitar perder cambios concurrentes realizados por Codex u otro editor, elige cómo proceder:",
+      "conflict_btn_diff": "VER DIFERENCIAS",
+      "conflict_btn_discard": "DESCARTAR Y RECARGAR DE DISCO",
+      "conflict_btn_overwrite": "SOBRESCRIBIR FORZADO"
+    },
+    "toasts": {
+      "copied_buffer": "BUFFER: CONFIGURACIÓN COPIADA AL PORTAPAPELES",
+      "copied_diag": "INFORME DE DIAGNÓSTICO COPIADO AL PORTAPAPELES",
+      "saved_success": "CONFIGURACIÓN GUARDADA CON ÉXITO",
+      "reloaded": "CONFIGURACIÓN RECARGADA DESDE DISCO",
+      "discarded": "CAMBIOS DESCARTADOS: CONFIGURACIÓN RESTAURADA",
+      "retest_completed": "RE-TEST COMPLETADO: {ready}/{total} CUENTAS LISTAS",
+      "retest_error": "ERROR AL EJECUTAR RE-TEST EN OMNIROUTE",
+      "retest_network_error": "FALLO DE RED AL RE-TESTEAR: {error}",
+      "retest_single_done": "RE-TEST DE CUENTA COMPLETADO",
+      "retest_single_error": "FALLÓ EL TEST DE LA CUENTA",
+      "cooldown_cleared": "COOLDOWN Y DISYUNTOR REINICIADOS EXITOSAMENTE",
+      "cooldown_error": "NO SE PUDO LIMPIAR EL COOLDOWN",
+      "master_reset_done": "MASTER RESET: DISYUNTORES Y ENFRIAMIENTOS RESTABLECIDOS",
+      "master_reset_error": "ERROR AL RESTABLECER DISYUNTORES",
+      "backup_restored": "RESPALDO RESTAURADO: {filename}",
+      "restarting_app": "REINICIANDO CHATGPT APP...",
+      "app_restarted": "APLICACIÓN REINICIADA EXITOSAMENTE",
+      "app_restart_error": "ERROR AL REINICIAR APLICACIÓN",
+      "syncing_threads": "SINCRONIZANDO HILOS DE CHATGPT AL COMBO: {combo}...",
+      "threads_synced": "HILOS SINCRONIZADOS EXITOSAMENTE AL COMBO: {combo}",
+      "threads_sync_error": "ERROR AL SINCRONIZAR HILOS DE CHATGPT"
+    },
+    "a11y": {
+      "lang_selector": "Selector de idioma / Language selector"
+    }
+  },
+  "en": {
+    "common": {
+      "save_changes": "SAVE CHANGES",
+      "discard_changes": "DISCARD",
+      "close": "CLOSE",
+      "cancel": "CANCEL",
+      "restore": "RESTORE",
+      "retest": "RE-TEST",
+      "reset_cooldown": "RESET COOLDOWN",
+      "loading": "LOADING...",
+      "na": "N/A",
+      "never": "NEVER",
+      "none": "NONE",
+      "active": "ACTIVE",
+      "inactive": "INACTIVE",
+      "unsaved": "UNSAVED",
+      "not_loaded": "NOT LOADED"
+    },
+    "nav": {
+      "accounts": "ACCOUNTS MONITOR",
+      "models": "MODELS & COMBOS",
+      "provider": "PROVIDER",
+      "security": "SECURITY",
+      "reasoning": "REASONING",
+      "features": "FEATURES",
+      "desktop": "DESKTOP / TUI",
+      "plugins": "PLUGINS",
+      "toml": "CONFIG.TOML"
+    },
+    "telemetry": {
+      "no_changes": "NO CHANGES",
+      "modified": "MODIFIED (UNSAVED)",
+      "dirty_title": "Status of changes compared to file on disk",
+      "accounts_checking": "ACCOUNTS: CHECKING",
+      "accounts_ready": "ACCOUNTS: {ready}/{total} READY",
+      "accounts_title": "OmniRoute Accounts Monitor (Click to view status)",
+      "omniroute_checking": "OMNIROUTE: CHECKING",
+      "omniroute_online": "OMNIROUTE: ONLINE",
+      "omniroute_offline": "OMNIROUTE: OFFLINE",
+      "omniroute_title": "Connection to OmniRoute (Port 20128)",
+      "server_checking": "SYNC_SERVER: CHECKING",
+      "server_online": "SYNC_SERVER: ONLINE",
+      "server_offline": "SYNC_SERVER: OFFLINE",
+      "server_title": "Synchronizer with config.toml (Port 20129)",
+      "system_ready": "SYSTEM: READY",
+      "demo_mode": "[DEMO MODE // MOCK ENVIRONMENT]"
+    },
+    "header": {
+      "hero_title": "CODEX AI MATRIX",
+      "hero_subtitle": "Technical control plane and configuration for OpenAI Codex autonomous agents, local OmniRoute routing, and execution system parameters.",
+      "sys_status_label": "SYS_STATUS:",
+      "status_waiting": "WAITING FOR RUNTIME RESPONSE",
+      "status_connected": "OMNIROUTE :20128 READY // ROUTING '{model}' THROUGH MATRIX",
+      "status_omniroute_down": "ALERT: OMNIROUTE NOT RESPONDING ON :20128 // VERIFY LOCAL SERVICE",
+      "status_server_down": "CONFIGURATION SERVER :20129 DISCONNECTED",
+      "btn_retest": "FORCE RE-TEST ACCOUNTS",
+      "btn_retest_testing": "TESTING...",
+      "btn_retest_title": "Forces an immediate re-test of all accounts in OmniRoute, ignoring cooldowns and resetting circuit breakers",
+      "btn_restart": "RESTART CHATGPT APP",
+      "btn_restart_title": "Cleanly closes ChatGPT and the daemon, then reopens the application",
+      "btn_diff": "VIEW DIFF",
+      "btn_diff_title": "View differences between configuration on disk and in-memory changes",
+      "btn_backups": "BACKUPS",
+      "btn_backups_title": "Browse and restore automatic configuration backups",
+      "btn_diagnostics": "DIAGNOSTICS",
+      "btn_diagnostics_title": "Inspect system integrity and OmniRoute telemetry",
+      "btn_reload": "RELOAD",
+      "btn_reload_title": "Reload combos and configuration",
+      "btn_save": "SAVE CHANGES",
+      "btn_save_title": "Save configuration to config.toml"
+    },
+    "accounts": {
+      "spec_tag": "// RUNTIME_MONITOR: OMNIROUTE_PRE_DISPATCH_MATRIX",
+      "spec_title": "LIVE ACCOUNTS & ROUTING MONITOR",
+      "spec_desc": "View in real-time whether your accounts (Codex, Antigravity, etc.) will be dispatched or ignored by OmniRoute before each request, their circuit breaker state, and quota limits (5h and 7d).",
+      "btn_retest_all": "FORCE IMMEDIATE RE-TEST (ALL)",
+      "chk_autorefresh": "AUTO-REFRESH (15s)",
+      "updated_at": "UPDATED: {time}",
+      "stat_total": "TOTAL CONNECTED ACCOUNTS",
+      "stat_ready": "READY FOR DISPATCH",
+      "stat_ignored": "IGNORED / QUOTA EXHAUSTED",
+      "stat_cooling": "IN COOLDOWN (429)",
+      "filter_label": "FILTER ACCOUNTS:",
+      "filter_all": "ALL",
+      "filter_ready": "READY",
+      "filter_ignored": "IGNORED",
+      "filter_codex": "CODEX",
+      "filter_antigravity": "ANTIGRAVITY",
+      "btn_master_reset": "⚡ MASTER RESET CIRCUIT BREAKERS",
+      "btn_master_reset_title": "Resets all Circuit Breakers and clears 429 cooldown locks across all accounts",
+      "btn_sync_threads": "🔄 SYNC ALL CHATS TO COMBO",
+      "btn_sync_threads_title": "Syncs all active ChatGPT threads in SQLite to the selected combo",
+      "no_accounts_match": "NO ACCOUNTS MATCH THE SELECTED FILTER",
+      "quota_5h_label": "5-HOUR WINDOW:",
+      "quota_7d_label": "7-DAY WINDOW (WEEKLY):",
+      "quota_resets_at": "Resets: {time}",
+      "reason_box_ignored": "OMNIROUTE WILL IGNORE THIS ACCOUNT:",
+      "reason_box_ready": "OPERATIONAL STATUS:",
+      "spec_health": "HEALTH:",
+      "spec_cb": "CIRCUIT BREAKER:",
+      "spec_cooldown": "COOLDOWN:",
+      "spec_priority": "PRIORITY:",
+      "priority_level": "LEVEL {priority}",
+      "cooldown_remaining": "{seconds}s remaining",
+      "cb_errors": "{count} err",
+      "btn_retest_single_title": "Forces an immediate re-test of this account",
+      "btn_clear_cooldown_title": "Clears any 429 cooldown and resets the circuit breaker",
+      "badge_ready": "READY FOR COMBO",
+      "reason_ready": "Active connection, closed circuit breaker and validated credentials.",
+      "badge_disabled": "DISABLED",
+      "reason_disabled": "Connection is marked as inactive in OmniRoute.",
+      "badge_cb_open": "CIRCUIT OPEN",
+      "reason_cb_open": "Circuit Breaker open ({failures} consecutive failures).",
+      "badge_cooldown": "COOLING DOWN ({seconds}s)",
+      "reason_cooldown": "Rate-limited (HTTP 429). Cooling down until {time}.",
+      "badge_cred_failed": "CREDENTIAL FAILURE",
+      "reason_cred_failed": "Credential Gate: {error}",
+      "badge_quota_5h": "5H QUOTA EXHAUSTED",
+      "reason_quota_5h": "5h limit reached ({usage}/{limit}). Resets at {time}.",
+      "badge_quota_7d": "7D QUOTA EXHAUSTED",
+      "reason_quota_7d": "Weekly limit reached ({usage}/{limit}). Resets on {date}."
+    },
+    "pipeline": {
+      "spec_tag": "// ACTIVE_COMBO_DISPATCH_FLOW:",
+      "spec_title": "EXECUTION SEQUENCE (PRE-DISPATCH)",
+      "spec_desc": "Shows the exact order OmniRoute will route requests among your configured models, skipping immediately any account that reached its quota or has an open circuit breaker.",
+      "active_target": "▶ CURRENT ACTIVE TARGET",
+      "skipped_target": "✖ SKIPPED BY PRE-DISPATCH",
+      "badge_ready": "READY",
+      "badge_ignored": "IGNORED",
+      "not_found_title": "COMBO NOT FOUND IN TELEMETRY",
+      "not_found_desc": "The selected combo '{model}' does not match any registered definition in OmniRoute. Verify the name is correct or select one of the available combos in [01] MODELS & COMBOS.",
+      "not_found_callout": "TELEMETRY NOT AVAILABLE: Cannot predict dispatch sequence because combo '{model}' is not registered in the OmniRoute database.",
+      "no_models": "No models configured in this combo.",
+      "select_prompt": "Select or type a combo in the [01] MODELS & COMBOS tab to view its dispatch sequence.",
+      "gate_active_prefix": "PRE-DISPATCH GATE ACTIVE:",
+      "gate_healthy": "All combo accounts are healthy and ready to dispatch in priority order (#1 ➔ #2 ➔ ...).",
+      "gate_skipped": "OmniRoute detected that {model} is in status [{badge}]: {reason}. It will be skipped immediately without wasted retries. Requests are routed to the next available target according to priority."
+    },
+    "models": {
+      "primary_tag": "// CONFIGURATION_TARGET: MODEL_SLUG",
+      "primary_title": "ACTIVE PRIMARY MODEL",
+      "primary_desc": "Defines the model or combo identifier that Codex will request from the backend router.",
+      "input_model_label": "ACTIVE IDENTIFIER (model)",
+      "input_model_help": "Directly enter the OmniRoute model or combo name.",
+      "select_model_label": "OMNIROUTE DIRECT SELECTOR",
+      "select_model_help": "Models and combos dynamically detected in real-time.",
+      "loading_models": "-- LOADING MODELS FROM OMNIROUTE... --",
+      "saved_in_disk": "SAVED ON DISK:",
+      "selected_in_memory": "SELECTED IN MEMORY:",
+      "btn_discard_label": "DISCARD",
+      "coding_combos_tag": "// CATEGORY: CODING_OPTIMIZED",
+      "coding_combos_title": "FEATURED CODING COMBOS",
+      "coding_combos_desc": "Pre-configured routings for code generation and engineering problem solving.",
+      "other_combos_tag": "// CATEGORY: MULTI_ROUTING",
+      "other_combos_title": "OTHER AVAILABLE COMBOS & ROUTINGS",
+      "other_combos_desc": "Automatic models for reasoning, cost balancing, and speed.",
+      "card_active_badge": "ACTIVE",
+      "btn_select_combo": "SELECT"
+    },
+    "provider": {
+      "spec_tag": "// BACKEND_SUBSYSTEM: MODEL_PROVIDER",
+      "spec_title": "PROVIDER PARAMETERS (model_provider)",
+      "spec_desc": "Sets the HTTP endpoint and communication credentials for Codex.",
+      "select_label": "SELECTED PROVIDER",
+      "select_help": "Should remain set to omniroute to take advantage of the local router.",
+      "name_label": "FRIENDLY NAME (name)",
+      "name_help": "Descriptive label for doctor logs and diagnostics.",
+      "url_label": "ENDPOINT BASE URL",
+      "url_help": "HTTP address of the server compatible with the OpenAI v1 API.",
+      "key_label": "API KEY ENVIRONMENT VARIABLE",
+      "key_help": "Windows environment variable where the token is stored.",
+      "wire_api_label": "WIRE API PROTOCOL",
+      "wire_api_help": "Message exchange format between client and server.",
+      "requires_openai_auth_desc": "Requires internal ChatGPT tokens. Inactive for OmniRoute."
+    },
+    "security": {
+      "spec_tag": "// SECURITY_POLICY: EXECUTION_ISOLATION",
+      "spec_title": "SECURITY POLICIES & SANDBOX",
+      "spec_desc": "Controls filesystem permissions and command execution approvals.",
+      "sandbox_mode_label": "SANDBOX MODE (sandbox_mode)",
+      "sandbox_mode_help": "Containment level for commands and file mutations.",
+      "opt_sandbox_danger": "danger-full-access (No terminal or disk restrictions)",
+      "opt_sandbox_write": "workspace-write (Write only in project root)",
+      "opt_sandbox_readonly": "read-only (Strict inspection, read-only)",
+      "approval_policy_label": "APPROVAL POLICY (approval_policy)",
+      "approval_policy_help": "Criterion for prompting interactive human confirmation.",
+      "opt_approval_never": "never (Autonomous execution without interruption)",
+      "opt_approval_on_request": "on-request (Agent decides when to prompt)",
+      "opt_approval_always": "always (Confirm every individual action)",
+      "reviewer_label": "APPROVALS REVIEWER (approvals_reviewer)",
+      "reviewer_help": "Entity responsible for approving or rejecting requests.",
+      "opt_reviewer_user": "user (Interactive human user)",
+      "opt_reviewer_auto": "auto (Automatic internal review)",
+      "win_sandbox_label": "WINDOWS SANDBOX (windows.sandbox)",
+      "win_sandbox_help": "Isolation within the Windows process subsystem.",
+      "opt_win_sandbox_elevated": "elevated (Full current user privileges)",
+      "opt_win_sandbox_standard": "standard (Standard containment)",
+      "opt_win_sandbox_restricted": "restricted (Strict token restriction)"
+    },
+    "reasoning": {
+      "spec_tag": "// INFERENCE_PARAMS: REASONING_ENGINE",
+      "spec_title": "REASONING & VERBOSITY PARAMETERS",
+      "spec_desc": "Adjusts thinking depth and output formatting of generated responses.",
+      "effort_label": "REASONING EFFORT (model_reasoning_effort)",
+      "effort_help": "Thinking token budget prior to generating the response.",
+      "opt_effort_none": "none (No extended reasoning)",
+      "opt_effort_low": "low (Light and agile reasoning)",
+      "opt_effort_medium": "medium (Balanced for engineering)",
+      "opt_effort_high": "high (Deep architectural analysis)",
+      "opt_effort_xhigh": "xhigh (Extra high for complex problems)",
+      "opt_effort_max": "max (Maximum available)",
+      "opt_effort_ultra": "ultra (Ultra with auto-delegation)",
+      "summary_label": "REASONING SUMMARY (model_reasoning_summary)",
+      "summary_help": "Presentation of the thought process within messages.",
+      "opt_summary_auto": "auto (Client-determined)",
+      "opt_summary_detailed": "detailed (Complete analytical breakdown)",
+      "opt_summary_concise": "concise (Synthetic summary)",
+      "opt_summary_none": "none (Hide completely)",
+      "verbosity_label": "RESPONSE VERBOSITY (model_verbosity)",
+      "verbosity_help": "Length and detail in the explanation of modifications.",
+      "opt_verbosity_low": "low (Code and essential steps only)",
+      "opt_verbosity_medium": "medium (Balanced)",
+      "opt_verbosity_high": "high (Explanatory and exhaustive)",
+      "web_search_label": "WEB SEARCH (web_search)",
+      "web_search_help": "Capability to search documentation and APIs online.",
+      "opt_web_disabled": "disabled (Disabled)",
+      "opt_web_live": "live (Real-time search)",
+      "opt_web_cached": "cached (Cached search)",
+      "hide_reasoning_desc": "Hides internal thought blocks in the chat interface."
+    },
+    "features": {
+      "spec_tag": "// SUBSYSTEM: FEATURE_FLAGS_MATRIX",
+      "spec_title": "FEATURE FLAGS (codex features)",
+      "spec_desc": "Enables or disables advanced capabilities in Codex architecture.",
+      "search_placeholder": "Type feature flag name to filter...",
+      "prevent_idle_sleep": "Prevents operating system sleep during long-running tasks.",
+      "write_stdin_approval": "Prompts for explicit human approval before writing to stdin streams.",
+      "guardian_approval": "Predictive validation against potentially destructive operations.",
+      "js_repl": "Real-time interactive JavaScript / Node REPL executor.",
+      "fast_mode": "Prioritizes ultra-low latency in response streaming.",
+      "multi_agent": "Allows invocation of specialized subagents for parallel tasks.",
+      "memories": "Persists key facts and context between work sessions.",
+      "in_app_browser": "Internal browser for web inspection and automation.",
+      "in_app_chat": "Continuous streaming of interactive messages.",
+      "in_app_dictation": "Voice recognition and dictation.",
+      "goals": "Tracking and maintenance of work goals.",
+      "worktrees": "Task isolation in managed Git worktrees.",
+      "shell_tool": "Terminal tool for native PowerShell / Bash commands.",
+      "sleep_tool": "Enables controlled asynchronous pauses in workflows.",
+      "system_proxy_fallback": "Uses Windows proxy configuration if direct connection fails."
+    },
+    "desktop": {
+      "spec_tag": "// CLIENT_PREFS: DESKTOP_AND_TUI",
+      "spec_title": "DESKTOP & TERMINAL PREFERENCES",
+      "spec_desc": "Adjusts the user experience in the desktop app and terminal.",
+      "detail_mode_label": "CONVERSATION DETAIL (conversationDetailMode)",
+      "detail_mode_help": "Display level for executed commands and tools.",
+      "opt_detail_commands": "STEPS_COMMANDS (Technical steps and direct commands)",
+      "opt_detail_prose": "STEPS_PROSE (Natural language summary)",
+      "opt_detail_full": "FULL (Exhaustive full detail)",
+      "queue_mode_label": "MESSAGE QUEUE (followUpQueueMode)",
+      "queue_mode_help": "Behavior when receiving new prompts while the agent is busy.",
+      "opt_queue_queue": "queue (Queue for next turn)",
+      "opt_queue_steer": "steer (Steer current turn immediately)",
+      "opt_queue_off": "off (Disable concurrent processing)",
+      "open_link_label": "OPEN EXTERNAL LINKS",
+      "open_link_help": "Destination when clicking external URLs in chat.",
+      "opt_link_external": "external-browser (Default system browser)",
+      "opt_link_in_app": "in-app-browser (Integrated web browser)",
+      "open_local_label": "OPEN LOCALHOST",
+      "open_local_help": "Destination for local development ports (e.g., localhost:3000).",
+      "opt_local_external": "external-browser (Default browser)",
+      "opt_local_in_app": "in-app-browser (Integrated browser)",
+      "ambient_suggestions_desc": "Proactive suggestions and contextual completions.",
+      "context_window_desc": "Shows token consumption and context window gauge.",
+      "toys_confetti_desc": "Subtle visual effect upon successful task completion.",
+      "tui_colors_desc": "Diagnostic colors in terminal status bar (TUI)."
+    },
+    "plugins": {
+      "spec_tag": "// ECOSYSTEM: BUNDLED_PLUGINS",
+      "spec_title": "OFFICIAL PLUGINS & RUNTIMES",
+      "spec_desc": "Tools for inspection, compilation, and integrated service access.",
+      "browser@openai-bundled": {
+        "name": "Browser Automation",
+        "desc": "Inspection and automation of web pages with Chromium."
+      },
+      "visualize@openai-bundled": {
+        "name": "Data Visualizer",
+        "desc": "Visualization of artifacts and charts within the app."
+      },
+      "chrome@openai-bundled": {
+        "name": "Chrome Integration",
+        "desc": "Tab control and developer tools integration in Google Chrome."
+      },
+      "computer-use@openai-bundled": {
+        "name": "Computer Use",
+        "desc": "User interface access and automation."
+      },
+      "unified-computer-use@openai-bundled": {
+        "name": "Unified Computer Use",
+        "desc": "Coordinated keyboard, mouse, and screen control."
+      },
+      "code-review@openai-bundled": {
+        "name": "Code Reviewer",
+        "desc": "Automated code quality audit and syntax analysis."
+      },
+      "codex-app-tools@openai-bundled": {
+        "name": "Codex App Tools",
+        "desc": "Integrated system tools for the desktop application."
+      },
+      "google-calendar@openai-curated": {
+        "name": "Google Calendar",
+        "desc": "Schedule consultation and calendar management in Google Calendar."
+      },
+      "slack@openai-curated": {
+        "name": "Slack Messaging",
+        "desc": "Notification delivery and channel reading in Slack."
+      },
+      "notion@openai-curated": {
+        "name": "Notion Workspace",
+        "desc": "Document interaction and editing in Notion."
+      },
+      "documents@openai-primary-runtime": {
+        "name": "Document Processor",
+        "desc": "Structured text document processing."
+      },
+      "pdf@openai-primary-runtime": {
+        "name": "PDF Reader",
+        "desc": "Text and image extraction from PDF files."
+      },
+      "spreadsheets@openai-primary-runtime": {
+        "name": "Spreadsheets",
+        "desc": "Tabular data reading and manipulation (CSV, XLSX)."
+      }
+    },
+    "toml": {
+      "file_label": "FILE: config.toml",
+      "path_label": "PATH: ~/.codex/config.toml",
+      "encoding_label": "ENCODING: UTF-8",
+      "btn_copy": "COPY TO BUFFER",
+      "btn_download": "DOWNLOAD .TOML"
+    },
+    "modals": {
+      "btn_close": "CLOSE",
+      "btn_cancel": "CANCEL",
+      "diff_title": "[DIFF] COMPARISON OF CHANGES // DISK VS MEMORY",
+      "diff_empty": "No differences compared to the version saved on disk.",
+      "btn_save_shortcut": "SAVE CHANGES (Ctrl+S)",
+      "backups_title": "[BACKUPS] AUTOMATIC CONFIGURATION BACKUPS",
+      "backups_loading": "Loading backups list...",
+      "backups_empty": "No automatic backups registered yet.",
+      "btn_restore": "RESTORE",
+      "confirm_restore": "Confirm restoring backup '{filename}'? Current configuration will be replaced immediately.",
+      "diag_title": "[DIAGNOSTICS] SYSTEM INTEGRITY & TELEMETRY",
+      "diag_loading": "Running comprehensive diagnostics...",
+      "diag_local_server": "LOCAL SERVER",
+      "diag_omniroute": "OMNIROUTE GATEWAY",
+      "diag_config": "ACTIVE CONFIG.TOML",
+      "diag_accounts": "ACCOUNTS & TELEMETRY",
+      "diag_port": "Port:",
+      "diag_status": "Status:",
+      "diag_operational": "OPERATIONAL",
+      "diag_size": "Size:",
+      "diag_total": "Total:",
+      "diag_ready": "Ready:",
+      "diag_combos_detected": "Detected combos:",
+      "btn_copy_diag": "COPY REDACTED REPORT",
+      "conflict_title": "[CONFLICT ALERT] EXTERNAL MODIFICATION DETECTED",
+      "conflict_body1": "The config.toml file was modified externally on disk since last read.",
+      "conflict_body2": "To avoid losing concurrent changes made by Codex or another editor, choose how to proceed:",
+      "conflict_btn_diff": "VIEW DIFFERENCES",
+      "conflict_btn_discard": "DISCARD & RELOAD FROM DISK",
+      "conflict_btn_overwrite": "FORCE OVERWRITE"
+    },
+    "toasts": {
+      "copied_buffer": "BUFFER: CONFIGURATION COPIED TO CLIPBOARD",
+      "copied_diag": "DIAGNOSTIC REPORT COPIED TO CLIPBOARD",
+      "saved_success": "CONFIGURATION SAVED SUCCESSFULLY",
+      "reloaded": "CONFIGURATION RELOADED FROM DISK",
+      "discarded": "CHANGES DISCARDED: CONFIGURATION RESTORED",
+      "retest_completed": "RE-TEST COMPLETED: {ready}/{total} ACCOUNTS READY",
+      "retest_error": "ERROR EXECUTING RE-TEST IN OMNIROUTE",
+      "retest_network_error": "NETWORK ERROR DURING RE-TEST: {error}",
+      "retest_single_done": "ACCOUNT RE-TEST COMPLETED",
+      "retest_single_error": "ACCOUNT TEST FAILED",
+      "cooldown_cleared": "COOLDOWN AND CIRCUIT BREAKER SUCCESSFULLY RESET",
+      "cooldown_error": "FAILED TO CLEAR COOLDOWN",
+      "master_reset_done": "MASTER RESET: CIRCUIT BREAKERS AND COOLDOWNS RESET",
+      "master_reset_error": "ERROR RESETTING CIRCUIT BREAKERS",
+      "backup_restored": "BACKUP RESTORED: {filename}",
+      "restarting_app": "RESTARTING CHATGPT APP...",
+      "app_restarted": "APPLICATION SUCCESSFULLY RESTARTED",
+      "app_restart_error": "ERROR RESTARTING APPLICATION",
+      "syncing_threads": "SYNCING CHATGPT THREADS TO COMBO: {combo}...",
+      "threads_synced": "THREADS SUCCESSFULLY SYNCED TO COMBO: {combo}",
+      "threads_sync_error": "ERROR SYNCING CHATGPT THREADS"
+    },
+    "a11y": {
+      "lang_selector": "Language selector / Selector de idioma"
+    }
+  }
+};
+
+    const STORAGE_LANG_KEY = 'codex-config-manager:ui-language';
+
+    function getPreferredLanguage() {
+      try {
+        const saved = localStorage.getItem(STORAGE_LANG_KEY);
+        if (saved === 'es' || saved === 'en') return saved;
+      } catch (e) {
+        // Fallback if localStorage restricted
+      }
+      return 'es'; // Strict default: Spanish on initial run
+    }
+
+    let currentLanguage = getPreferredLanguage();
+
+    function t(key, params = {}) {
+      const dict = MESSAGES[currentLanguage] || MESSAGES.es;
+      const parts = key.split('.');
+      let cur = dict;
+      for (const part of parts) {
+        if (cur && typeof cur === 'object' && part in cur) {
+          cur = cur[part];
+        } else {
+          cur = undefined;
+          break;
+        }
+      }
+
+      // Safe fallback to Spanish
+      if (cur === undefined) {
+        let fallback = MESSAGES.es;
+        for (const part of parts) {
+          if (fallback && typeof fallback === 'object' && part in fallback) {
+            fallback = fallback[part];
+          } else {
+            fallback = undefined;
+            break;
+          }
+        }
+        cur = fallback;
+      }
+
+      if (typeof cur !== 'string') {
+        return key;
+      }
+
+      return cur.replace(/\{(\w+)\}/g, (match, param) => {
+        return (params && param in params) ? params[param] : match;
+      });
+    }
+
+    function formatDateTime(val, options = {}) {
+      if (!val) return t('common.na');
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return t('common.na');
+      const locale = currentLanguage === 'es' ? 'es-CO' : 'en-US';
+      return new Intl.DateTimeFormat(locale, options).format(d);
+    }
+
+    function formatTime(val) {
+      return formatDateTime(val, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function formatDate(val) {
+      return formatDateTime(val, { year: 'numeric', month: 'numeric', day: 'numeric' });
+    }
+
+    let lastAccountsUpdateTime = null;
+
+    function updateAccountsLastUpdateText() {
+      const el = document.getElementById('text-accounts-last-update');
+      if (el) {
+        if (lastAccountsUpdateTime) {
+          el.textContent = t('accounts.updated_at', { time: formatTime(lastAccountsUpdateTime) });
+        } else {
+          el.textContent = t('accounts.updated_at', { time: '--:--:--' });
+        }
+      }
+    }
+
+    function applyStaticTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (key) {
+          el.textContent = t(key);
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (key) {
+          el.setAttribute('title', t(key));
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (key) {
+          el.setAttribute('placeholder', t(key));
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria-label');
+        if (key) {
+          el.setAttribute('aria-label', t(key));
+        }
+      });
+    }
+
+    function updateFeatureTogglesText() {
+      document.querySelectorAll('.feature-toggle').forEach(el => {
+        const input = el.querySelector('input[type="checkbox"]');
+        if (!input) return;
+        const featureId = input.id.replace(/^feature-/, '');
+        const descKey = 'features.' + featureId;
+        const desc = t(descKey);
+        const descEl = el.querySelector('.toggle-desc');
+        if (descEl) descEl.textContent = desc;
+        el.dataset.filter = (featureId + ' ' + desc).toLowerCase();
+      });
+    }
+
+    function updatePluginTogglesText() {
+      KNOWN_PLUGINS.forEach(p => {
+        const input = document.getElementById('plugin-' + escapePluginId(p.id));
+        if (!input) return;
+        const row = input.closest('.retro-toggle-row');
+        if (!row) return;
+        const name = t('plugins.' + p.id + '.name') || p.name;
+        const desc = t('plugins.' + p.id + '.desc') || p.desc;
+        const codeEl = row.querySelector('.toggle-code');
+        const descEl = row.querySelector('.toggle-desc');
+        if (codeEl) codeEl.innerHTML = escapeHtml(name) + ' [<code>' + escapeHtml(p.id) + '</code>]';
+        if (descEl) descEl.textContent = desc;
+      });
+    }
+
+    function updateTelemetryStatusTexts() {
+      const accountsEl = document.getElementById('text-accounts');
+      if (accountsEl && accountsData && accountsData.summary) {
+        accountsEl.textContent = t('telemetry.accounts_ready', {
+          ready: accountsData.summary.ready,
+          total: accountsData.summary.total
+        });
+      }
+
+      const omniEl = document.getElementById('text-omniroute');
+      if (omniEl) {
+        omniEl.textContent = isOmniRouteConnected ? t('telemetry.omniroute_online') : t('telemetry.omniroute_offline');
+      }
+
+      const serverEl = document.getElementById('text-server');
+      if (serverEl) {
+        serverEl.textContent = isServerConnected ? t('telemetry.server_online') : t('telemetry.server_offline');
+      }
+    }
+
+    function updateOpenModals() {
+      const diffModal = document.getElementById('modal-diff');
+      if (diffModal && diffModal.classList.contains('active')) {
+        openDiffModal();
+      }
+      const diagModal = document.getElementById('modal-diagnostics');
+      if (diagModal && diagModal.classList.contains('active')) {
+        openDiagnosticsModal();
+      }
+    }
+
+    function setLanguage(lang) {
+      if (lang !== 'es' && lang !== 'en') lang = 'es';
+      currentLanguage = lang;
+      try {
+        localStorage.setItem(STORAGE_LANG_KEY, lang);
+      } catch (e) {
+        // ignore
+      }
+
+      document.documentElement.lang = lang;
+
+      const btnEs = document.getElementById('btn-lang-es');
+      const btnEn = document.getElementById('btn-lang-en');
+      if (btnEs) {
+        btnEs.classList.toggle('active', lang === 'es');
+        btnEs.setAttribute('aria-pressed', lang === 'es' ? 'true' : 'false');
+      }
+      if (btnEn) {
+        btnEn.classList.toggle('active', lang === 'en');
+        btnEn.setAttribute('aria-pressed', lang === 'en' ? 'true' : 'false');
+      }
+
+      applyStaticTranslations();
+
+      updateHeroCallout();
+      markDirty();
+      if (typeof renderAccountsUI === 'function') {
+        renderAccountsUI();
+      }
+      updateAccountsLastUpdateText();
+      updateFeatureTogglesText();
+      updatePluginTogglesText();
+      updateTelemetryStatusTexts();
+      updateOpenModals();
+    }
+    window.setLanguage = setLanguage;
+    window.t = t;
+
     
     let initialDiskToml = '';
     let currentFullToml = '';
@@ -2405,6 +3477,7 @@
     // LIFECYCLE & INITIALIZATION
     // ============================================================
     window.addEventListener('DOMContentLoaded', async () => {
+      setLanguage(getPreferredLanguage());
       renderFeatureToggles();
       renderPluginToggles();
       bindFormChangeListeners();
@@ -2443,13 +3516,14 @@
 
     function updateHeroCallout() {
       const callout = document.getElementById('callout-status-text');
-      const activeModel = document.getElementById('input-model').value || 'coding-con-caro';
+      const activeModel = (document.getElementById('input-model') && document.getElementById('input-model').value) || 'coding-con-caro';
+      if (!callout) return;
       if (isOmniRouteConnected && isServerConnected) {
-        callout.textContent = `OMNIROUTE :20128 LISTO // ENRUTANDO '${activeModel}' A TRAVÉS DE MATRIX`;
+        callout.textContent = t('header.status_connected', { model: activeModel });
       } else if (!isOmniRouteConnected) {
-        callout.textContent = `ALERTA: OMNIROUTE NO RESPONDE EN :20128 // VERIFICAR SERVICIO LOCAL`;
+        callout.textContent = t('header.status_omniroute_down');
       } else {
-        callout.textContent = `SERVIDOR DE CONFIGURACIÓN :20129 DESCONECTADO`;
+        callout.textContent = t('header.status_server_down');
       }
     }
 
@@ -2463,25 +3537,25 @@
       if (isDirty) {
         if (badge) {
           badge.className = 'telemetry-item dirty';
-          badge.innerHTML = '<span class="status-dot warning"></span><span>MODIFICADO (SIN GUARDAR)</span>';
+          badge.innerHTML = `<span class="status-dot warning"></span><span>${escapeHtml(t('telemetry.modified'))}</span>`;
         }
         if (discardBtn) discardBtn.style.display = 'inline-flex';
       } else {
         if (badge) {
           badge.className = 'telemetry-item clean';
-          badge.innerHTML = '<span class="status-dot success"></span><span>SIN CAMBIOS</span>';
+          badge.innerHTML = `<span class="status-dot success"></span><span>${escapeHtml(t('telemetry.no_changes'))}</span>`;
         }
         if (discardBtn) discardBtn.style.display = 'none';
       }
 
-      const currentModel = document.getElementById('input-model').value;
-      if (savedComboText) savedComboText.textContent = initialSavedModel || 'NO CARGADO';
+      const currentModel = (document.getElementById('input-model') && document.getElementById('input-model').value) || '';
+      if (savedComboText) savedComboText.textContent = initialSavedModel || t('common.not_loaded');
       if (selectedComboText) {
         if (currentModel === initialSavedModel) {
           selectedComboText.textContent = currentModel;
           selectedComboText.className = 'combo-pill match';
         } else {
-          selectedComboText.textContent = `${currentModel} (SIN GUARDAR)`;
+          selectedComboText.textContent = `${currentModel} (${t('common.unsaved')})`;
           selectedComboText.className = 'combo-pill changed';
         }
       }
@@ -2661,8 +3735,8 @@
           <span class="combo-tag">${escapeHtml(ownedBy || 'COMBO')}</span>
         </div>
         <div class="combo-instruction">
-          <span class="active-indicator-symbol">ACTIVE █</span>
-          <span>// CLIC PARA ACTIVAR</span>
+          <span class="active-indicator-symbol">${escapeHtml(t('models.card_active_badge'))} █</span>
+          <span>// ${escapeHtml(t('models.btn_select_combo'))}</span>
         </div>
       `;
       return card;
@@ -3113,11 +4187,10 @@
           const { total, ready, ignored } = accountsData.summary || { total: 0, ready: 0, ignored: 0 };
 
           statusPill.className = 'telemetry-item active';
-          statusText.textContent = `CUENTAS: ${ready}/${total} LISTAS`;
+          statusText.textContent = t('telemetry.accounts_ready', { ready, total });
 
-          const now = new Date();
-          const timeStr = now.toTimeString().split(' ')[0];
-          if (lastUpdateText) lastUpdateText.textContent = `ACTUALIZADO: ${timeStr}`;
+          lastAccountsUpdateTime = new Date();
+          updateAccountsLastUpdateText();
 
           renderAccountsUI();
           if (showToast) pushToast(`CUENTAS OMNIROUTE: ${ready}/${total} LISTAS PARA DESPACHO`, 'success');
@@ -3185,27 +4258,24 @@
       if (!container) return;
       container.innerHTML = '';
 
-      // Búsqueda exacta del combo seleccionado
       const activeCombo = accountsData.combos.find(c => c.name === activeModel || c.id === activeModel);
 
       if (!activeCombo) {
-        // Alerta honesta: No inventar secuencias de fallback
         container.innerHTML = `
           <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #DC2626; padding: 14px; border: 1px dashed #DC2626; background: rgba(220, 38, 38, 0.05); width: 100%;">
-            <strong>COMBO NO ENCONTRADO EN LA TELEMETRÍA</strong><br>
-            El combo seleccionado <code>${escapeHtml(activeModel)}</code> no coincide con ninguna definición registrada en OmniRoute.
-            Verifica que el nombre sea correcto o selecciona uno de los combos disponibles en [01] MODELOS & COMBOS.
+            <strong>${escapeHtml(t('pipeline.not_found_title'))}</strong><br>
+            ${escapeHtml(t('pipeline.not_found_desc', { model: activeModel }))}
           </div>
         `;
         if (explanationEl) {
-          explanationEl.innerHTML = `<strong>TELEMETRÍA NO DISPONIBLE:</strong> No se puede predecir la secuencia de despacho porque el combo '${escapeHtml(activeModel)}' no está registrado en la base de datos de OmniRoute.`;
+          explanationEl.innerHTML = `<strong>${escapeHtml(t('pipeline.not_found_callout', { model: activeModel }))}</strong>`;
         }
         return;
       }
 
       if (!activeCombo.models || activeCombo.models.length === 0) {
-        container.innerHTML = '<div style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono); padding:10px;">No hay modelos configurados en este combo.</div>';
-        if (explanationEl) explanationEl.textContent = 'Selecciona o escribe un combo en la pestaña [01] MODELOS & COMBOS para visualizar su secuencia de despacho.';
+        container.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono); padding:10px;">${escapeHtml(t('pipeline.no_models'))}</div>`;
+        if (explanationEl) explanationEl.textContent = t('pipeline.select_prompt');
         return;
       }
 
@@ -3217,15 +4287,20 @@
         const isFirstActive = !isIgnored && !activeTargetAssigned;
         if (isFirstActive) activeTargetAssigned = true;
 
+        const badgeText = isIgnored ? t('pipeline.badge_ignored') : t('pipeline.badge_ready');
+        const badgeClass = isIgnored ? 'warn' : 'ok';
+
         if (isIgnored && !firstIgnoredReason) {
-          firstIgnoredReason = `OmniRoute detectó que ${m.label || m.model} está en estado [${m.statusBadge || 'IGNORADA'}]: ${m.connection?.evaluation?.reason || 'Límite alcanzado'}. Se salta inmediatamente sin reintentos innecesarios.`;
+          const reasonStr = m.connection?.evaluation?.reason || t('accounts.badge_quota_5h');
+          firstIgnoredReason = t('pipeline.gate_skipped', {
+            model: m.label || m.model,
+            badge: badgeText,
+            reason: reasonStr
+          });
         }
 
         const node = document.createElement('div');
         node.className = `pipeline-step-node ${isIgnored ? 'ignored' : (isFirstActive ? 'active-first' : '')}`;
-
-        const badgeClass = isIgnored ? 'warn' : 'ok';
-        const badgeText = m.statusBadge || (isIgnored ? 'IGNORADA' : 'LISTA');
 
         node.innerHTML = `
           <div class="pipeline-step-header">
@@ -3233,11 +4308,11 @@
             <span class="account-verdict-badge ${badgeClass}">${escapeHtml(badgeText)}</span>
           </div>
           <div class="pipeline-step-account" title="${escapeHtml(m.label || m.connection?.email || m.connectionId)}">
-            ${escapeHtml(m.label || m.connection?.email || m.connectionId || 'Conexión')}
+            ${escapeHtml(m.label || m.connection?.email || m.connectionId || t('provider.name_label'))}
           </div>
           <div class="pipeline-step-model">${escapeHtml(m.model)}</div>
-          ${isFirstActive ? '<div style="font-family:var(--font-pixel); font-size:0.60rem; color:#15803D; font-weight:700; margin-top:2px;">▶ OBJETIVO ACTIVO EN CURSO</div>' : ''}
-          ${isIgnored ? '<div style="font-family:var(--font-pixel); font-size:0.58rem; color:#DC2626; margin-top:2px;">✖ SALTADA POR PRE-DISPATCH</div>' : ''}
+          ${isFirstActive ? `<div style="font-family:var(--font-pixel); font-size:0.60rem; color:#15803D; font-weight:700; margin-top:2px;">${escapeHtml(t('pipeline.active_target'))}</div>` : ''}
+          ${isIgnored ? `<div style="font-family:var(--font-pixel); font-size:0.58rem; color:#DC2626; margin-top:2px;">${escapeHtml(t('pipeline.skipped_target'))}</div>` : ''}
         `;
         container.appendChild(node);
 
@@ -3251,9 +4326,9 @@
 
       if (explanationEl) {
         if (firstIgnoredReason) {
-          explanationEl.innerHTML = `<strong>PRE-DISPATCH GATE ACTIVO:</strong> ${escapeHtml(firstIgnoredReason)} Las peticiones se canalizan al siguiente objetivo disponible según la estrategia de prioridad.`;
+          explanationEl.innerHTML = `<strong>${escapeHtml(t('pipeline.gate_active_prefix'))}</strong> ${escapeHtml(firstIgnoredReason)}`;
         } else {
-          explanationEl.innerHTML = `<strong>PRE-DISPATCH GATE ACTIVO:</strong> Todas las cuentas del combo están saludables y listas para despachar según orden de prioridad (#1 ➔ #2 ➔ ...).`;
+          explanationEl.innerHTML = `<strong>${escapeHtml(t('pipeline.gate_active_prefix'))}</strong> ${escapeHtml(t('pipeline.gate_healthy'))}`;
         }
       }
     }
@@ -3277,7 +4352,7 @@
       }
 
       if (list.length === 0) {
-        container.innerHTML = '<div style="grid-column: 1/-1; padding: 24px; text-align: center; font-family: var(--font-mono); color: var(--text-muted); border: 2px dashed var(--border-line);">NO HAY CUENTAS QUE COINCIDAN CON EL FILTRO SELECCIONADO</div>';
+        container.innerHTML = `<div style="grid-column: 1/-1; padding: 24px; text-align: center; font-family: var(--font-mono); color: var(--text-muted); border: 2px dashed var(--border-line);">${escapeHtml(t('accounts.no_accounts_match'))}</div>`;
         return;
       }
 
@@ -3290,6 +4365,35 @@
         const card = document.createElement('div');
         card.className = `account-card ${cardClass}`;
 
+        let localizedBadge = acc.evaluation?.badge || t('telemetry.accounts_checking');
+        let localizedReason = acc.evaluation?.reason || '';
+        const reasonCode = acc.evaluation?.reasonCode;
+        const cbFailures = acc.circuit_breaker?.failure_count || 0;
+        const cbState = acc.circuit_breaker?.state || 'CLOSED';
+
+        if (reasonCode === 'READY_FOR_COMBO') {
+          localizedBadge = t('accounts.badge_ready');
+          localizedReason = t('accounts.reason_ready');
+        } else if (reasonCode === 'DISABLED') {
+          localizedBadge = t('accounts.badge_disabled');
+          localizedReason = t('accounts.reason_disabled');
+        } else if (reasonCode === 'CIRCUIT_OPEN') {
+          localizedBadge = t('accounts.badge_cb_open');
+          localizedReason = t('accounts.reason_cb_open', { failures: cbFailures });
+        } else if (reasonCode === 'COOLDOWN') {
+          localizedBadge = t('accounts.badge_cooldown', { seconds: acc.cooling_remaining_seconds });
+          localizedReason = t('accounts.reason_cooldown', { time: formatTime(acc.rate_limited_until) });
+        } else if (reasonCode === 'CREDENTIALS_FAILED') {
+          localizedBadge = t('accounts.badge_cred_failed');
+          localizedReason = t('accounts.reason_cred_failed', { error: acc.last_error || t('common.na') });
+        } else if (reasonCode === 'QUOTA_5H_EXHAUSTED' && acc.quota) {
+          localizedBadge = t('accounts.badge_quota_5h');
+          localizedReason = t('accounts.reason_quota_5h', { usage: acc.quota.usage5h, limit: acc.quota.limit5h, time: formatTime(acc.quota.resetAt5h) });
+        } else if (reasonCode === 'QUOTA_7D_EXHAUSTED' && acc.quota) {
+          localizedBadge = t('accounts.badge_quota_7d');
+          localizedReason = t('accounts.reason_quota_7d', { usage: acc.quota.usage7d, limit: acc.quota.limit7d, date: formatDate(acc.quota.resetAt7d) });
+        }
+
         let quotaHtml = '';
         if (acc.quota) {
           const pct5h = Math.min(100, Math.round((acc.quota.usage5h / Math.max(1, acc.quota.limit5h)) * 100));
@@ -3301,32 +4405,31 @@
             <div class="quota-section">
               <div class="quota-item">
                 <div class="quota-row-label">
-                  <span>VENTANA 5 HORAS:</span>
+                  <span>${escapeHtml(t('accounts.quota_5h_label'))}</span>
                   <span>${acc.quota.usage5h} / ${acc.quota.limit5h} (${pct5h}%)</span>
                 </div>
                 <div class="quota-track">
                   <div class="quota-fill ${is5hExhausted ? 'exhausted' : ''}" style="width: ${pct5h}%;"></div>
                 </div>
-                <div class="quota-reset-text">Reinicia: ${escapeHtml(acc.quota.resetAt5h || 'N/A')}</div>
+                <div class="quota-reset-text">${escapeHtml(t('accounts.quota_resets_at', { time: formatTime(acc.quota.resetAt5h) }))}</div>
               </div>
 
               <div class="quota-item" style="margin-top: 4px;">
                 <div class="quota-row-label">
-                  <span>VENTANA 7 DÍAS (SEMANAL):</span>
+                  <span>${escapeHtml(t('accounts.quota_7d_label'))}</span>
                   <span>${acc.quota.usage7d} / ${acc.quota.limit7d} (${pct7d}%)</span>
                 </div>
                 <div class="quota-track">
                   <div class="quota-fill ${is7dExhausted ? 'exhausted' : ''}" style="width: ${pct7d}%;"></div>
                 </div>
-                <div class="quota-reset-text">Reinicia: ${escapeHtml(acc.quota.resetAt7d || 'N/A')}</div>
+                <div class="quota-reset-text">${escapeHtml(t('accounts.quota_resets_at', { time: formatDate(acc.quota.resetAt7d) }))}</div>
               </div>
             </div>
           `;
         }
 
-        const lastTestedStr = acc.last_tested ? new Date(acc.last_tested).toLocaleTimeString() : 'NUNCA';
-        const cbState = acc.circuit_breaker?.state || 'CLOSED';
-        const cbFailures = acc.circuit_breaker?.failure_count || 0;
+        const lastTestedStr = acc.last_tested ? formatTime(acc.last_tested) : t('common.never');
+        const reasonHeader = isIgnored ? t('accounts.reason_box_ignored') : t('accounts.reason_box_ready');
 
         card.innerHTML = `
           <div class="account-card-header">
@@ -3334,43 +4437,43 @@
               <span class="provider-pill ${escapeHtml(acc.provider)}">${escapeHtml(acc.provider)}</span>
               <span class="account-card-name" title="${escapeHtml(acc.name || acc.email)}">${escapeHtml(acc.name || acc.email)}</span>
             </div>
-            <span class="account-verdict-badge ${badgeClass}">${escapeHtml(acc.evaluation?.badge || 'VERIFICANDO')}</span>
+            <span class="account-verdict-badge ${badgeClass}">${escapeHtml(localizedBadge)}</span>
           </div>
 
           <div class="account-reason-box">
-            <strong>${isIgnored ? 'OMNIROUTE IGNORARÁ ESTA CUENTA:' : 'ESTADO OPERATIVO:'}</strong>
-            ${escapeHtml(acc.evaluation?.reason || 'Sin detalles adicionales.')}
+            <strong>${escapeHtml(reasonHeader)}</strong>
+            ${escapeHtml(localizedReason || t('common.none'))}
           </div>
 
           ${quotaHtml}
 
           <div class="telemetry-specs-grid">
             <div class="telemetry-spec-row">
-              <span>SALUD:</span>
+              <span>${escapeHtml(t('accounts.spec_health'))}</span>
               <strong>${escapeHtml(acc.test_status.toUpperCase())} (${escapeHtml(lastTestedStr)})</strong>
             </div>
             <div class="telemetry-spec-row">
-              <span>DISYUNTOR:</span>
-              <strong style="color: ${cbState === 'OPEN' ? '#DC2626' : '#15803D'}">${escapeHtml(cbState)} (${cbFailures} err)</strong>
+              <span>${escapeHtml(t('accounts.spec_cb'))}</span>
+              <strong style="color: ${cbState === 'OPEN' ? '#DC2626' : '#15803D'}">${escapeHtml(cbState)} (${escapeHtml(t('accounts.cb_errors', { count: cbFailures }))})</strong>
             </div>
             <div class="telemetry-spec-row">
-              <span>COOLDOWN:</span>
-              <strong style="color: ${isCooling ? '#D97706' : 'inherit'}">${isCooling ? `${acc.cooling_remaining_seconds}s rest.` : 'NINGUNO'}</strong>
+              <span>${escapeHtml(t('accounts.spec_cooldown'))}</span>
+              <strong style="color: ${isCooling ? '#D97706' : 'inherit'}">${isCooling ? escapeHtml(t('accounts.cooldown_remaining', { seconds: acc.cooling_remaining_seconds })) : escapeHtml(t('common.none'))}</strong>
             </div>
             <div class="telemetry-spec-row">
-              <span>PRIORIDAD:</span>
-              <strong>NIVEL ${acc.priority || 1}</strong>
+              <span>${escapeHtml(t('accounts.spec_priority'))}</span>
+              <strong>${escapeHtml(t('accounts.priority_level', { priority: acc.priority || 1 }))}</strong>
             </div>
           </div>
 
           <div class="account-card-actions">
-            <button class="btn btn-outline" onclick="testSingleConnection('${escapeHtml(acc.id)}', this)" title="Fuerza un re-test inmediato de esta cuenta">
+            <button class="btn btn-outline" onclick="testSingleConnection('${escapeHtml(acc.id)}', this)" title="${escapeHtml(t('accounts.btn_retest_single_title'))}">
               <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>RE-TEST</span>
+              <span>${escapeHtml(t('common.retest'))}</span>
             </button>
-            <button class="btn btn-outline" onclick="clearConnectionCooldown('${escapeHtml(acc.id)}', this)" title="Limpia cualquier cooldown 429 y resetea el disyuntor">
+            <button class="btn btn-outline" onclick="clearConnectionCooldown('${escapeHtml(acc.id)}', this)" title="${escapeHtml(t('accounts.btn_clear_cooldown_title'))}">
               <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-              <span>RESET COOLDOWN</span>
+              <span>${escapeHtml(t('common.reset_cooldown'))}</span>
             </button>
           </div>
         `;
@@ -3505,7 +4608,7 @@
       const diff = computeLineDiff(initialDiskToml, currentFullToml);
 
       if (diff.length === 0) {
-        diffOutput.innerHTML = '<div style="padding:20px; color:var(--text-muted); text-align:center;">No hay diferencias con la versión guardada en disco.</div>';
+        diffOutput.innerHTML = `<div style="padding:20px; color:var(--text-muted); text-align:center;">${escapeHtml(t('modals.diff_empty'))}</div>`;
       } else {
         diffOutput.innerHTML = diff.map(d => {
           const prefix = d.type === 'add' ? '+ ' : (d.type === 'remove' ? '- ' : '  ');
@@ -3519,32 +4622,32 @@
     async function openBackupsModal() {
       const modal = document.getElementById('modal-backups');
       const listEl = document.getElementById('backups-list');
-      listEl.innerHTML = '<div style="padding:16px;">Cargando lista de respaldos...</div>';
+      listEl.innerHTML = `<div style="padding:16px;">${escapeHtml(t('modals.backups_loading'))}</div>`;
       modal.classList.add('active');
 
       try {
         const res = await fetch(`${CONFIG_SERVER_URL}/api/config/backups`);
         const data = await res.json();
         if (!data.backups || data.backups.length === 0) {
-          listEl.innerHTML = '<div style="padding:16px; color:var(--text-muted);">No hay respaldos automáticos registrados aún.</div>';
+          listEl.innerHTML = `<div style="padding:16px; color:var(--text-muted);">${escapeHtml(t('modals.backups_empty'))}</div>`;
           return;
         }
         listEl.innerHTML = data.backups.map(b => `
           <div class="backup-item-row">
             <div>
               <strong>${escapeHtml(b.name)}</strong>
-              <div style="font-size:0.75rem; color:var(--text-muted);">${new Date(b.time).toLocaleString()} &bull; ${b.size} bytes</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">${formatDateTime(b.time)} &bull; ${b.size} bytes</div>
             </div>
-            <button class="btn btn-sm btn-outline" onclick="restoreBackup('${escapeHtml(b.name)}')">RESTAURAR</button>
+            <button class="btn btn-sm btn-outline" onclick="restoreBackup('${escapeHtml(b.name)}')">${escapeHtml(t('modals.btn_restore'))}</button>
           </div>
         `).join('');
       } catch (e) {
-        listEl.innerHTML = `<div style="padding:16px; color:#DC2626;">Error cargando respaldos: ${escapeHtml(e.message)}</div>`;
+        listEl.innerHTML = `<div style="padding:16px; color:#DC2626;">Error: ${escapeHtml(e.message)}</div>`;
       }
     }
 
     async function restoreBackup(filename) {
-      if (!confirm(`¿Confirmas restaurar el respaldo '${filename}'? La configuración actual será reemplazada de inmediato.`)) return;
+      if (!confirm(t('modals.confirm_restore', { filename }))) return;
       try {
         const res = await fetch(`${CONFIG_SERVER_URL}/api/config/restore-backup`, {
           method: 'POST',
@@ -3555,9 +4658,9 @@
         if (res.ok && data.success) {
           closeModals();
           await reloadAll();
-          pushToast(`RESPALDO RESTAURADO: ${filename}`, 'success');
+          pushToast(t('toasts.backup_restored', { filename }), 'success');
         } else {
-          pushToast(`ERROR: ${data.error || 'No se pudo restaurar el respaldo'}`, 'error');
+          pushToast(`ERROR: ${data.error || 'Restore failed'}`, 'error');
         }
       } catch (e) {
         pushToast(`ERROR: ${e.message}`, 'error');
@@ -3567,7 +4670,7 @@
     async function openDiagnosticsModal() {
       const modal = document.getElementById('modal-diagnostics');
       const contentEl = document.getElementById('diagnostics-content');
-      contentEl.innerHTML = '<div style="padding:16px;">Ejecutando diagnóstico integral...</div>';
+      contentEl.innerHTML = `<div style="padding:16px;">${escapeHtml(t('modals.diag_loading'))}</div>`;
       modal.classList.add('active');
 
       try {
@@ -3576,31 +4679,31 @@
         contentEl.innerHTML = `
           <div class="diag-grid">
             <div class="diag-card">
-              <h4>SERVIDOR LOCAL</h4>
-              <div>Puerto: <strong>${data.serverPort}</strong></div>
-              <div>Estado: <strong style="color:#15803D;">OPERATIVO</strong></div>
+              <h4>${escapeHtml(t('modals.diag_local_server'))}</h4>
+              <div>${escapeHtml(t('modals.diag_port'))} <strong>${data.serverPort}</strong></div>
+              <div>${escapeHtml(t('modals.diag_status'))} <strong style="color:#15803D;">${escapeHtml(t('modals.diag_operational'))}</strong></div>
             </div>
             <div class="diag-card">
-              <h4>OMNIROUTE GATEWAY</h4>
+              <h4>${escapeHtml(t('modals.diag_omniroute'))}</h4>
               <div>URL: <strong>${escapeHtml(data.omniRoute.url)}</strong></div>
-              <div>Estado: <strong style="color:${data.omniRoute.online ? '#15803D' : '#DC2626'};">${data.omniRoute.status}</strong></div>
+              <div>${escapeHtml(t('modals.diag_status'))} <strong style="color:${data.omniRoute.online ? '#15803D' : '#DC2626'};">${data.omniRoute.status}</strong></div>
             </div>
             <div class="diag-card">
-              <h4>CONFIG.TOML OPERATIVO</h4>
-              <div>Tamaño: <strong>${data.configToml?.size || 0} bytes</strong></div>
-              <div>SHA256: <code>${data.configToml?.hash ? data.configToml.hash.substring(0, 16) + '...' : 'N/A'}</code></div>
+              <h4>${escapeHtml(t('modals.diag_config'))}</h4>
+              <div>${escapeHtml(t('modals.diag_size'))} <strong>${data.configToml?.size || 0} bytes</strong></div>
+              <div>SHA256: <code>${data.configToml?.hash ? data.configToml.hash.substring(0, 16) + '...' : t('common.na')}</code></div>
             </div>
             <div class="diag-card">
-              <h4>CUENTAS & TELEMETRÍA</h4>
-              <div>Total: <strong>${data.accountsSummary?.total || 0}</strong> &bull; Listas: <strong>${data.accountsSummary?.ready || 0}</strong></div>
-              <div>Combos detectados: <strong>${data.combosAvailable?.length || 0}</strong></div>
+              <h4>${escapeHtml(t('modals.diag_accounts'))}</h4>
+              <div>${escapeHtml(t('modals.diag_total'))} <strong>${data.accountsSummary?.total || 0}</strong> &bull; ${escapeHtml(t('modals.diag_ready'))} <strong>${data.accountsSummary?.ready || 0}</strong></div>
+              <div>${escapeHtml(t('modals.diag_combos_detected'))} <strong>${data.combosAvailable?.length || 0}</strong></div>
             </div>
           </div>
           <pre id="raw-diag-json" style="background:#0c0d10; color:#FAF9F6; padding:12px; margin-top:12px; font-size:0.75rem; max-height:200px; overflow:auto;">${escapeHtml(JSON.stringify(data, null, 2))}</pre>
-          <button class="btn btn-outline" style="margin-top:10px;" onclick="copyDiagnosticsReport()">COPIAR INFORME REDACTADO</button>
+          <button class="btn btn-outline" style="margin-top:10px;" onclick="copyDiagnosticsReport()">${escapeHtml(t('modals.btn_copy_diag'))}</button>
         `;
       } catch (e) {
-        contentEl.innerHTML = `<div style="padding:16px; color:#DC2626;">Fallo al obtener diagnóstico: ${escapeHtml(e.message)}</div>`;
+        contentEl.innerHTML = `<div style="padding:16px; color:#DC2626;">Error: ${escapeHtml(e.message)}</div>`;
       }
     }
 

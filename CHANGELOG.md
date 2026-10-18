@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0] - 2026-10-17
+
+### Added
+- **Persistent Bilingual Desktop UI (Español / English)**:
+  - Instant in-place UI switching between Español (`es`) and English (`en`) without full page reloads.
+  - Zero-dependency client-side translation engine embedded directly into `src/web/index.html`.
+  - Accessible segmented toggle (`ES | EN`) in the top telemetry strip with full keyboard accessibility (`aria-pressed`, `:focus-visible`).
+  - Preference persistence in `localStorage` under `codex-config-manager:ui-language` with strict default to Spanish (`es`).
+  - Symmetrical dictionary schema spanning 340 translation keys per language across 17 namespaces (`common`, `nav`, `telemetry`, `header`, `accounts`, `pipeline`, `models`, `provider`, `security`, `reasoning`, `features`, `desktop`, `plugins`, `toml`, `modals`, `toasts`, `a11y`).
+  - Resilient `Intl.DateTimeFormat` date/time formatting with localized `N/A` fallback for invalid or missing timestamps.
+  - Additive structured `reasonCode` metadata in server telemetry (`READY_FOR_COMBO`, `DISABLED`, `CIRCUIT_OPEN`, `COOLDOWN`, `CREDENTIALS_FAILED`, `QUOTA_5H_EXHAUSTED`, `QUOTA_7D_EXHAUSTED`) with backward-compatible Spanish strings.
+- **Automated i18n Test Batteries**:
+  - `tests/i18n-static.test.mjs`: 22 unit & static tests asserting 100% dictionary symmetry, placeholder alignment, DOM key resolution, and locale fallback.
+  - `tests/e2e-i18n.test.mjs`: 22 Playwright E2E browser automation scenarios validating real-time toggling, state preservation (form inputs, filters, dirty state, open modals), and persistence across reloads.
+- **Documentation & Visuals**:
+  - Added [`docs/I18N.md`](docs/I18N.md) documenting architecture, strict invariants, and developer guide.
+  - Captured English dashboard screenshot (`docs/images/dashboard-en.png`).
+
+---
+
 ## [2.1.1] - 2026-10-17
 
 ### Fixed

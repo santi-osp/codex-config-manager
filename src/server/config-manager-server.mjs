@@ -191,6 +191,7 @@ export function getSyntheticDemoAccounts() {
         willIgnore: false,
         badge: 'LISTA PARA EL COMBO',
         reason: 'Conexión activa, disyuntor cerrado y credenciales validadas.',
+        reasonCode: 'READY_FOR_COMBO',
         level: 'ok'
       }
     },
@@ -221,6 +222,7 @@ export function getSyntheticDemoAccounts() {
         willIgnore: false,
         badge: 'LISTA PARA EL COMBO',
         reason: 'Conexión activa, disyuntor cerrado y credenciales validadas.',
+        reasonCode: 'READY_FOR_COMBO',
         level: 'ok'
       }
     },
@@ -251,6 +253,7 @@ export function getSyntheticDemoAccounts() {
         willIgnore: true,
         badge: 'ENFRIAMIENTO (45s)',
         reason: 'Rate-limited (HTTP 429). En enfriamiento.',
+        reasonCode: 'COOLDOWN',
         level: 'warn'
       }
     },
@@ -274,6 +277,7 @@ export function getSyntheticDemoAccounts() {
         willIgnore: true,
         badge: 'DISYUNTOR ABIERTO',
         reason: 'Circuit Breaker abierto (5 fallos consecutivos).',
+        reasonCode: 'CIRCUIT_OPEN',
         level: 'error'
       }
     }
@@ -429,37 +433,44 @@ export function getOmniRouteAccountsData(dbPath = null) {
       let willIgnore = false;
       let badge = 'LISTA PARA EL COMBO';
       let reason = 'Conexión activa, disyuntor cerrado y credenciales validadas.';
+      let reasonCode = 'READY_FOR_COMBO';
       let level = 'ok';
 
       if (!conn.is_active) {
         willIgnore = true;
         badge = 'DESACTIVADA';
         reason = 'La conexión está marcada como inactiva en OmniRoute.';
+        reasonCode = 'DISABLED';
         level = 'error';
       } else if (cbState === 'OPEN') {
         willIgnore = true;
         badge = 'DISYUNTOR ABIERTO';
         reason = `Circuit Breaker abierto (${cbFailures} fallos consecutivos).`;
+        reasonCode = 'CIRCUIT_OPEN';
         level = 'error';
       } else if (isCooling) {
         willIgnore = true;
         badge = `ENFRIAMIENTO (${coolingRemainingSec}s)`;
         reason = `Rate-limited (HTTP 429). En enfriamiento hasta las ${new Date(conn.rate_limited_until).toLocaleTimeString()}.`;
+        reasonCode = 'COOLDOWN';
         level = 'warn';
       } else if (conn.test_status === 'error') {
         willIgnore = true;
         badge = 'FALLO CREDENCIALES';
         reason = `Credential Gate: ${conn.last_error || 'Error en última comprobación'}`;
+        reasonCode = 'CREDENTIALS_FAILED';
         level = 'error';
       } else if (quota && quota.usage5h >= quota.limit5h) {
         willIgnore = true;
         badge = 'CUOTA 5H AGOTADA';
         reason = `Límite 5h alcanzado (${quota.usage5h}/${quota.limit5h}). Reinicia a las ${new Date(quota.resetAt5h).toLocaleTimeString()}.`;
+        reasonCode = 'QUOTA_5H_EXHAUSTED';
         level = 'warn';
       } else if (quota && quota.usage7d >= quota.limit7d) {
         willIgnore = true;
         badge = 'CUOTA 7D AGOTADA';
         reason = `Límite semanal alcanzado (${quota.usage7d}/${quota.limit7d}). Reinicia el ${new Date(quota.resetAt7d).toLocaleDateString()}.`;
+        reasonCode = 'QUOTA_7D_EXHAUSTED';
         level = 'warn';
       }
 
@@ -479,7 +490,7 @@ export function getOmniRouteAccountsData(dbPath = null) {
         cooling_remaining_seconds: coolingRemainingSec,
         rate_limited_until: conn.rate_limited_until,
         quota,
-        evaluation: { willIgnore, badge, reason, level }
+        evaluation: { willIgnore, badge, reason, reasonCode, level }
       };
     });
 
