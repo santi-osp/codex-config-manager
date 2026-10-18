@@ -9,9 +9,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
 const suites = [
-  { name: 'Unit Suite (TOML Engine)', script: 'tests/toml-engine.test.mjs' },
+  { name: 'Unit Suite (TOML Engine Surgical Round-Trip)', script: 'tests/toml-engine.test.mjs' },
   { name: 'Security & Hardening Suite', script: 'tests/security.test.mjs' },
-  { name: 'Playwright Isolated E2E Suite', script: 'tests/e2e.test.mjs' }
+  { name: 'Real Disk Persistence & Recovery E2E Suite', script: 'tests/e2e-disk-persistence.test.mjs' },
+  { name: 'Playwright Synthetic UI Demo E2E Suite', script: 'tests/e2e.test.mjs' }
 ];
 
 async function runSuite({ name, script }) {

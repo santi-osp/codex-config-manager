@@ -5,10 +5,10 @@
 <p align="center">
   <a href="https://github.com/santi-osp/codex-config-manager/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/santi-osp/codex-config-manager/ci.yml?branch=main&style=flat-square&label=CI%20Gates" alt="CI Status"></a>
   <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=flat-square&logo=windows" alt="Windows Platform">
-  <img src="https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?style=flat-square&logo=node.js" alt="Node Version">
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D22.5.0-339933?style=flat-square&logo=node.js" alt="Node Version">
   <img src="https://img.shields.io/badge/Architecture-Single--File%20UI%20%2B%20Micro--Bridge-informational?style=flat-square" alt="Architecture">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT License">
-  <img src="https://img.shields.io/badge/Tests-69%20Passed%20%2F%200%20Failed-success?style=flat-square" alt="Test Results">
+  <img src="https://img.shields.io/badge/Tests-121%20Passed%20%2F%200%20Failed-success?style=flat-square" alt="Test Results">
 </p>
 
 ---
@@ -66,7 +66,7 @@ Redacted runtime diagnostics inspecting gateway connectivity, TOML hash integrit
 
 ## 📐 Why a Single-File Frontend?
 
-The entire user interface resides in [`src/web/index.html`](file:///C:/Users/santi/Documents/0%20REPOSITORIOS/CodexConfigManager/src/web/index.html) as a standalone HTML5 document with inline CSS and vanilla JavaScript:
+The entire user interface resides in [`src/web/index.html`](src/web/index.html) as a standalone HTML5 document with inline CSS and vanilla JavaScript:
 
 1. **Zero Frontend Build Step**: No webpack, Vite, Babel, React, or CSS preprocessor overhead. What you read is what executes.
 2. **Instant Desktop Rendering**: Opens instantly in any browser or webview with minimal memory footprint.
@@ -112,7 +112,7 @@ The entire user interface resides in [`src/web/index.html`](file:///C:/Users/san
 
 ### Prerequisites
 - **Windows 10 / 11**
-- **Node.js** >= 18.0.0
+- **Node.js** >= 22.5.0 *(required for native `node:sqlite`)*
 
 ### 1. Installation
 Clone the repository and install runtime dependencies:
@@ -143,7 +143,7 @@ Open **[http://127.0.0.1:20129](http://127.0.0.1:20129)**.
 
 ## ⚙️ Environment Configuration
 
-You can override default ports and system paths using environment variables or a `.env` file (see [`.env.example`](file:///C:/Users/santi/Documents/0%20REPOSITORIOS/CodexConfigManager/.env.example)):
+You can override default ports and system paths using environment variables or a `.env` file (see [`.env.example`](.env.example)):
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
@@ -160,36 +160,38 @@ You can override default ports and system paths using environment variables or a
 
 ## 🧪 Automated Testing & Verification
 
-Codex Config Manager includes an automated test battery with 69 comprehensive test scenarios:
+Codex Config Manager includes an automated test battery with 121 comprehensive test scenarios across 4 specialized suites:
 
 ```powershell
-# Run all test suites (Unit, Security, E2E)
+# Run all test suites (Unit, Security, Real Disk Persistence, Playwright E2E)
 npm test
 
 # Run individual suites
-npm run test:unit      # 30 Unit tests (TOML parsing, surgical updates, hash checks)
-npm run test:security  # 19 Security tests (Loopback, Host/Origin guard, secrets audit)
-npm run test:e2e       # 20 Playwright E2E browser automation scenarios
+npm run test:unit        # 45 Unit tests (TOML parsing, surgical updates, comment & CRLF preservation, hash checks)
+npm run test:security    # 27 Security tests (Loopback, Host/Origin guard, secrets audit, env loader, DI)
+npm run test:disk        # 29 Real Disk Persistence tests (Atomic writes, 409 conflict, backup restore, SQLite sync)
+npm run test:e2e         # 20 Playwright E2E browser automation scenarios
+npm run docs:screenshots # Regenerate documentation screenshots via Playwright
 ```
 
-For detailed test architecture and coverage reports, see [`docs/TESTING.md`](file:///C:/Users/santi/Documents/0%20REPOSITORIOS/CodexConfigManager/docs/TESTING.md) and [`docs/RELEASE_CHECKLIST.md`](file:///C:/Users/santi/Documents/0%20REPOSITORIOS/CodexConfigManager/docs/RELEASE_CHECKLIST.md).
+For detailed test architecture and coverage reports, see [`docs/TESTING.md`](docs/TESTING.md) and [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
 
 ---
 
 ## 🔒 Security Policy
 
-For vulnerability reporting procedures, network boundaries, and threat model details, refer to [`SECURITY.md`](file:///C:/Users/santi/Documents/0%20REPOSITORIOS/CodexConfigManager/SECURITY.md).
+For vulnerability reporting procedures, network boundaries, and threat model details, refer to [`SECURITY.md`](SECURITY.md).
 
 ---
 
 ## 🤝 Contributing
 
-Contributions adhering to the single-file UI architecture and non-destructive TOML preservation rules are welcome. Please read [`CONTRIBUTING.md`](file:///C:/Users/santi/Documents/0%20REPOSITORIOS/CodexConfigManager/CONTRIBUTING.md) before submitting pull requests.
+Contributions adhering to the single-file UI architecture and non-destructive TOML preservation rules are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before submitting pull requests.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see the [`LICENSE`](file:///C:/Users/santi/Documents/0%20REPOSITORIOS/CodexConfigManager/LICENSE) file for details.
+This project is licensed under the **MIT License** — see the [`LICENSE`](LICENSE) file for details.
 
 Developed with precision by [Santiago Ospina](https://github.com/santi-osp).

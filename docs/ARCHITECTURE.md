@@ -49,10 +49,11 @@ The user interface lives in `src/web/index.html` as a standalone, zero-bundler d
 
 Generic TOML parsers typically discard comments, alter whitespace, and reorder tables on serialization. To solve this, `src/server/toml-engine.mjs` implements a **surgical line-preserving modifier**:
 
-1. **Targeted Replacement**: Using precise regex patterns, only the targeted key within its target section header (`[section]`) is replaced in place.
-2. **Preservation of Unknown Keys & Sections**: Unmapped sections—such as arbitrary `[projects."..."]` tables and third-party `[mcp_servers.*]` definitions—are left 100% unaltered.
-3. **Escaped Formatting**: Windows backslashes, quotes, booleans, and arrays are escaped safely without corrupting adjacent lines.
-4. **Pre-Save Syntax Gate**: Before writing to disk, the resulting TOML string is fully validated using `smol-toml`. If parsing fails, the save is aborted immediately, preserving disk safety.
+1. **Targeted Replacement**: Using precise regex patterns and quote scanners, only the targeted key within its target section header (`[section]`) is replaced in place.
+2. **Inline Comment & Line Ending Preservation**: Preserves trailing inline comments (`# ...`) and original line endings (CRLF `\r\n` vs LF `\n`), ensuring zero unprompted diff changes across untouched lines.
+3. **Preservation of Unknown Keys & Sections**: Unmapped sections—such as arbitrary `[projects."..."]` tables and third-party `[mcp_servers.*]` definitions—are left 100% unaltered.
+4. **Escaped Formatting**: Windows backslashes, quotes, booleans, and arrays are escaped safely without corrupting adjacent lines.
+5. **Pre-Save Syntax Gate**: Before writing to disk, the resulting TOML string is fully validated using `smol-toml`. If parsing fails, the save is aborted immediately, preserving disk safety.
 
 ---
 

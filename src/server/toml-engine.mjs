@@ -59,10 +59,49 @@ function escapeRegex(str) {
 }
 
 /**
+ * Extrae comentarios en línea respetando cadenas entre comillas simples o dobles
+ */
+export function extractTrailingComment(str) {
+  if (!str) return '';
+  let inDouble = false;
+  let inSingle = false;
+  let escaped = false;
+
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\' && inDouble) {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"' && !inSingle) {
+      inDouble = !inDouble;
+      continue;
+    }
+    if (ch === "'" && !inDouble) {
+      inSingle = !inSingle;
+      continue;
+    }
+    if (ch === '#' && !inDouble && !inSingle) {
+      let startIdx = i;
+      while (startIdx > 0 && (str[startIdx - 1] === ' ' || str[startIdx - 1] === '\t')) {
+        startIdx--;
+      }
+      return str.slice(startIdx);
+    }
+  }
+  return '';
+}
+
+/**
  * Modifica una clave específica dentro de una sección de forma quirúrgica,
- * preservando el 100% del resto del archivo.
+ * preservando el 100% del resto del archivo, comentarios en línea y saltos de línea (CRLF/LF).
  */
 export function updateFieldInToml(rawToml, section, key, newValue) {
+  const eol = rawToml.includes('\r\n') ? '\r\n' : '\n';
   const lines = rawToml.split(/\r?\n/);
   const formattedVal = formatTomlValue(newValue);
   const keyRegex = new RegExp(`^(\\s*)${escapeRegex(key)}(\\s*=)(.*)$`);
@@ -80,7 +119,11 @@ export function updateFieldInToml(rawToml, section, key, newValue) {
       }
       if (keyRegex.test(line)) {
         const match = line.match(keyRegex);
-        lines[i] = `${match[1]}${key} = ${formattedVal}`;
+        const trailingComment = extractTrailingComment(match[3] || '');
+        const commentSuffix = trailingComment
+          ? (trailingComment.startsWith(' ') || trailingComment.startsWith('\t') ? trailingComment : ' ' + trailingComment)
+          : '';
+        lines[i] = `${match[1]}${key} = ${formattedVal}${commentSuffix}`;
         updated = true;
         break;
       }
@@ -91,11 +134,15 @@ export function updateFieldInToml(rawToml, section, key, newValue) {
       if (firstSectionIdx !== -1) {
         lines.splice(firstSectionIdx, 0, newLine);
       } else {
-        lines.push(newLine);
+        if (lines.length > 0 && lines[lines.length - 1] === '') {
+          lines.splice(lines.length - 1, 0, newLine);
+        } else {
+          lines.push(newLine);
+        }
       }
     }
 
-    return lines.join('\n');
+    return lines.join(eol);
   }
 
   // Clave dentro de una sección específica
@@ -122,7 +169,11 @@ export function updateFieldInToml(rawToml, section, key, newValue) {
     if (inTargetSection) {
       if (keyRegex.test(line)) {
         const match = line.match(keyRegex);
-        lines[i] = `${match[1]}${key} = ${formattedVal}`;
+        const trailingComment = extractTrailingComment(match[3] || '');
+        const commentSuffix = trailingComment
+          ? (trailingComment.startsWith(' ') || trailingComment.startsWith('\t') ? trailingComment : ' ' + trailingComment)
+          : '';
+        lines[i] = `${match[1]}${key} = ${formattedVal}${commentSuffix}`;
         keyUpdated = true;
         break;
       }
@@ -131,17 +182,18 @@ export function updateFieldInToml(rawToml, section, key, newValue) {
 
   if (inTargetSection) {
     if (!keyUpdated) {
-      const insertAt = nextSectionIdx !== -1 ? nextSectionIdx : lines.length;
+      const insertAt = nextSectionIdx !== -1
+        ? nextSectionIdx
+        : (lines.length > 0 && lines[lines.length - 1] === '' ? lines.length - 1 : lines.length);
       lines.splice(insertAt, 0, `${key} = ${formattedVal}`);
     }
   } else {
     // La sección no existía: agregarla al final
-    lines.push('');
-    lines.push(`[${section}]`);
-    lines.push(`${key} = ${formattedVal}`);
+    const insertIdx = (lines.length > 0 && lines[lines.length - 1] === '') ? lines.length - 1 : lines.length;
+    lines.splice(insertIdx, 0, '', `[${section}]`, `${key} = ${formattedVal}`);
   }
 
-  return lines.join('\n');
+  return lines.join(eol);
 }
 
 /**

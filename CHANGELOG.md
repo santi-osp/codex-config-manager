@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.1] - 2026-10-17
+
+### Fixed
+- **Surgical TOML Inline Comment Preservation**: Preserves trailing inline comments (`# ...`) when modifying top-level and section keys, preventing comment stripping during configuration updates.
+- **Line Ending Fidelity**: Detects and preserves native Windows CRLF (`\r\n`) vs Unix LF (`\n`) line endings, eliminating widespread diff noise on file saves.
+- **Server Dependency Injection & Path Resolution**: Refactored `createServer(options)` with full dependency injection (`port`, `codexDir`, `configPath`, `stateDbPath`, `omniRouteDbPath`, `omniRouteUrl`, `demoMode`, `htmlPath`, `assetsDir`), ensuring test sandboxes run with complete isolation.
+- **Safe Environment Loading**: Added built-in `.env` file loader (`loadEnvFile`) running before path resolution without overwriting existing environment variables.
+- **Documentation Link Hygiene**: Converted all local `file:///` URLs to relative repository links in `README.md`.
+- **Node.js Engine Documentation**: Aligned documented minimum Node.js engine requirement to `>=22.5.0` (required for built-in `node:sqlite`).
+
+### Added
+- **Dedicated Real Disk Persistence E2E Test Suite (`tests/e2e-disk-persistence.test.mjs`)**: 29 automated test scenarios verifying atomic writes, `.backup-...` creation, SHA-256 collision detection (HTTP 409), malformed TOML rejection (HTTP 400), and SQLite thread updates in an isolated temp directory.
+- **Screenshot Protection**: Separated screenshot generation into a dedicated command (`npm run docs:screenshots`), preventing regular test runs from unintentionally modifying `docs/images/*.png`.
+- **Expanded CI Quality Gates**: Added automated `test:disk` and Playwright Chromium E2E execution to `.github/workflows/ci.yml`.
+
+---
+
 ## [2.1.0] - 2026-10-17
 
 ### Added

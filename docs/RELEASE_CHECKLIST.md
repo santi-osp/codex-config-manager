@@ -1,4 +1,4 @@
-# Pre-Release Quality Gates & Verification Checklist (v2.1.0)
+# Pre-Release Quality Gates & Verification Checklist (v2.1.1)
 
 Every release of **Codex Config Manager** must satisfy the 14 mandatory release gates prior to public distribution.
 
@@ -14,14 +14,14 @@ Every release of **Codex Config Manager** must satisfy the 14 mandatory release 
 | **G4** | **Loopback Binding & Network Isolation** | Server binds to `127.0.0.1`. Sockets inspected for loopback addresses (`127.0.0.1`, `::1`). Non-loopback requests rejected (HTTP 403). | :white_check_mark: PASS |
 | **G5** | **DNS Rebinding & Anti-CSRF Hardening** | `tests/security.test.mjs` tests malicious Host (`attacker.com`) and spoofed Origin headers (`attacker-localhost.com`), asserting HTTP 403. | :white_check_mark: PASS |
 | **G6** | **Atomic File Operations & Backups** | Atomic `.tmp-[timestamp]` writes with `fs.renameSync` and rolling backups up to 10 generations. Collision detection with SHA-256 hash. | :white_check_mark: PASS |
-| **G7** | **Unit Test Suite** | 30 unit tests in `tests/toml-engine.test.mjs` pass cleanly (0 failures). | :white_check_mark: PASS |
-| **G8** | **Security & Hardening Suite** | 19 security tests in `tests/security.test.mjs` pass cleanly (0 failures). | :white_check_mark: PASS |
-| **G9** | **Playwright E2E Suite** | 20 end-to-end browser automation tests in `tests/e2e.test.mjs` pass cleanly in an isolated sandbox. | :white_check_mark: PASS |
-| **G10** | **Clean Console on Startup** | Defined canonical `window.updateRawPreview`. E2E suite verifies 0 `ReferenceError` or console exceptions. | :white_check_mark: PASS |
-| **G11** | **Synthetic Privacy-Safe Imagery** | Generated fresh screenshots in `docs/images/` using synthetic demo accounts and combos. Zero user emails or real credentials exposed. | :white_check_mark: PASS |
+| **G7** | **Unit Test Suite (TOML Engine)** | 45 unit tests in `tests/toml-engine.test.mjs` pass cleanly (comments, CRLF/LF, 0-byte fidelity). | :white_check_mark: PASS |
+| **G8** | **Security & Hardening Suite** | 27 security tests in `tests/security.test.mjs` pass cleanly (Loopback, Origin, env loader, DI). | :white_check_mark: PASS |
+| **G9** | **Real Disk Persistence E2E Suite** | 29 isolated disk persistence and recovery tests in `tests/e2e-disk-persistence.test.mjs` pass cleanly. | :white_check_mark: PASS |
+| **G10** | **Playwright UI E2E Suite** | 20 end-to-end browser automation tests in `tests/e2e.test.mjs` pass cleanly in an isolated sandbox. | :white_check_mark: PASS |
+| **G11** | **Synthetic Privacy-Safe Imagery** | Protected screenshots in `docs/images/` using synthetic demo accounts; separate `docs:screenshots` script. | :white_check_mark: PASS |
 | **G12** | **Single-File Frontend Architecture** | Verified `src/web/index.html` is a standalone, vanilla HTML5+CSS+JS document without external node/npm build dependencies. | :white_check_mark: PASS |
 | **G13** | **Path Portability & CI Compatibility** | Paths resolved via `process.env.USERPROFILE || os.homedir()`, overridable via environment variables. Dynamic parent folder resolution in VBS scripts. | :white_check_mark: PASS |
-| **G14** | **Documentation & Community Standards** | Comprehensive English `README.md`, `SECURITY.md`, `LICENSE` (MIT), `CONTRIBUTING.md`, `CHANGELOG.md`, `docs/ARCHITECTURE.md`, and `docs/TESTING.md`. | :white_check_mark: PASS |
+| **G14** | **Documentation & Community Standards** | Relative repository links in `README.md`, truthful Node `>=22.5.0` engine requirement, `SECURITY.md`, `LICENSE` (MIT), `CONTRIBUTING.md`, `CHANGELOG.md`, `docs/ARCHITECTURE.md`, and `docs/TESTING.md`. | :white_check_mark: PASS |
 
 ---
 
@@ -29,10 +29,10 @@ Every release of **Codex Config Manager** must satisfy the 14 mandatory release 
 
 ```text
 ================================================================
- SUMMARY AUDIT RESULTS
+ SUMMARY AUDIT RESULTS (v2.1.1)
 ================================================================
-Total Test Scenarios Executed : 69
-Total Passed                  : 69
+Total Test Scenarios Executed : 121
+Total Passed                  : 121
 Total Failed                  : 0
 Total Regressions             : 0
 Release Gate Decision         : ALL GATES PASS -> AUTHORIZED FOR RELEASE
