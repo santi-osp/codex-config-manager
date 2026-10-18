@@ -310,6 +310,10 @@ async function runE2ESuite() {
   console.log(`================================================================\n`);
 
   if (failedCount > 0) {
+    console.error('\n❌ DETALLE DE PRUEBAS FALLIDAS:');
+    testResults.filter(r => r.status === 'FAIL').forEach(f => {
+      console.error(` - [TEST ${String(f.id).padStart(2, '0')}] ${f.name} -> ${f.detail || 'Sin detalle adicional'}`);
+    });
     process.exit(1);
   }
 }
