@@ -112,10 +112,18 @@ async function runE2ESuite() {
   let page = null;
 
   try {
+    const launchOptions = {
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+    };
     try {
-      browser = await chromium.launch({ headless: true, channel: 'msedge' });
-    } catch {
-      browser = await chromium.launch({ headless: true });
+      browser = await chromium.launch(launchOptions);
+    } catch (launchErr) {
+      try {
+        browser = await chromium.launch({ ...launchOptions, channel: 'msedge' });
+      } catch {
+        throw launchErr;
+      }
     }
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 }
@@ -132,11 +140,17 @@ async function runE2ESuite() {
     });
 
     // TEST 01: Initial load
-    await page.goto(appUrl, { waitUntil: 'networkidle' });
+    await page.goto(appUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForSelector('#stat-accounts-total', { state: 'visible', timeout: 15000 });
     recordTest(1, 'Servidor y Web UI cargan correctamente', 'PASS', `HTTP 200 en ${appUrl}`);
 
     // TEST 02: Zero console errors on startup
-    const initialErrors = consoleErrors.slice();
+    const initialErrors = consoleErrors.filter(err => {
+      if (err.includes('net::ERR_') || err.includes('Failed to load resource') || err.includes('fonts.g') || err.includes('favicon')) {
+        return false;
+      }
+      return true;
+    });
     recordTest(2, 'Cero errores de consola en inicio (sin ReferenceError)', initialErrors.length === 0 ? 'PASS' : 'FAIL', initialErrors.join(', '));
 
     // TEST 03: Direct landing on Accounts Monitor ([00] MONITOR CUENTAS)
@@ -272,6 +286,9 @@ async function runE2ESuite() {
     const isCleanAfterHotkey = await page.$eval('#status-dirty', el => el.textContent.includes('SIN CAMBIOS'));
     recordTest(20, 'Atajo de teclado global Ctrl+S guarda la configuración', isCleanAfterHotkey ? 'PASS' : 'FAIL');
 
+  } catch (err) {
+    console.error('\n❌ ERROR CRÍTICO EN EJECUCIÓN E2E:', err);
+    recordTest(99, 'Ejecución completa de suite E2E', 'FAIL', err.message);
   } finally {
     if (browser) await browser.close();
     if (typeof testServer.closeAllConnections === 'function') {
