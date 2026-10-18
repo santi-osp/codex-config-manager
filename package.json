@@ -1,6 +1,6 @@
 {
   "name": "codex-config-manager",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Retro-pixel desktop control plane and telemetry monitor for OpenAI Codex and OmniRoute on Windows",
   "type": "module",
   "main": "src/server/config-manager-server.mjs",
@@ -17,10 +17,11 @@
     "demo": "node -e \"process.env.DEMO_MODE='true'; import('./src/server/config-manager-server.mjs');\"",
     "test": "node scripts/run-all-tests.mjs",
     "test:unit": "node tests/toml-engine.test.mjs",
+    "test:i18n": "node tests/i18n-static.test.mjs && node tests/e2e-i18n.test.mjs",
     "test:security": "node tests/security.test.mjs",
     "test:disk": "node tests/e2e-disk-persistence.test.mjs",
     "test:e2e": "node tests/e2e.test.mjs",
-    "docs:screenshots": "node tests/e2e.test.mjs --screenshots"
+    "docs:screenshots": "node tests/e2e.test.mjs --screenshots && node tests/e2e-i18n.test.mjs --screenshots"
   },
   "engines": {
     "node": ">=22.5.0"

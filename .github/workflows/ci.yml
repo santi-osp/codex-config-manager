@@ -35,6 +35,9 @@ jobs:
       - name: Run Security & Hardening Suite
         run: npm run test:security
 
+      - name: Run Static i18n & Translation Quality Tests
+        run: node tests/i18n-static.test.mjs
+
       - name: Run Real Disk Persistence E2E Tests
         run: npm run test:disk
 
@@ -44,4 +47,8 @@ jobs:
 
       - name: Run Playwright UI E2E Tests
         run: npm run test:e2e
+        if: matrix.node-version == '22.x'
+
+      - name: Run Playwright Bilingual i18n E2E Tests
+        run: node tests/e2e-i18n.test.mjs
         if: matrix.node-version == '22.x'

@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Node.js-%3E%3D22.5.0-339933?style=flat-square&logo=node.js" alt="Node Version">
   <img src="https://img.shields.io/badge/Architecture-Single--File%20UI%20%2B%20Micro--Bridge-informational?style=flat-square" alt="Architecture">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT License">
-  <img src="https://img.shields.io/badge/Tests-121%20Passed%20%2F%200%20Failed-success?style=flat-square" alt="Test Results">
+  <img src="https://img.shields.io/badge/Tests-165%20Passed%20%2F%200%20Failed-success?style=flat-square" alt="Test Results">
 </p>
 
 ---
@@ -49,10 +49,17 @@ Redacted runtime diagnostics inspecting gateway connectivity, TOML hash integrit
   <img src="docs/images/diagnostics.png" alt="System Diagnostics Modal" width="840">
 </p>
 
+### 5. Instant Bilingual Desktop Interface (Español / English)
+Zero-reload language switching between Spanish and English, preserving active input buffers, dirty state, and open modals with persistent `localStorage` preference.
+<p align="center">
+  <img src="docs/images/dashboard-en.png" alt="Bilingual Desktop Interface in English" width="840">
+</p>
+
 ---
 
 ## 🛡️ Core Capabilities
 
+- **Instant Bilingual UI (Español / English)**: Complete in-place localization across all 9 tabs, real-time telemetry badges, modal dialogs, and dynamic combo pipelines with zero page reloads and instant retro-segmented switching.
 - **Surgical Round-Trip TOML Engine**: Modifies targeted configuration keys in place without stripping comments, altering indentation, or destroying unmapped custom sections (e.g. `[projects."..."]`, `[mcp_servers.*]`).
 - **All 7 Reasoning Effort Levels**: Fully exposes and preserves `none`, `low`, `medium`, `high`, `xhigh`, `max`, and `ultra` along with `model_reasoning_summary` and `model_verbosity`. OmniRoute defines effective reasoning dynamically through combo selection.
 - **Strict Codex Permissions Preservation**: Never modifies or silently normalizes `sandbox_mode`, `approval_policy`, `approvals_reviewer`, or `windows.sandbox`.
@@ -160,21 +167,22 @@ You can override default ports and system paths using environment variables or a
 
 ## 🧪 Automated Testing & Verification
 
-Codex Config Manager includes an automated test battery with 121 comprehensive test scenarios across 4 specialized suites:
+Codex Config Manager includes an automated test battery with 165 comprehensive test scenarios across 6 specialized suites:
 
 ```powershell
-# Run all test suites (Unit, Security, Real Disk Persistence, Playwright E2E)
+# Run all test suites (Unit, i18n Static, Security, Real Disk Persistence, Playwright E2E)
 npm test
 
 # Run individual suites
 npm run test:unit        # 45 Unit tests (TOML parsing, surgical updates, comment & CRLF preservation, hash checks)
+npm run test:i18n        # 44 i18n tests (22 Static dictionary symmetry & quality + 22 Playwright bilingual E2E)
 npm run test:security    # 27 Security tests (Loopback, Host/Origin guard, secrets audit, env loader, DI)
 npm run test:disk        # 29 Real Disk Persistence tests (Atomic writes, 409 conflict, backup restore, SQLite sync)
-npm run test:e2e         # 20 Playwright E2E browser automation scenarios
+npm run test:e2e         # 20 Playwright Synthetic UI browser automation scenarios
 npm run docs:screenshots # Regenerate documentation screenshots via Playwright
 ```
 
-For detailed test architecture and coverage reports, see [`docs/TESTING.md`](docs/TESTING.md) and [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
+For detailed test architecture, localization guides, and coverage reports, see [`docs/I18N.md`](docs/I18N.md), [`docs/TESTING.md`](docs/TESTING.md), and [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
 
 ---
 
