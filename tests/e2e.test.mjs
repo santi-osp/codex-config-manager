@@ -30,6 +30,8 @@ if (!fs.existsSync(SANDBOX_DIR)) {
 
 const TEST_PORT = 20197;
 const SANDBOX_CONFIG_PATH = path.join(SANDBOX_DIR, 'config.toml');
+const shouldCaptureScreenshots = process.argv.includes('--screenshots') || process.env.UPDATE_SCREENSHOTS === 'true';
+const targetImagesDir = shouldCaptureScreenshots ? IMAGES_DIR : SANDBOX_DIR;
 
 const FIXTURE_TOML = `# Codex Desktop Configuration (Sandbox E2E Fixture)
 model = "coding-con-caro"
@@ -94,12 +96,12 @@ async function runE2ESuite() {
   // 1. Prepare isolated sandbox
   fs.writeFileSync(SANDBOX_CONFIG_PATH, FIXTURE_TOML, 'utf8');
 
-  process.env.PORT = String(TEST_PORT);
-  process.env.CODEX_DIR = SANDBOX_DIR;
-  process.env.CODEX_CONFIG_PATH = SANDBOX_CONFIG_PATH;
-  process.env.DEMO_MODE = 'true';
-
-  const testServer = createServer();
+  const testServer = createServer({
+    port: TEST_PORT,
+    codexDir: SANDBOX_DIR,
+    configPath: SANDBOX_CONFIG_PATH,
+    demoMode: true
+  });
   await new Promise((resolve, reject) => {
     testServer.listen(TEST_PORT, '127.0.0.1', () => resolve());
     testServer.on('error', reject);
@@ -174,9 +176,9 @@ async function runE2ESuite() {
     await page.waitForTimeout(150);
 
     // TEST 08: Capture Screenshot 1: Dashboard / Accounts Monitor
-    const dashboardPng = path.join(IMAGES_DIR, 'dashboard.png');
+    const dashboardPng = path.join(targetImagesDir, 'dashboard.png');
     await page.screenshot({ path: dashboardPng, fullPage: false });
-    recordTest(8, 'Captura generada: docs/images/dashboard.png', fs.existsSync(dashboardPng) ? 'PASS' : 'FAIL');
+    recordTest(8, `Captura generada: ${shouldCaptureScreenshots ? 'docs/images/' : 'sandbox/'}dashboard.png`, fs.existsSync(dashboardPng) ? 'PASS' : 'FAIL');
 
     // TEST 09: Navigation to Tab [01] Modelos & Combos
     await page.click('button:has-text("MODELOS & COMBOS")');
@@ -192,9 +194,9 @@ async function runE2ESuite() {
     recordTest(10, 'Detección de estado modificado (Dirty State) al editar combo', isDirtyDetected ? 'PASS' : 'FAIL', `Badge: ${dirtyBadgeText}`);
 
     // TEST 11: Capture Screenshot 2: Model Routing
-    const modelRoutingPng = path.join(IMAGES_DIR, 'model-routing.png');
+    const modelRoutingPng = path.join(targetImagesDir, 'model-routing.png');
     await page.screenshot({ path: modelRoutingPng, fullPage: false });
-    recordTest(11, 'Captura generada: docs/images/model-routing.png', fs.existsSync(modelRoutingPng) ? 'PASS' : 'FAIL');
+    recordTest(11, `Captura generada: ${shouldCaptureScreenshots ? 'docs/images/' : 'sandbox/'}model-routing.png`, fs.existsSync(modelRoutingPng) ? 'PASS' : 'FAIL');
 
     // TEST 12: Tab [04] Razonamiento contains all 7 effort levels without restriction
     await page.click('button:has-text("RAZONAMIENTO")');
@@ -229,9 +231,9 @@ async function runE2ESuite() {
     recordTest(15, 'Modal de Diff visualiza comparativa en tiempo real', diffContent.length > 0 ? 'PASS' : 'FAIL');
 
     // TEST 16: Capture Screenshot 3: Config Diff Modal
-    const configDiffPng = path.join(IMAGES_DIR, 'config-diff.png');
+    const configDiffPng = path.join(targetImagesDir, 'config-diff.png');
     await page.screenshot({ path: configDiffPng, fullPage: false });
-    recordTest(16, 'Captura generada: docs/images/config-diff.png', fs.existsSync(configDiffPng) ? 'PASS' : 'FAIL');
+    recordTest(16, `Captura generada: ${shouldCaptureScreenshots ? 'docs/images/' : 'sandbox/'}config-diff.png`, fs.existsSync(configDiffPng) ? 'PASS' : 'FAIL');
 
     // Close diff modal
     await page.keyboard.press('Escape');
@@ -244,9 +246,9 @@ async function runE2ESuite() {
     recordTest(17, 'Modal de Diagnósticos muestra integridad del sistema', diagContent.includes('omniRoute') || diagContent.includes('SERVER') || diagContent.includes('status') ? 'PASS' : 'FAIL');
 
     // TEST 18: Capture Screenshot 4: Diagnostics Modal
-    const diagnosticsPng = path.join(IMAGES_DIR, 'diagnostics.png');
+    const diagnosticsPng = path.join(targetImagesDir, 'diagnostics.png');
     await page.screenshot({ path: diagnosticsPng, fullPage: false });
-    recordTest(18, 'Captura generada: docs/images/diagnostics.png', fs.existsSync(diagnosticsPng) ? 'PASS' : 'FAIL');
+    recordTest(18, `Captura generada: ${shouldCaptureScreenshots ? 'docs/images/' : 'sandbox/'}diagnostics.png`, fs.existsSync(diagnosticsPng) ? 'PASS' : 'FAIL');
 
     // Close diagnostics modal
     await page.keyboard.press('Escape');

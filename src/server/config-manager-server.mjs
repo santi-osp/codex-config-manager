@@ -21,10 +21,79 @@ try {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const WEB_DIR = path.resolve(__dirname, '../web');
+const HTML_PATH = path.join(WEB_DIR, 'index.html');
+const ASSETS_DIR = path.resolve(__dirname, '../../assets');
 
 const execAsync = promisify(exec);
 
-// Configurable ports & paths (portable across systems & test sandboxes)
+/**
+ * Carga de forma segura variables de entorno desde un archivo .env si existe.
+ * No sobrescribe variables ya definidas en process.env.
+ */
+export function loadEnvFile(envFilePath = null) {
+  const targetPath = envFilePath || path.resolve(process.cwd(), '.env');
+  if (!fs.existsSync(targetPath)) return {};
+  try {
+    const content = fs.readFileSync(targetPath, 'utf8');
+    const parsed = {};
+    const lines = content.split(/\r?\n/);
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx === -1) continue;
+      const key = trimmed.slice(0, eqIdx).trim();
+      let val = trimmed.slice(eqIdx + 1).trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+      parsed[key] = val;
+      if (process.env[key] === undefined) {
+        process.env[key] = val;
+      }
+    }
+    return parsed;
+  } catch (err) {
+    console.warn('[Server] Error leyendo archivo .env:', err.message);
+    return {};
+  }
+}
+
+// Cargar .env automáticamente al inicio
+loadEnvFile();
+
+/**
+ * Resuelve la configuración y rutas de la aplicación combinando opciones explícitas y variables de entorno.
+ */
+export function resolveConfig(options = {}) {
+  const userHome = process.env.USERPROFILE || process.env.HOME || os.homedir();
+  const appDataRoaming = process.env.APPDATA || path.join(userHome, 'AppData', 'Roaming');
+
+  const port = options.port ?? (process.env.PORT ? parseInt(process.env.PORT, 10) : 20129);
+  const codexDir = options.codexDir ?? process.env.CODEX_DIR ?? path.join(userHome, '.codex');
+  const configPath = options.configPath ?? process.env.CODEX_CONFIG_PATH ?? path.join(codexDir, 'config.toml');
+  const stateDbPath = options.stateDbPath ?? process.env.CODEX_STATE_DB_PATH ?? path.join(codexDir, 'state_5.sqlite');
+  const omniRouteDbPath = options.omniRouteDbPath ?? process.env.OMNIROUTE_DB_PATH ?? path.join(appDataRoaming, 'omniroute', 'storage.sqlite');
+  const omniRouteUrl = options.omniRouteUrl ?? process.env.OMNIROUTE_URL ?? 'http://127.0.0.1:20128';
+  const demoMode = options.demoMode ?? (process.env.DEMO_MODE === 'true' || process.env.DEMO_MODE === '1');
+  const htmlPath = options.htmlPath ?? HTML_PATH;
+  const assetsDir = options.assetsDir ?? ASSETS_DIR;
+
+  return {
+    port,
+    codexDir,
+    configPath,
+    stateDbPath,
+    omniRouteDbPath,
+    omniRouteUrl,
+    demoMode,
+    htmlPath,
+    assetsDir
+  };
+}
+
+// Configurable ports & paths (retrocompatibilidad a nivel de módulo)
 export const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 20129;
 const USER_HOME = process.env.USERPROFILE || process.env.HOME || os.homedir();
 export const CODEX_DIR = process.env.CODEX_DIR || path.join(USER_HOME, '.codex');
@@ -34,14 +103,11 @@ const APPDATA_ROAMING = process.env.APPDATA || path.join(USER_HOME, 'AppData', '
 export const OMNIROUTE_DB_PATH = process.env.OMNIROUTE_DB_PATH || path.join(APPDATA_ROAMING, 'omniroute', 'storage.sqlite');
 export const OMNIROUTE_URL = process.env.OMNIROUTE_URL || 'http://127.0.0.1:20128';
 
-const WEB_DIR = path.resolve(__dirname, '../web');
-const HTML_PATH = path.join(WEB_DIR, 'index.html');
-const ASSETS_DIR = path.resolve(__dirname, '../../assets');
-
 /**
  * Checks whether the current request or runtime environment is in Demo Mode.
  */
-export function isDemoMode(req, url) {
+export function isDemoMode(req, url, instanceDefault = false) {
+  if (instanceDefault) return true;
   if (process.env.DEMO_MODE === 'true' || process.env.DEMO_MODE === '1') return true;
   if (url && (url.searchParams.get('demo') === '1' || url.searchParams.get('demo') === 'true')) return true;
   if (req && (req.headers['x-demo-mode'] === '1' || req.headers['x-demo-mode'] === 'true')) return true;
@@ -291,13 +357,14 @@ export function getSyntheticDemoAccounts() {
  * 2. OmniRoute local sqlite storage
  * Returns null if unavailable; NEVER falls back to hardcoded secrets.
  */
-export function getOmniRouteApiKey() {
+export function getOmniRouteApiKey(dbPath = null) {
   if (process.env.OMNIROUTE_API_KEY) {
     return process.env.OMNIROUTE_API_KEY;
   }
+  const targetDb = dbPath || OMNIROUTE_DB_PATH;
   try {
-    if (DatabaseSync && fs.existsSync(OMNIROUTE_DB_PATH)) {
-      const db = new DatabaseSync(OMNIROUTE_DB_PATH);
+    if (DatabaseSync && fs.existsSync(targetDb)) {
+      const db = new DatabaseSync(targetDb);
       db.exec('PRAGMA busy_timeout = 3000;');
       const row = db.prepare('SELECT key FROM api_keys WHERE is_active = 1 LIMIT 1').get();
       if (row && row.key) return row.key;
@@ -312,13 +379,14 @@ export function getOmniRouteApiKey() {
  * Pure read-only telemetry reader.
  * DOES NOT mutate database records on GET requests.
  */
-export function getOmniRouteAccountsData() {
-  if (!DatabaseSync || !fs.existsSync(OMNIROUTE_DB_PATH)) {
+export function getOmniRouteAccountsData(dbPath = null) {
+  const targetDb = dbPath || OMNIROUTE_DB_PATH;
+  if (!DatabaseSync || !fs.existsSync(targetDb)) {
     return { error: 'OmniRoute database no encontrada', connections: [], combos: [], summary: { total: 0, ready: 0, ignored: 0 } };
   }
 
   try {
-    const db = new DatabaseSync(OMNIROUTE_DB_PATH);
+    const db = new DatabaseSync(targetDb);
     db.exec('PRAGMA busy_timeout = 3000;');
     const rawConns = db.prepare('SELECT * FROM provider_connections').all();
     const rawCbs = db.prepare('SELECT * FROM domain_circuit_breakers').all();
@@ -459,10 +527,23 @@ export function getOmniRouteAccountsData() {
 }
 
 /**
- * Creates and configures the HTTP server instance.
+ * Creates and configures the HTTP server instance with dependency injection support.
  */
-export function createServer() {
-  return http.createServer(async (req, res) => {
+export function createServer(options = {}) {
+  const cfg = resolveConfig(options);
+  const {
+    port,
+    codexDir,
+    configPath,
+    stateDbPath,
+    omniRouteDbPath,
+    omniRouteUrl,
+    demoMode: defaultDemo,
+    htmlPath,
+    assetsDir
+  } = cfg;
+
+  const server = http.createServer(async (req, res) => {
     // 1. Loopback Address Security Check
     const remote = req.socket?.remoteAddress || '';
     const isLoopback = remote === '127.0.0.1' || remote === '::1' || remote === '::ffff:127.0.0.1';
@@ -498,7 +579,7 @@ export function createServer() {
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Vary', 'Origin');
     } else {
-      res.setHeader('Access-Control-Allow-Origin', `http://127.0.0.1:${PORT}`);
+      res.setHeader('Access-Control-Allow-Origin', `http://127.0.0.1:${port}`);
     }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Demo-Mode');
@@ -510,13 +591,13 @@ export function createServer() {
     }
 
     const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-    const demo = isDemoMode(req, url);
+    const demo = isDemoMode(req, url, defaultDemo);
 
     // Static Web UI
     if (url.pathname === '/' || url.pathname === '/index.html') {
-      if (fs.existsSync(HTML_PATH)) {
+      if (fs.existsSync(htmlPath)) {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        fs.createReadStream(HTML_PATH).pipe(res);
+        fs.createReadStream(htmlPath).pipe(res);
         return;
       }
     }
@@ -530,7 +611,7 @@ export function createServer() {
 
     // Static Assets
     if (url.pathname === '/assets/codex-config-icon.png') {
-      const iconPath = path.join(ASSETS_DIR, 'codex-config-icon.png');
+      const iconPath = path.join(assetsDir, 'codex-config-icon.png');
       if (fs.existsSync(iconPath)) {
         res.writeHead(200, { 'Content-Type': 'image/png' });
         fs.createReadStream(iconPath).pipe(res);
@@ -539,7 +620,7 @@ export function createServer() {
     }
 
     if (url.pathname === '/assets/codex-config-icon.ico') {
-      const icoPath = path.join(ASSETS_DIR, 'codex-config-icon.ico');
+      const icoPath = path.join(assetsDir, 'codex-config-icon.ico');
       if (fs.existsSync(icoPath)) {
         res.writeHead(200, { 'Content-Type': 'image/x-icon' });
         fs.createReadStream(icoPath).pipe(res);
@@ -563,20 +644,20 @@ export function createServer() {
           return;
         }
 
-        if (!fs.existsSync(CONFIG_PATH)) {
+        if (!fs.existsSync(configPath)) {
           res.writeHead(404, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'config.toml no encontrado' }));
           return;
         }
-        const content = fs.readFileSync(CONFIG_PATH, 'utf8');
+        const content = fs.readFileSync(configPath, 'utf8');
         const hash = computeHash(content);
-        const stat = fs.statSync(CONFIG_PATH);
+        const stat = fs.statSync(configPath);
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({
           toml: content,
           hash,
-          path: CONFIG_PATH,
+          path: configPath,
           updated: stat.mtime
         }));
       } catch (err) {
@@ -595,7 +676,7 @@ export function createServer() {
           const { toml } = JSON.parse(body || '{}');
           const diskContent = demo
             ? SYNTHETIC_DEMO_CONFIG_TOML
-            : (fs.existsSync(CONFIG_PATH) ? fs.readFileSync(CONFIG_PATH, 'utf8') : '');
+            : (fs.existsSync(configPath) ? fs.readFileSync(configPath, 'utf8') : '');
           const diff = generateDiff(diskContent, toml);
           const check = validateToml(toml);
 
@@ -655,7 +736,7 @@ export function createServer() {
           }
 
           // 2. Collision / External modification check
-          const currentDisk = fs.existsSync(CONFIG_PATH) ? fs.readFileSync(CONFIG_PATH, 'utf8') : '';
+          const currentDisk = fs.existsSync(configPath) ? fs.readFileSync(configPath, 'utf8') : '';
           const currentHash = computeHash(currentDisk);
           if (data.expectedHash && data.expectedHash !== currentHash && !data.forceOverwrite) {
             res.writeHead(409, { 'Content-Type': 'application/json' });
@@ -670,26 +751,26 @@ export function createServer() {
 
           // 3. Backup with auto-pruning (max 10)
           const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-          const backupPath = path.join(CODEX_DIR, `config.toml.backup-${timestamp}`);
-          if (fs.existsSync(CONFIG_PATH)) {
-            fs.copyFileSync(CONFIG_PATH, backupPath);
+          const backupPath = path.join(codexDir, `config.toml.backup-${timestamp}`);
+          if (fs.existsSync(configPath)) {
+            fs.copyFileSync(configPath, backupPath);
           }
           try {
-            const backups = fs.readdirSync(CODEX_DIR)
+            const backups = fs.readdirSync(codexDir)
               .filter(f => f.startsWith('config.toml.backup-'))
-              .map(f => ({ name: f, time: fs.statSync(path.join(CODEX_DIR, f)).mtimeMs }))
+              .map(f => ({ name: f, time: fs.statSync(path.join(codexDir, f)).mtimeMs }))
               .sort((a,b) => b.time - a.time);
             if (backups.length > 10) {
               backups.slice(10).forEach(b => {
-                try { fs.unlinkSync(path.join(CODEX_DIR, b.name)); } catch (e) {}
+                try { fs.unlinkSync(path.join(codexDir, b.name)); } catch (e) {}
               });
             }
           } catch (e) {}
 
           // 4. Atomic write (.tmp -> renameSync)
-          const tmpConfigPath = path.join(CODEX_DIR, `config.toml.tmp-${Date.now()}`);
+          const tmpConfigPath = path.join(codexDir, `config.toml.tmp-${Date.now()}`);
           fs.writeFileSync(tmpConfigPath, data.toml, 'utf8');
-          fs.renameSync(tmpConfigPath, CONFIG_PATH);
+          fs.renameSync(tmpConfigPath, configPath);
           const newHash = computeHash(data.toml);
 
           // 5. Sync active threads in SQLite state_5 if present
@@ -697,9 +778,9 @@ export function createServer() {
           const activeProvider = validation.data?.model_provider || 'omniroute';
           let threadsUpdated = 0;
 
-          if (DatabaseSync && activeModel && fs.existsSync(STATE_DB_PATH)) {
+          if (DatabaseSync && activeModel && fs.existsSync(stateDbPath)) {
             try {
-              const db = new DatabaseSync(STATE_DB_PATH);
+              const db = new DatabaseSync(stateDbPath);
               db.exec('PRAGMA busy_timeout = 5000;');
               const latest = db.prepare('SELECT id FROM threads ORDER BY updated_at_ms DESC LIMIT 1').get();
               if (latest && latest.id) {
@@ -717,7 +798,7 @@ export function createServer() {
           let daemonRestart = null;
           if (data.restartDaemon) {
             try {
-              const daemonExe = path.join(CODEX_DIR, 'packages', 'app-server-daemon', 'current', 'bin', 'codex.exe');
+              const daemonExe = path.join(codexDir, 'packages', 'app-server-daemon', 'current', 'bin', 'codex.exe');
               if (fs.existsSync(daemonExe)) {
                 await execAsync(`"${daemonExe}" app-server daemon stop`).catch(() => {});
                 daemonRestart = 'Daemon reciclado ordenadamente';
@@ -748,7 +829,7 @@ export function createServer() {
     // GET /api/config/backups: List available backups
     if (url.pathname === '/api/config/backups' && req.method === 'GET') {
       try {
-        if (demo || !fs.existsSync(CODEX_DIR)) {
+        if (demo || !fs.existsSync(codexDir)) {
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({
             backups: [
@@ -758,10 +839,10 @@ export function createServer() {
           return;
         }
 
-        const backups = fs.readdirSync(CODEX_DIR)
+        const backups = fs.readdirSync(codexDir)
           .filter(f => f.startsWith('config.toml.backup-'))
           .map(f => {
-            const stat = fs.statSync(path.join(CODEX_DIR, f));
+            const stat = fs.statSync(path.join(codexDir, f));
             return { name: f, time: stat.mtime, size: stat.size };
           })
           .sort((a,b) => new Date(b.time) - new Date(a.time));
@@ -792,7 +873,7 @@ export function createServer() {
             return;
           }
 
-          const targetBackup = path.join(CODEX_DIR, path.basename(backupName || ''));
+          const targetBackup = path.join(codexDir, path.basename(backupName || ''));
           if (!fs.existsSync(targetBackup)) {
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Archivo de backup no encontrado' }));
@@ -807,9 +888,9 @@ export function createServer() {
             return;
           }
 
-          const tmpPath = path.join(CODEX_DIR, `config.toml.tmp-${Date.now()}`);
+          const tmpPath = path.join(codexDir, `config.toml.tmp-${Date.now()}`);
           fs.writeFileSync(tmpPath, backupContent, 'utf8');
-          fs.renameSync(tmpPath, CONFIG_PATH);
+          fs.renameSync(tmpPath, configPath);
 
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({
@@ -842,9 +923,9 @@ export function createServer() {
       }
 
       try {
-        const apiKey = getOmniRouteApiKey();
+        const apiKey = getOmniRouteApiKey(omniRouteDbPath);
         const headers = apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {};
-        const omniRes = await fetch(`${OMNIROUTE_URL}/models`, {
+        const omniRes = await fetch(`${omniRouteUrl}/models`, {
           headers,
           signal: AbortSignal.timeout(5000)
         });
@@ -858,7 +939,7 @@ export function createServer() {
         }
       } catch (err) {
         res.writeHead(502, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: `OmniRoute no disponible en ${OMNIROUTE_URL}: ${err.message}` }));
+        res.end(JSON.stringify({ error: `OmniRoute no disponible en ${omniRouteUrl}: ${err.message}` }));
       }
       return;
     }
@@ -866,7 +947,7 @@ export function createServer() {
     // GET /api/omniroute/accounts: Live accounts & combos telemetry
     if (url.pathname === '/api/omniroute/accounts' && req.method === 'GET') {
       try {
-        const data = demo ? getSyntheticDemoAccounts() : getOmniRouteAccountsData();
+        const data = demo ? getSyntheticDemoAccounts() : getOmniRouteAccountsData(omniRouteDbPath);
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify(data));
       } catch (err) {
@@ -890,18 +971,18 @@ export function createServer() {
       }
 
       try {
-        const apiKey = getOmniRouteApiKey();
+        const apiKey = getOmniRouteApiKey(omniRouteDbPath);
         const headers = { 'Content-Type': 'application/json' };
         if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-        const omniRes = await fetch(`${OMNIROUTE_URL}/api/providers/test-batch`, {
+        const omniRes = await fetch(`${omniRouteUrl}/api/providers/test-batch`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ mode: 'all' })
         });
 
         const batchResult = await omniRes.json().catch(() => ({}));
-        const updatedData = getOmniRouteAccountsData();
+        const updatedData = getOmniRouteAccountsData(omniRouteDbPath);
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({
@@ -941,17 +1022,17 @@ export function createServer() {
             return;
           }
 
-          const apiKey = getOmniRouteApiKey();
+          const apiKey = getOmniRouteApiKey(omniRouteDbPath);
           const headers = {};
           if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-          const omniRes = await fetch(`${OMNIROUTE_URL}/api/providers/${connectionId}/test`, {
+          const omniRes = await fetch(`${omniRouteUrl}/api/providers/${connectionId}/test`, {
             method: 'POST',
             headers
           });
 
           const testResult = await omniRes.json().catch(() => ({}));
-          const updatedData = getOmniRouteAccountsData();
+          const updatedData = getOmniRouteAccountsData(omniRouteDbPath);
 
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({
@@ -991,25 +1072,25 @@ export function createServer() {
             return;
           }
 
-          const apiKey = getOmniRouteApiKey();
+          const apiKey = getOmniRouteApiKey(omniRouteDbPath);
           const headers = { 'Content-Type': 'application/json' };
           if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-          const omniRes = await fetch(`${OMNIROUTE_URL}/api/providers/${connectionId}`, {
+          const omniRes = await fetch(`${omniRouteUrl}/api/providers/${connectionId}`, {
             method: 'PUT',
             headers,
             body: JSON.stringify({ rateLimitedUntil: null })
           });
 
           try {
-            if (DatabaseSync && fs.existsSync(OMNIROUTE_DB_PATH)) {
-              const db = new DatabaseSync(OMNIROUTE_DB_PATH);
+            if (DatabaseSync && fs.existsSync(omniRouteDbPath)) {
+              const db = new DatabaseSync(omniRouteDbPath);
               db.exec('PRAGMA busy_timeout = 3000;');
               db.prepare("UPDATE domain_circuit_breakers SET state = 'CLOSED', failure_count = 0 WHERE name LIKE ?").run(`%${connectionId}%`);
             }
           } catch (dbErr) {}
 
-          const updatedData = getOmniRouteAccountsData();
+          const updatedData = getOmniRouteAccountsData(omniRouteDbPath);
 
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({
@@ -1038,13 +1119,13 @@ export function createServer() {
       }
 
       try {
-        if (DatabaseSync && fs.existsSync(OMNIROUTE_DB_PATH)) {
-          const db = new DatabaseSync(OMNIROUTE_DB_PATH);
+        if (DatabaseSync && fs.existsSync(omniRouteDbPath)) {
+          const db = new DatabaseSync(omniRouteDbPath);
           db.exec('PRAGMA busy_timeout = 5000;');
           db.prepare("UPDATE domain_circuit_breakers SET state = 'CLOSED', failure_count = 0").run();
           db.prepare("UPDATE provider_connections SET rate_limited_until = NULL WHERE rate_limited_until IS NOT NULL").run();
         }
-        const updatedData = getOmniRouteAccountsData();
+        const updatedData = getOmniRouteAccountsData(omniRouteDbPath);
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({
           success: true,
@@ -1080,8 +1161,8 @@ export function createServer() {
             return;
           }
 
-          if (DatabaseSync && fs.existsSync(STATE_DB_PATH)) {
-            const db = new DatabaseSync(STATE_DB_PATH);
+          if (DatabaseSync && fs.existsSync(stateDbPath)) {
+            const db = new DatabaseSync(stateDbPath);
             db.exec('PRAGMA busy_timeout = 5000;');
             const r = db.prepare('UPDATE threads SET model = ?, model_provider = ? WHERE archived = 0').run(targetModel, targetProvider);
             updatedCount = r.changes;
@@ -1133,7 +1214,7 @@ export function createServer() {
         await new Promise(r => setTimeout(r, 600));
 
         try {
-          const daemonExe = path.join(CODEX_DIR, 'packages', 'app-server-daemon', 'current', 'bin', 'codex.exe');
+          const daemonExe = path.join(codexDir, 'packages', 'app-server-daemon', 'current', 'bin', 'codex.exe');
           if (fs.existsSync(daemonExe)) {
             await execAsync(`"${daemonExe}" app-server daemon stop`).catch(() => {});
           }
@@ -1161,9 +1242,9 @@ export function createServer() {
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({
             timestamp: new Date().toISOString(),
-            serverPort: PORT,
+            serverPort: port,
             demoMode: true,
-            omniRoute: { url: OMNIROUTE_URL, status: 'MOCK_ONLINE', online: true },
+            omniRoute: { url: omniRouteUrl, status: 'MOCK_ONLINE', online: true },
             configToml: { size: SYNTHETIC_DEMO_CONFIG_TOML.length, mtime: new Date().toISOString(), hash: computeHash(SYNTHETIC_DEMO_CONFIG_TOML) },
             accountsSummary: { total: 4, ready: 2, ignored: 2 },
             combosAvailable: ['coding-con-caro', 'codex-auto-review']
@@ -1174,7 +1255,7 @@ export function createServer() {
         let omniOnline = false;
         let omniStatusText = 'OFFLINE';
         try {
-          const ping = await fetch(`${OMNIROUTE_URL}/health`, { signal: AbortSignal.timeout(2000) }).catch(() => null);
+          const ping = await fetch(`${omniRouteUrl}/health`, { signal: AbortSignal.timeout(2000) }).catch(() => null);
           if (ping && ping.ok) {
             omniOnline = true;
             omniStatusText = 'HEALTHY';
@@ -1182,19 +1263,19 @@ export function createServer() {
         } catch (e) {}
 
         let configStat = null;
-        if (fs.existsSync(CONFIG_PATH)) {
-          const s = fs.statSync(CONFIG_PATH);
-          configStat = { size: s.size, mtime: s.mtime, hash: computeHash(fs.readFileSync(CONFIG_PATH, 'utf8')) };
+        if (fs.existsSync(configPath)) {
+          const s = fs.statSync(configPath);
+          configStat = { size: s.size, mtime: s.mtime, hash: computeHash(fs.readFileSync(configPath, 'utf8')) };
         }
 
-        const accData = getOmniRouteAccountsData();
+        const accData = getOmniRouteAccountsData(omniRouteDbPath);
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({
           timestamp: new Date().toISOString(),
-          serverPort: PORT,
+          serverPort: port,
           demoMode: false,
-          omniRoute: { url: OMNIROUTE_URL, status: omniStatusText, online: omniOnline },
+          omniRoute: { url: omniRouteUrl, status: omniStatusText, online: omniOnline },
           configToml: configStat,
           accountsSummary: accData.summary,
           combosAvailable: (accData.combos || []).map(c => c.name)
@@ -1209,25 +1290,30 @@ export function createServer() {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Ruta no encontrada' }));
   });
+
+  server.config = cfg;
+  return server;
 }
 
 // Start listener if executed directly as main script
 const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
 
 if (isDirectRun) {
+  loadEnvFile();
   const server = createServer();
+  const activePort = server.config?.port || PORT;
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.log(`[Server] Puerto ${PORT} ya está ocupado por otra instancia activa. Saliendo limpiamente.`);
+      console.log(`[Server] Puerto ${activePort} ya está ocupado por otra instancia activa. Saliendo limpiamente.`);
       process.exit(0);
     } else {
       console.error('[Server] Error en servidor HTTP:', err);
     }
   });
 
-  server.listen(PORT, '127.0.0.1', () => {
-    console.log(`Codex Config Server escuchando en http://127.0.0.1:${PORT}`);
-    if (process.env.DEMO_MODE === 'true' || process.env.DEMO_MODE === '1') {
+  server.listen(activePort, '127.0.0.1', () => {
+    console.log(`Codex Config Server escuchando en http://127.0.0.1:${activePort}`);
+    if (server.config?.demoMode) {
       console.log(`[Server] DEMO MODE ACTIVO: Servidor operando con datos sintéticos seguros.`);
     }
   });

@@ -5,6 +5,7 @@ import {
   computeHash,
   validateToml,
   formatTomlValue,
+  extractTrailingComment,
   updateFieldInToml,
   applyBatchUpdates,
   generateDiff
@@ -157,6 +158,74 @@ async function runTests() {
   const h2 = computeHash(updated1);
   assert('SHA256 consistente para el mismo archivo', computeHash(sampleToml) === h1);
   assert('SHA256 cambia cuando el contenido varía', h1 !== h2);
+
+  // TEST 9: Helper extractTrailingComment analiza correctamente los comentarios
+  assert('Detecta comentario estándar tras valor', extractTrailingComment(' "val" # my comment') === ' # my comment');
+  assert('Preserva múltiples espacios previos al comentario', extractTrailingComment(' true   # keep alive') === '   # keep alive');
+  assert('Preserva comillas dentro de comentario', extractTrailingComment(' "test" # don\'t touch') === ' # don\'t touch');
+  assert('Ignora almohadilla # dentro de cadena entre comillas dobles', extractTrailingComment(' "http://example.com/#anchor"') === '');
+  assert('Ignora almohadilla # dentro de comillas simples', extractTrailingComment(" 'val#anchor'") === '');
+  assert('Maneja comillas escapadas antes del comentario', extractTrailingComment(' "some \\" quote" # comment') === ' # comment');
+  assert('Retorna cadena vacía cuando no hay comentario', extractTrailingComment(' 42') === '');
+
+  // TEST 10: Preservación quirúrgica de comentarios en línea al modificar claves
+  const tomlWithComments = [
+    '# Top header',
+    'model = "coding-con-caro" # modelo preferido de produccion',
+    'model_provider = "omniroute"',
+    '',
+    '[windows]',
+    'sandbox = "disabled"   # aislamiento nativo de windows',
+    'elevated = true'
+  ].join('\n');
+
+  const updatedComments1 = updateFieldInToml(tomlWithComments, '', 'model', 'o3-mini');
+  assert('Comentario en línea en clave raíz preservado exactamente',
+    updatedComments1.includes('model = "o3-mini" # modelo preferido de produccion'));
+
+  const updatedComments2 = updateFieldInToml(updatedComments1, 'windows', 'sandbox', 'elevated');
+  assert('Comentario en línea dentro de sección [windows] preservado con espacios',
+    updatedComments2.includes('sandbox = "elevated"   # aislamiento nativo de windows'));
+
+  // TEST 11: Preservación de saltos de línea Windows (CRLF) vs Linux (LF)
+  const crlfToml = 'model = "old"\r\nmodel_provider = "omniroute"\r\n';
+  const updatedCrlf = updateFieldInToml(crlfToml, '', 'model', 'new');
+  assert('Entrada con CRLF preserva CRLF al actualizar', updatedCrlf === 'model = "new"\r\nmodel_provider = "omniroute"\r\n');
+  assert('No contiene saltos LF aislados sin retorno de carro', !/[^\r]\n/.test(updatedCrlf));
+
+  const lfToml = 'model = "old"\nmodel_provider = "omniroute"\n';
+  const updatedLf = updateFieldInToml(lfToml, '', 'model', 'new');
+  assert('Entrada con LF preserva LF al actualizar', updatedLf === 'model = "new"\nmodel_provider = "omniroute"\n');
+
+  // TEST 12: Fidelidad de 0 bytes modificados en líneas no tocadas
+  const multiSectionToml = [
+    '# Comentario inicial de 6 líneas',
+    '# con varias descripciones técnicas',
+    'model = "alpha"',
+    'model_provider = "omniroute"',
+    '',
+    '[features]',
+    'fast_mode = true',
+    'multi_agent = false',
+    '',
+    '[desktop]',
+    'theme = "monochrome"',
+    ''
+  ].join('\n');
+
+  const afterSingleEdit = updateFieldInToml(multiSectionToml, 'features', 'multi_agent', true);
+  const origLines = multiSectionToml.split('\n');
+  const newLines = afterSingleEdit.split('\n');
+  assert('Misma cantidad de líneas al editar una clave existente', origLines.length === newLines.length);
+
+  let differentLineCount = 0;
+  for (let i = 0; i < origLines.length; i++) {
+    if (origLines[i] !== newLines[i]) {
+      differentLineCount++;
+      assert(`Línea modificada es la esperada: ${newLines[i]}`, newLines[i] === 'multi_agent = true');
+    }
+  }
+  assert('Exactamente una línea cambió en todo el documento (0 alteraciones colaterales)', differentLineCount === 1);
 
   console.log(`\n=== RESULTADOS TOML ENGINE: ${passed} PASSED / ${failed} FAILED ===`);
   if (failed > 0) process.exit(1);

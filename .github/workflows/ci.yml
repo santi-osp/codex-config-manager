@@ -33,3 +33,12 @@ jobs:
 
       - name: Run Security & Hardening Suite
         run: npm run test:security
+
+      - name: Run Real Disk Persistence E2E Tests
+        run: npm run test:disk
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
+      - name: Run Playwright UI E2E Tests
+        run: npm run test:e2e

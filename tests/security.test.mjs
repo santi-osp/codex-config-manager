@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
-import { createServer } from '../src/server/config-manager-server.mjs';
+import { createServer, loadEnvFile, resolveConfig } from '../src/server/config-manager-server.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -133,6 +133,36 @@ async function runSecurityTests() {
     const htmlText = await htmlRes.text();
     assert('Served index.html does not contain hardcoded user path', !htmlText.includes('C:\\Users\\santi'));
     assert('Served index.html defines updateRawPreview', htmlText.includes('function updateRawPreview'));
+
+    // TEST 11: loadEnvFile safely parses env variables and respects existing process.env
+    const tempEnvPath = path.resolve(__dirname, '.temp.env');
+    fs.writeFileSync(tempEnvPath, 'TEST_ENV_KEY="test_val_123"\n# Comment line\nALREADY_SET="should_not_overwrite"\n', 'utf8');
+    process.env.ALREADY_SET = 'original_value';
+    const parsedEnv = loadEnvFile(tempEnvPath);
+    try {
+      assert('loadEnvFile parses variables from file', parsedEnv.TEST_ENV_KEY === 'test_val_123');
+      assert('loadEnvFile does not overwrite existing process.env', process.env.ALREADY_SET === 'original_value');
+    } finally {
+      try { fs.unlinkSync(tempEnvPath); } catch (e) {}
+      delete process.env.TEST_ENV_KEY;
+      delete process.env.ALREADY_SET;
+    }
+
+    // TEST 12: Dependency injection in resolveConfig & createServer overrides process defaults
+    const customConfig = resolveConfig({
+      port: 29999,
+      codexDir: 'C:\\custom\\codex',
+      configPath: 'C:\\custom\\codex\\custom-config.toml',
+      demoMode: true
+    });
+    assert('resolveConfig honors custom port injection', customConfig.port === 29999);
+    assert('resolveConfig honors custom codexDir injection', customConfig.codexDir === 'C:\\custom\\codex');
+    assert('resolveConfig honors custom configPath injection', customConfig.configPath === 'C:\\custom\\codex\\custom-config.toml');
+    assert('resolveConfig honors custom demoMode injection', customConfig.demoMode === true);
+
+    const customServer = createServer({ port: 29998, demoMode: true });
+    assert('createServer attaches resolved config to instance', customServer.config?.port === 29998);
+    assert('createServer config instance demoMode is true', customServer.config?.demoMode === true);
 
   } finally {
     if (typeof testServer.closeAllConnections === 'function') {
