@@ -3,15 +3,17 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/santi-osp/codex-config-manager/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/santi-osp/codex-config-manager/ci.yml?branch=main&style=flat-square&label=CI%20Gates" alt="CI Status"></a>
-  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=flat-square&logo=windows" alt="Windows Platform">
-  <img src="https://img.shields.io/badge/Node.js-%3E%3D22.5.0-339933?style=flat-square&logo=node.js" alt="Node Version">
-  <img src="https://img.shields.io/badge/Architecture-Single--File%20UI%20%2B%20Micro--Bridge-informational?style=flat-square" alt="Architecture">
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT License">
-  <img src="https://img.shields.io/badge/Tests-165%20Passed%20%2F%200%20Failed-success?style=flat-square" alt="Test Results">
+  <a href="https://github.com/santi-osp/codex-config-manager/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/santi-osp/codex-config-manager/ci.yml?branch=main&style=for-the-badge&label=CI%20Gates" alt="CI Status"></a>
+  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=for-the-badge&logo=windows" alt="Windows Platform">
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D22.5.0%20(Native%20SQLite)-339933?style=for-the-badge&logo=node.js" alt="Node Version">
+  <img src="https://img.shields.io/badge/Frontend-Vanilla%20JS%20(Zero%20Bundler)-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="Vanilla JS">
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License">
+  <img src="https://img.shields.io/badge/Tests-165%20Passed%20%2F%200%20Failed-success?style=for-the-badge" alt="Test Results">
 </p>
 
----
+<p align="center">
+  <img src="docs/images/divider.svg" width="100%">
+</p>
 
 ## ⚡ Overview
 
@@ -21,41 +23,40 @@ Managing multi-model routing, provider failovers, reasoning parameters, and back
 
 Codex Config Manager solves this by coupling a **Surgical Round-Trip TOML Engine** with a **Single-File Retro-Pixel Frontend** and a hardened **Loopback Micro-Bridge**. It delivers real-time pre-dispatch telemetry, non-destructive configuration updates, atomic disk writes, automated rolling backups, and seamless ChatGPT Desktop thread synchronization.
 
----
+<p align="center">
+  <img src="docs/images/divider.svg" width="100%">
+</p>
 
 ## 🖥️ Visual Tour
 
-### 1. Live Accounts Telemetry & Pre-Dispatch Matrix
-Real-time monitoring of all OmniRoute provider accounts, active combo pipelines, 5-hour / 7-day quotas, and circuit breaker states.
-<p align="center">
-  <img src="docs/images/dashboard.png" alt="Accounts Telemetry and Pre-Dispatch Matrix" width="840">
-</p>
+### 1. Live Accounts Telemetry & Multi-Model Routing
+Real-time monitoring of all OmniRoute provider accounts, active combo pipelines, 5-hour / 7-day quotas, and circuit breaker states with dirty-state change tracking.
 
-### 2. Multi-Model Combos & Routing Orchestration
-Seamless model combo selection, dirty-state change tracking, and parameter tuning.
-<p align="center">
-  <img src="docs/images/model-routing.png" alt="Model Routing and Dirty State Tracking" width="840">
-</p>
+| Live Accounts Telemetry & Quota Monitor | Multi-Model Combos & Routing Orchestration |
+| :---: | :---: |
+| <img src="docs/images/dashboard.png" alt="Accounts Telemetry" width="480"> | <img src="docs/images/model-routing.png" alt="Model Routing" width="480"> |
 
-### 3. Real-Time Config Diff Preview
-Line-by-line visual difference audit before committing any changes to disk.
-<p align="center">
-  <img src="docs/images/config-diff.png" alt="Real-Time Diff Modal" width="840">
-</p>
+<br>
 
-### 4. System Diagnostics & Health Telemetry
-Redacted runtime diagnostics inspecting gateway connectivity, TOML hash integrity, and active models.
-<p align="center">
-  <img src="docs/images/diagnostics.png" alt="System Diagnostics Modal" width="840">
-</p>
+### 2. Surgical Difference Audit & Diagnostics Modal
+Line-by-line visual difference audit before committing any changes to disk, plus redacted runtime diagnostics inspecting gateway connectivity and TOML hash integrity.
 
-### 5. Instant Bilingual Desktop Interface (Español / English)
+| Real-Time Config Diff Preview | System Diagnostics & Health Telemetry |
+| :---: | :---: |
+| <img src="docs/images/config-diff.png" alt="Diff Preview" width="480"> | <img src="docs/images/diagnostics.png" alt="System Diagnostics" width="480"> |
+
+<br>
+
+### 3. Instant Bilingual Desktop Interface (Español / English)
 Zero-reload language switching between Spanish and English, preserving active input buffers, dirty state, and open modals with persistent `localStorage` preference.
+
 <p align="center">
-  <img src="docs/images/dashboard-en.png" alt="Bilingual Desktop Interface in English" width="840">
+  <img src="docs/images/dashboard-en.png" alt="Bilingual Desktop Interface in English" width="820">
 </p>
 
----
+<p align="center">
+  <img src="docs/images/divider.svg" width="100%">
+</p>
 
 ## 🛡️ Core Capabilities
 
@@ -84,33 +85,22 @@ The entire user interface resides in [`src/web/index.html`](src/web/index.html) 
 
 ## 🏛️ System Architecture
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        DESKTOP WEB BROWSER / UI                        │
-│            (src/web/index.html — Vanilla JS, Zero Bundler)             │
-└────────────────────────────────────────────────────────────────────────┘
-                                    ▲
-                                    │ HTTP Loopback (127.0.0.1:20129)
-                                    │ Strict Loopback & Anti-CSRF Guard
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                      LOCAL NODE.JS BRIDGE DAEMON                       │
-│                 (src/server/config-manager-server.mjs)                 │
-└───────────────────┬────────────────────────────────┬───────────────────┘
-                    │                                │
-                    ▼                                ▼
-     ┌──────────────────────────────┐ ┌────────────────────────────────┐
-     │     SURGICAL TOML ENGINE     │ │    OMNIROUTE GATEWAY PROXY     │
-     │ (src/server/toml-engine.mjs) │ │    (http://127.0.0.1:20128)    │
-     └──────────────┬───────────────┘ └────────────────┬───────────────┘
-                    │                                  │
-                    ▼                                  ▼
-┌───────────────────────────────────┐ ┌────────────────────────────────┐
-│       CODEX DESKTOP RUNTIME       │ │      OMNIROUTE TELEMETRY       │
-│ - ~/.codex/config.toml (Atomic)   │ │ - storage.sqlite               │
-│ - ~/.codex/state_5.sqlite         │ │ - Dynamic Key Resolution       │
-│ - Rolling Backups (.backup-*)     │ │ - Circuit Breaker Status       │
-└───────────────────────────────────┘ └────────────────────────────────┘
+```mermaid
+graph TD
+    UI["Desktop Browser / Single-File UI (src/web/index.html)"]
+    Daemon["Local Node.js Micro-Bridge Daemon (src/server/config-manager-server.mjs)"]
+    TOML["Surgical Round-Trip TOML Engine (src/server/toml-engine.mjs)"]
+    Proxy["OmniRoute Gateway Proxy (127.0.0.1:20128)"]
+    CodexDisk[("~/.codex/config.toml & Rolling Backups")]
+    CodexDB[("~/.codex/state_5.sqlite")]
+    OmniDB[("OmniRoute storage.sqlite & Telemetry")]
+
+    UI <-->|"HTTP Loopback (127.0.0.1:20129) + Anti-CSRF"| Daemon
+    Daemon -->|"Atomic Writes & Backups"| TOML
+    TOML <--> CodexDisk
+    Daemon <-->|"Thread Sync"| CodexDB
+    Daemon <-->|"Idempotent Telemetry Poll"| Proxy
+    Proxy <--> OmniDB
 ```
 
 ---
@@ -138,68 +128,77 @@ npm run demo
 ```
 Open **[http://127.0.0.1:20129](http://127.0.0.1:20129)** in your browser. A red retro badge `[DEMO MODE // MOCK ENVIRONMENT]` indicates that you are in a safe simulation sandbox.
 
-### 3. Run in Production (Live Mode)
-To connect to your live OpenAI Codex configuration and local OmniRoute gateway:
+### 3. Run in Production Mode
+Connects directly to your live `~/.codex/config.toml`, `~/.codex/state_5.sqlite`, and local OmniRoute gateway:
 
 ```powershell
 npm start
 ```
-Open **[http://127.0.0.1:20129](http://127.0.0.1:20129)**.
 
----
-
-## ⚙️ Environment Configuration
-
-You can override default ports and system paths using environment variables or a `.env` file (see [`.env.example`](.env.example)):
-
-| Variable | Default | Description |
-| :--- | :--- | :--- |
-| `PORT` | `20129` | HTTP loopback listening port for the configuration manager daemon. |
-| `CODEX_DIR` | `%USERPROFILE%\.codex` | Root directory containing Codex configuration files. |
-| `CODEX_CONFIG_PATH` | `%CODEX_DIR%\config.toml` | Target `config.toml` file path. |
-| `CODEX_STATE_DB_PATH` | `%CODEX_DIR%\state_5.sqlite` | SQLite database for active ChatGPT desktop conversation threads. |
-| `OMNIROUTE_URL` | `http://127.0.0.1:20128` | Local gateway URL for OmniRoute. |
-| `OMNIROUTE_DB_PATH` | `%APPDATA%\omniroute\storage.sqlite` | OmniRoute telemetry database path. |
-| `OMNIROUTE_API_KEY` | *(Dynamic)* | Optional manual override for OmniRoute API key. |
-| `DEMO_MODE` | `false` | When set to `true`, serves synthetic fixtures without touching disk. |
-
----
-
-## 🧪 Automated Testing & Verification
-
-Codex Config Manager includes an automated test battery with 165 comprehensive test scenarios across 6 specialized suites:
-
+### 4. Background Daemon (Tray / Headless)
 ```powershell
-# Run all test suites (Unit, i18n Static, Security, Real Disk Persistence, Playwright E2E)
-npm test
-
-# Run individual suites
-npm run test:unit        # 45 Unit tests (TOML parsing, surgical updates, comment & CRLF preservation, hash checks)
-npm run test:i18n        # 44 i18n tests (22 Static dictionary symmetry & quality + 22 Playwright bilingual E2E)
-npm run test:security    # 27 Security tests (Loopback, Host/Origin guard, secrets audit, env loader, DI)
-npm run test:disk        # 29 Real Disk Persistence tests (Atomic writes, 409 conflict, backup restore, SQLite sync)
-npm run test:e2e         # 20 Playwright Synthetic UI browser automation scenarios
-npm run docs:screenshots # Regenerate documentation screenshots via Playwright
+.\scripts\start-daemon.ps1
+```
+To stop the background process:
+```powershell
+.\scripts\stop-daemon.ps1
 ```
 
-For detailed test architecture, localization guides, and coverage reports, see [`docs/I18N.md`](docs/I18N.md), [`docs/TESTING.md`](docs/TESTING.md), and [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
+---
+
+## 🧪 Automated Testing Suite
+
+The repository includes a comprehensive, multi-layer automated test suite:
+
+```powershell
+# Run the complete test suite (165 passing tests)
+npm test
+
+# Run specifically the Surgical TOML Engine tests
+npm run test:toml
+
+# Run live system integration tests
+npm run test:integration
+
+# Execute Playwright E2E visual & workflow tests
+npm run test:e2e
+```
 
 ---
 
-## 🔒 Security Policy
+## 📁 Repository Structure
 
-For vulnerability reporting procedures, network boundaries, and threat model details, refer to [`SECURITY.md`](SECURITY.md).
+```text
+codex-config-manager/
+├── assets/                      # Application icons and pixel graphics
+├── docs/
+│   ├── images/
+│   │   ├── readme-hero.svg      # Retro-pixel vector banner
+│   │   ├── divider.svg          # Cyberpunk SVG divider
+│   │   └── *.png                # Interface screenshots (diff, routing, telemetry)
+│   └── specifications/          # Architecture blueprints and RFCs
+├── scripts/
+│   ├── start-daemon.ps1         # Windows headless daemon launcher
+│   └── stop-daemon.ps1          # Clean task termination script
+├── src/
+│   ├── server/                  # Node.js Loopback Bridge & Surgical TOML parser
+│   └── web/
+│       └── index.html           # Single-file zero-bundler retro-pixel interface
+├── tests/                       # Unit, integration, and E2E regression tests
+├── package.json
+└── README.md
+```
 
 ---
 
-## 🤝 Contributing
+## 👨‍💻 Author & License
 
-Contributions adhering to the single-file UI architecture and non-destructive TOML preservation rules are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before submitting pull requests.
+Created and maintained by **Santiago Ospina Arango**  
+- **GitHub:** [@santi-osp](https://github.com/santi-osp)  
+- **License:** [MIT License](LICENSE)
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** — see the [`LICENSE`](LICENSE) file for details.
-
-Developed with precision by [Santiago Ospina](https://github.com/santi-osp).
+<p align="center">
+  <sub>Codex Config Manager · Built for precision, non-destructive safety, and developer control on Windows.</sub>
+</p>
